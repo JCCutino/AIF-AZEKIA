@@ -1,0 +1,37 @@
+
+    body {
+      font-family: Helvetica, Arial, sans-serif; 
+    }
+    
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      tr:hover {
+        background-color: #f2f2f2;
+      }
+      .navbar {
+        overflow: hidden;
+        background-color: #ededf0;
+       text-align: center;
+       width: 800px;
+       margin: 0 auto; /* Centrar horizontalmente */
+       margin-top: 60px;
+       border-radius: 5px;
+      }
+      .navbar a {
+        display: inline-block; ;
+        color: black;
+        text-align: center;
+        padding: 14px 20px;
+        text-decoration: none;
+      }
+      .navbar a:hover {
+        background-color: #c5c0c0;
+      }
