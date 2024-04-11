@@ -48,6 +48,27 @@ class LibEmpresas {
             }
         });
     }
+
+     eliminarEmpresa(empresaCod) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'DELETE FROM Empresa WHERE empresaCod = ?';
+                connection.query(query, [empresaCod], (err, resultado) => {
+                    connection.end();
+                    if (err) {
+                        console.error('Error al eliminar empresa:', err);
+                        reject('Error al eliminar empresa');
+                    } else {
+                        resolve(resultado);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
     
 
     

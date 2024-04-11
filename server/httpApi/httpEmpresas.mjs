@@ -20,7 +20,7 @@ class HttpEmpresas {
         }
     }
 
-    async  postAnadirEmpresa(req, res) {
+    async  postAgregarEmpresa(req, res) {
         try {
             const empresa = req.body.empresa;
             const resultado = await libEmpresas.agregarEmpresa(empresa);
@@ -30,7 +30,17 @@ class HttpEmpresas {
             throw err; 
         }
     }
-    
+
+    async  postEliminarEmpresa(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const empresas = await libEmpresas.eliminarEmpresa(empresaCod);
+            return {empresas};
+        } catch (err) {
+            console.error('Error al obtener las empresas:', err);
+            throw err; 
+        }
+    }
 
 }
 
