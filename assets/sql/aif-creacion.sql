@@ -70,11 +70,11 @@ CREATE TABLE Serie (
 CREATE TABLE FacturaVenta (
     empresaCod VARCHAR(20),
     serieCod VARCHAR(10),
-    facturaVentaNum INTEGER,
+    facturaVentaNum INTEGER PRIMARY KEY,
     bloqueada BOOLEAN,
     clienteCod VARCHAR(20),
     fechaEmision DATE,
-    PRIMARY KEY (empresaCod, serieCod, facturaVentaNum),
+   -- PRIMARY KEY (empresaCod, serieCod, facturaVentaNum),
     FOREIGN KEY (empresaCod) REFERENCES Empresa(empresaCod),
     FOREIGN KEY (serieCod) REFERENCES Serie(serieCod),
     FOREIGN KEY (clienteCod) REFERENCES Cliente(clienteCod)
