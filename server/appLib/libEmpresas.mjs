@@ -106,9 +106,6 @@ class LibEmpresas {
             }
         });
     }
-    
-
-    
 }
 
 export const libEmpresas = new LibEmpresas();
