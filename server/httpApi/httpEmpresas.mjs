@@ -8,6 +8,29 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpEmpresas {
 
+    async  postObtenerEmpresas(req, res) {
+        try {
+            const pagina = req.body.pagina;
+            const resultadosTotales = req.body.resultadosTotales
+            const empresas = await libEmpresas.obtenerEmpresas(pagina, resultadosTotales);
+            return {empresas};
+        } catch (err) {
+            console.error('Error al obtener las empresas:', err);
+            throw err; 
+        }
+    }
+
+    async  postAnadirEmpresa(req, res) {
+        try {
+            const empresa = req.body.empresa;
+            const resultado = await libEmpresas.agregarEmpresa(empresa);
+            return {resultado};
+        } catch (err) {
+            console.error('Error al obtener las empresas:', err);
+            throw err; 
+        }
+    }
+    
 
 }
 

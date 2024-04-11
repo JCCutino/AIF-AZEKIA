@@ -7,4 +7,4 @@ class LibClientes {
     
 }
 
-export const libUsuarios = new LibClientes();
+export const libClientes = new LibClientes();
