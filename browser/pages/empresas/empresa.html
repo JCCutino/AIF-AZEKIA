@@ -1,15 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIF - Empresas</title>
-    <script defer src="../../pages/empresas/empresa.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla de Datos</title>
+  <link rel="stylesheet" href="../../css/styles.css">
 
 </head>
 <body>
-    
 
-    <h1>Prueba</h1>
+<!-- Navbar -->
+<div class="navbar">
+
+  <a href="empresas.html">EMPRESAS</a>
+  <a href="clientes.html">CLIENTES</a>
+  <a href="proyectos.html">PROYECTOS</a>
+  <a href="series.html">SERIES</a>
+  <a href="facturas.html">FACTURAS</a>
+  <a href="impuestos.html">IMPUESTOS</a>
+
+</div>
+
+<!-- Tabla de Datos -->
+<h2>Listado de Empresas</h2>
+
+<table id="tablaEmpresas">
+  <tr>
+    <th>Cod Empresas</th>
+    <th>CIF</th>
+    <th>Razón Social</th>
+    <th>Dirección</th>
+    <th>CP</th>
+    <th>Municipio</th>
+    <th>Acciones</th>
+  </tr>
+</table>
+
+<script defer src="../../pages/empresas/empresa.js"></script>
+
 </body>
 </html>
