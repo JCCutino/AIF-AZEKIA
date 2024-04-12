@@ -20,12 +20,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Funciones de empresas 
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 app.get('/clientes', httpUsuarios.mostrarClientes);
 app.get('/facturas', httpUsuarios.mostrarFacturas);
 
+
+app.get('/clientes', httpUsuarios.mostrarClientes);
+
+app.get('/proyectos', httpUsuarios.mostrarProyectos);
+
+app.get('/series', httpUsuarios.mostrarSeries);
+
+app.get('/facturas', httpUsuarios.mostrarFacturas);
+
+app.get('/impuestos', httpUsuarios.mostrarImpuestos);
+
+// Funciones de empresas 
 
 app.post('/obtenerEmpresas', async (req, res) => {
     const empresas = await httpEmpresas.postObtenerEmpresas(req, res);
@@ -36,6 +47,11 @@ app.post('/agregarEmpresa', async (req, res) => {
   const resultado = await httpEmpresas.postAgregarEmpresa(req, res);
   res.json({ resultado: resultado });
 });
+
+app.post('/actualizarEmpresa', async (req, res) => {
+  const resultado = await httpEmpresas.postActualizarEmpresa(req, res);
+  res.json({ resultado: resultado });
+}); 
 
 app.post('/eliminarEmpresa', async (req, res) => {
   const resultado = await httpEmpresas.postEliminarEmpresa(req, res);
