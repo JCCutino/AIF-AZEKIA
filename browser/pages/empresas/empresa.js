@@ -19,14 +19,13 @@ async function agregarEmpresa(empresa) {
     }
 }
 
-async function obtenerEmpresasAPI(pagina = 1, resultadosTotales = 10) {
+async function obtenerEmpresasAPI() {
     try {
         const response = await fetch('/obtenerEmpresas', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ pagina, resultadosTotales })
         });
 
         if (response.ok) {
@@ -108,12 +107,13 @@ async function main() {
             CP: '41720',
             municipio: 'Los palacios'
         };
-        const empresaCod = "E003";
+        const empresaCod = "E005";
 
 
        // await anadirEmpresa(empresa);
        await obtenerEmpresasAPI();
-       await eliminarEmpresa(empresaCod);
+        await eliminarEmpresa(empresaCod);
+        await obtenerEmpresasAPI();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
     }
