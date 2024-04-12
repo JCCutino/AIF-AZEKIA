@@ -24,6 +24,17 @@ app.use(bodyParser.json());
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
+app.get('/clientes', httpUsuarios.mostrarClientes);
+
+app.get('/proyectos', httpUsuarios.mostrarProyectos);
+
+app.get('/series', httpUsuarios.mostrarSeries);
+
+app.get('/facturas', httpUsuarios.mostrarFacturas);
+
+app.get('/impuestos', httpUsuarios.mostrarImpuestos);
+
+
 app.post('/obtenerEmpresas', async (req, res) => {
     const empresas = await httpEmpresas.postObtenerEmpresas(req, res);
     res.json({ datosEmpresa: empresas });
