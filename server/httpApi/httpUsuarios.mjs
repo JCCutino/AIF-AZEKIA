@@ -16,8 +16,22 @@ class HttpUsuarios {
             console.error('Error al procesar la acción de turno:', error);
             res.status(500).send('Error al conectar con la base de datos');
         }
-    
-
+    async mostrarClientes(req, res) {
+            
+        res.sendFile(path.join(staticFilesPath, 'pages/clientes/cliente.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de turno:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }
+    async mostrarFacturas(req, res) {
+            
+        res.sendFile(path.join(staticFilesPath, 'pages/facturas/facturas.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de turno:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }    
     }
 
 export default new HttpUsuarios();

@@ -23,6 +23,9 @@ app.use(bodyParser.json());
 // Funciones de empresas 
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
+app.get('/clientes', httpUsuarios.mostrarClientes);
+app.get('/facturas', httpUsuarios.mostrarFacturas);
+
 
 app.post('/obtenerEmpresas', async (req, res) => {
     const empresas = await httpEmpresas.postObtenerEmpresas(req, res);
@@ -39,6 +42,10 @@ app.post('/eliminarEmpresa', async (req, res) => {
   res.json({ resultado: resultado });
 });
 
+app.post('/obtenerFacturas', async (req, res) => {
+  const facturas = await httpFacturas.postObtenerFacturas(req, res);
+  res.json({ datosFactura: facturas });
+});
 
 app.listen(process.env.PORT, () => {
     console.log(`Example app listening at http://localhost:${process.env.PORT}`);

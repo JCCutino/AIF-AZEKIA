@@ -24,6 +24,10 @@
 <!-- Tabla de Datos -->
 <h2>Listado de Empresas</h2>
 
+<button onclick="mostrarModalAgregarEmpresa()" id="btnAgregarEmpresa">
+</button>
+
+
 <table id="tablaEmpresas">
   <tr>
     <th>Cod Empresas</th>
@@ -35,6 +39,56 @@
     <th>Acciones</th>
   </tr>
 </table>
+
+<div id="modalAgregarEmpresa" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="tituloForm">
+      <h3>Formulario para Agregar Empresa</h3>
+    </div>
+    <form id="formularioAgregarEmpresa">
+
+      <div class="labelpck">
+        <div style="flex: 1; margin-right: 10px;">
+          <label for="codEmpresa">Cod Empresa:</label><br>
+          <input type="text" id="codEmpresa" name="codEmpresa">
+        </div>
+
+        <div style="flex: 1; margin-left: 10px;">
+          <label for="cif">CIF:</label><br>
+          <input type="text" id="cif" name="cif">
+        </div>
+      </div>
+    
+      <div class="labelUQ">
+        <label for="razonSocial">Razón Social:</label><br>
+        <input type="text" id="razonSocial" name="razonSocial" class="inputlg">
+      </div>
+
+      <div class="labelUQ">
+        <label for="direccion">Dirección:</label><br>
+        <input type="text" id="direccion" name="direccion" class="inputlg">
+      </div>
+    
+      <div class="labelpck">
+        <div style="flex: 1;">
+          <label for="cp">CP:</label><br>
+          <input type="text" id="cp" name="cp">
+        </div>
+
+        <div style="flex: 1;">
+          <label for="municipio">Municipio:</label><br>
+          <input type="text" id="municipio" name="municipio">
+        </div>
+      </div>
+      <!-- Botón para guardar la empresa -->
+      <div class="footerForm">
+        <button class="btnCancelar" type="button" onclick="cerrarModalAgregarEmpresa()">Cancelar</button>
+        <button class="btnGuardar" type="button" onclick="guardarEmpresa()">Guardar</button>
+      </div>
+    </form>
+    
+  </div>
+</div>
 
 <script defer src="../../pages/empresas/empresa.js"></script>
 
