@@ -44,7 +44,7 @@ class HttpEmpresas {
             const empresa = req.body.empresa;
             const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
     
-            if (!empresaExistePorCIF) {
+            if (empresaExistePorCIF) {
                 const error = 'La empresa ya existe en la base de datos';
                 return { error };
             }
