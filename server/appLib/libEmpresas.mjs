@@ -2,13 +2,12 @@ import { dbConexion } from "./dbConexion.mjs";
 
 class LibEmpresas {
 
-    obtenerEmpresas(pagina = 1, resultadosPorPagina = 10) {
+    obtenerEmpresas() {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const offset = (pagina - 1) * resultadosPorPagina;
-                const query = 'SELECT * FROM Empresa LIMIT ?, ?';
-                connection.query(query, [offset, resultadosPorPagina], (err, resultados) => {
+                const query = 'SELECT * FROM Empresa';
+                connection.query(query, (err, resultados) => {
                     if (err) {
                         console.error('Error al obtener empresas:', err);
                         connection.end(); 
@@ -69,6 +68,44 @@ class LibEmpresas {
         });
     }
     
+    comprobarEmpresaExistente(empresa) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+    
+                const queryCodEmpresa = 'SELECT * FROM Empresa WHERE empresaCod = ?';
+                const resultCodEmpresa = await connection.query(queryCodEmpresa, [empresa.empresaCod]);
+                if (resultCodEmpresa.length > 0) {
+                    connection.end();
+                    resolve(false);
+                    return;
+                }
+    
+                const queryCIF = 'SELECT * FROM Empresa WHERE CIF = ?';
+                const resultCIF = await connection.query(queryCIF, [empresa.CIF]);
+                if (resultCIF.length > 0) {
+                    connection.end();
+                    resolve(false);
+                    return;
+                }
+    
+                const queryRazonSocial = 'SELECT * FROM Empresa WHERE razonSocial = ?';
+                const resultRazonSocial = await connection.query(queryRazonSocial, [empresa.razonSocial]);
+                if (resultRazonSocial.length > 0) {
+                    connection.end();
+                    resolve(false);
+                    return;
+                }
+    
+                connection.end();
+    
+                resolve(true);
+            } catch (error) {
+                console.error('Error al validar datos de empresa:', error);
+                reject(error);
+            }
+        });
+    }
     
 
     

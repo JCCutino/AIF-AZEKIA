@@ -10,9 +10,7 @@ class HttpEmpresas {
 
     async  postObtenerEmpresas(req, res) {
         try {
-            const pagina = req.body.pagina;
-            const resultadosTotales = req.body.resultadosTotales
-            const empresas = await libEmpresas.obtenerEmpresas(pagina, resultadosTotales);
+            const empresas = await libEmpresas.obtenerEmpresas();
             return {empresas};
         } catch (err) {
             console.error('Error al obtener las empresas:', err);
@@ -23,8 +21,14 @@ class HttpEmpresas {
     async  postAgregarEmpresa(req, res) {
         try {
             const empresa = req.body.empresa;
+            const empresaExiste = await libEmpresas.comprobarEmpresaExistente(empresa);
+        if (empresaExiste) {
+            const error = 'La empresa ya existe en la base de datos';
+            return {error};
+        } else {
             const resultado = await libEmpresas.agregarEmpresa(empresa);
             return {resultado};
+        }
         } catch (err) {
             console.error('Error al obtener las empresas:', err);
             throw err; 

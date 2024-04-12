@@ -8,35 +8,15 @@ function mostrarModalAgregarEmpresa() {
     document.getElementById("modalAgregarEmpresa").style.display = "none";
   }
 
-// async function agregarEmpresa(empresa) {
-//     try {
-//         const response = await fetch('/agregarEmpresa', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({empresa: empresa })
-//         });
-//         if (response.ok) {
 
-//             const data = await response.json();
-//             console.log('Empresa añadida correctamente:', data);
-//         } else {
-//             console.error('Error al añadir empresa:', response.statusText);
-//         }
-//     } catch (error) {
-//         console.error('Error al añadir empresa:', error.message);
-//     }
-// }
 
-async function obtenerEmpresasAPI(pagina = 1, resultadosTotales = 10) {
+async function obtenerEmpresasAPI() {
     try {
         const response = await fetch('/obtenerEmpresas', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ pagina, resultadosTotales })
         });
 
         if (response.ok) {
@@ -146,14 +126,12 @@ async function main() {
             CP: '41720',
             municipio: 'Los palacios'
         };
-        const empresaCod = "E003";
+        const empresaCod = "E005";
 
 
        // await anadirEmpresa(empresa);
        await obtenerEmpresasAPI();
        await eliminarEmpresa(empresaCod);
-       await agregarEmpresa(empresa);
-       await cerrarModalAgregarEmpresa();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
     }
