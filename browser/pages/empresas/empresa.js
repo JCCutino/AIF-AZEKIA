@@ -100,8 +100,8 @@ async function mostrarDatosEnTabla(data) {
 async function main() {
     try {
         const empresa = {
-            empresaCod: 'E005',
-            CIF: '64672383T',
+            empresaCod: 'E503',
+            CIF: '64672383S	',
             razonSocial: 'Rusvel',
             direccion: 'Avenida SEVILLA 456',
             CP: '41720',
@@ -110,10 +110,10 @@ async function main() {
         const empresaCod = "E005";
 
 
-       // await anadirEmpresa(empresa);
+       await agregarEmpresa(empresa);
        await obtenerEmpresasAPI();
-        await eliminarEmpresa(empresaCod);
-        await obtenerEmpresasAPI();
+       // await eliminarEmpresa(empresaCod);
+       // await obtenerEmpresasAPI();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
     }
