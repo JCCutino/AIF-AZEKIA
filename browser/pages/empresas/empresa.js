@@ -120,9 +120,9 @@ async function mostrarDatosEnTabla(data) {
 async function main() {
     try {
         const empresa = {
-            empresaCod: 'E403',
-            CIF: '64672383S	',
-            razonSocial: 'Azekia',
+            empresaCod: 'E633',
+            CIF: '64672383T	',
+            razonSocial: 'Javier',
             direccion: 'Avenida SEVILLA 123',
             CP: '41720',
             municipio: 'Los palacios'

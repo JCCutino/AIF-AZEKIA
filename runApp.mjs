@@ -20,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-// Funciones de empresas 
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
@@ -34,6 +33,7 @@ app.get('/facturas', httpUsuarios.mostrarFacturas);
 
 app.get('/impuestos', httpUsuarios.mostrarImpuestos);
 
+// Funciones de empresas 
 
 app.post('/obtenerEmpresas', async (req, res) => {
     const empresas = await httpEmpresas.postObtenerEmpresas(req, res);

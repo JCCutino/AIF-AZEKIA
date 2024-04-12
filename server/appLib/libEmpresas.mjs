@@ -67,16 +67,16 @@ class LibEmpresas {
             }
         });
     } 
-    comprobarEmpresaExistente(codEmpresa, CIF) {
+    comprobarExistenciaEmpresaPorCodigo(codEmpresa) {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE empresaCod = ? OR CIF = ?';
-                connection.query(query, [codEmpresa, CIF], (err, resultado) => {
+                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE empresaCod = ?';
+                connection.query(query, [codEmpresa], (err, resultado) => {
                     connection.end();
                     if (err) {
-                        console.error('Error al comprobar empresa existente:', err);
-                        reject('Error al comprobar empresa existente');
+                        console.error('Error al comprobar empresa existente por código:', err);
+                        reject('Error al comprobar empresa existente por código');
                     } else {
                         resolve(resultado[0].count > 0);
                     }
@@ -86,6 +86,27 @@ class LibEmpresas {
             }
         });
     }
+    
+    comprobarExistenciaEmpresaPorCIF(CIF) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ?';
+                connection.query(query, [CIF], (err, resultado) => {
+                    connection.end();
+                    if (err) {
+                        console.error('Error al comprobar empresa existente por CIF:', err);
+                        reject('Error al comprobar empresa existente por CIF');
+                    } else {
+                        resolve(resultado[0].count > 0);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
     
     
     eliminarEmpresa(empresaCod) {
