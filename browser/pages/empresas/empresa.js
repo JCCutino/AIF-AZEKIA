@@ -1,23 +1,33 @@
-async function agregarEmpresa(empresa) {
-    try {
-        const response = await fetch('/agregarEmpresa', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({empresa: empresa })
-        });
-        if (response.ok) {
 
-            const data = await response.json();
-            console.log('Empresa añadida correctamente:', data);
-        } else {
-            console.error('Error al añadir empresa:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error al añadir empresa:', error.message);
-    }
-}
+function mostrarModalAgregarEmpresa() {
+    document.getElementById("modalAgregarEmpresa").style.display = "block";
+  }
+  
+  // Función para cerrar el modal de agregar empresas
+  function cerrarModalAgregarEmpresa() {
+    document.getElementById("modalAgregarEmpresa").style.display = "none";
+  }
+
+// async function agregarEmpresa(empresa) {
+//     try {
+//         const response = await fetch('/agregarEmpresa', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({empresa: empresa })
+//         });
+//         if (response.ok) {
+
+//             const data = await response.json();
+//             console.log('Empresa añadida correctamente:', data);
+//         } else {
+//             console.error('Error al añadir empresa:', response.statusText);
+//         }
+//     } catch (error) {
+//         console.error('Error al añadir empresa:', error.message);
+//     }
+// }
 
 async function obtenerEmpresasAPI(pagina = 1, resultadosTotales = 10) {
     try {
@@ -66,8 +76,6 @@ async function eliminarEmpresa(empresaCod) {
 async function mostrarDatosEnTabla(data) {
             // Obtener la tabla HTML
             const tabla = document.getElementById('tablaEmpresas');
-        
-         
 
             // Verificar si hay datos de empresas
             if (data.datosEmpresa && data.datosEmpresa.empresas && Array.isArray(data.datosEmpresa.empresas)) {
@@ -98,6 +106,36 @@ async function mostrarDatosEnTabla(data) {
             }
 }
 
+// async function guardarEmpresa() {
+//     // Obtener los datos del formulario
+//     const codEmpresa = document.getElementById("codEmpresa").value;
+//     const cif = document.getElementById("cif").value;
+//     const razonSocial = document.getElementById("razonSocial").value;
+//     const direccion = document.getElementById("direccion").value;
+//     const cp = document.getElementById("cp").value;
+//     const municipio = document.getElementById("municipio").value;
+  
+//     // Crear un objeto empresa con los datos del formulario
+//     const empresa = {
+//       codEmpresa: codEmpresa,
+//       cif: cif,
+//       razonSocial: razonSocial,
+//       direccion: direccion,
+//       cp: cp,
+//       municipio: municipio
+//     };
+
+//     try {
+//         // Llamar a la función agregarEmpresa con el objeto empresa como argumento
+//         await agregarEmpresa(empresa);
+//         // Cerrar el modal después de agregar la empresa con éxito
+//         cerrarModalAgregarEmpresa();
+//         // Aquí podrías actualizar la tabla de empresas si lo deseas
+//       } catch (error) {
+//         console.error('Error al agregar empresa:', error.message);
+//       }
+//     }  
+
 async function main() {
     try {
         const empresa = {
@@ -114,6 +152,8 @@ async function main() {
        // await anadirEmpresa(empresa);
        await obtenerEmpresasAPI();
        await eliminarEmpresa(empresaCod);
+       await agregarEmpresa(empresa);
+       await cerrarModalAgregarEmpresa();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
     }

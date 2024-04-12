@@ -7,8 +7,8 @@
       table {
         width: 50%;
         border-collapse: collapse;
-        margin: 20px auto; /* Centrar la tabla horizontalmente */
-        margin-top: 25px;
+        margin: 20px auto;
+        margin-top: 60px;
       }
       h2{
         text-align: center;
@@ -17,7 +17,7 @@
       th, td {
         border: 1px solid #ddd;
         padding: 8px;
-        text-align: left;
+        text-align: center;
       }
       th {
         background-color: #f2f2f2;
@@ -30,7 +30,7 @@
         background-color: #ededf0;
        text-align: center;
        width: 800px;
-       margin: 0 auto; /* Centrar horizontalmente */
+       margin: 0 auto;
        margin-top: 60px;
        border-radius: 5px;
       }
@@ -43,4 +43,115 @@
       }
       .navbar a:hover {
         background-color: #c5c0c0;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8); /* Fondo oscuro */
+      }
+      
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 450px;
+        height: 400px;
+        align-items: center;
+        text-align: center;
+        border: solid 1px black;
+        position: relative;
+      }
+      #formularioAgregarEmpresa{
+        margin-top: 80px;
+      }
+      #formularioAgregarEmpresa label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarEmpresa input{
+        border: solid 1px black;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .labelUQ{
+        text-align: left;
+        margin-left: 22px;
+        margin-top: 22px;
+      }
+      .labelpck{
+        margin-top: 22px;
+        display: flex;
+        text-align: left;
+        margin-left: 22px;
+      }
+      .inputlg{
+        width: 300px;
+      }
+      .btnGuardar{
+        margin-left: 10px;
+        margin-top: 15px;
+        background-color: #099c4b;
+        color: black;
+        font-weight: bold;
+        border: 1px solid black;
+      }
+
+      .btnGuardar:hover{
+        background-color: #11531f;
+      }
+
+      .btnCancelar{
+        margin-top: 15px;
+        background-color: rgb(219, 219, 219);
+        color: black;
+        font-weight: bold;
+        border: 1px solid black;
+        margin-left: 250px;
+      }
+      .btnCancelar:hover{
+        background-color: #636764;
+      }
+
+      .tituloForm{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid #000000;
+        height: 60px;
+        background-color: #222222;
+        color: white;
+      }
+
+      .footerForm{
+        position: absolute;
+        bottom: 0;
+        left: 0; 
+        width: 100%; 
+        border-top: 1px solid #000000;
+        height: 50px;
+        background-color: #888;
+      }
+
+      #btnAgregarEmpresa {
+        width: 100px; /* Ancho de tu imagen */
+        height: 100px; /* Alto de tu imagen */
+        background-image: url("../Images/anadir.png"); /* Ruta de la imagen */
+        background-size: cover; /* Ajusta la imagen al tamaño del botón */
+        background-repeat: no-repeat; /* Evita que la imagen se repita */
+        border: none; /* Quita el borde del botón */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
       }
