@@ -21,16 +21,28 @@ class HttpEmpresas {
     async  postAgregarEmpresa(req, res) {
         try {
             const empresa = req.body.empresa;
-            const empresaExiste = await libEmpresas.comprobarEmpresaExistente(empresa);
+            const empresaExiste = await libEmpresas.comprobarEmpresaExistente(empresa.empresaCod, empresa.CIF);
         if (empresaExiste) {
             const error = 'La empresa ya existe en la base de datos';
             return {error};
         } else {
             const resultado = await libEmpresas.agregarEmpresa(empresa);
             return {resultado};
+           
         }
         } catch (err) {
             console.error('Error al obtener las empresas:', err);
+            throw err; 
+        }
+    }
+
+    async  postActualizarEmpresa(req, res) {
+        try {
+            const empresa = req.body.empresa;
+            const resultado = await libEmpresas.actualizarEmpresa(empresa);
+            return {resultado};
+        }catch (err) {
+            console.error('Error al actualizar la empresa:', err);
             throw err; 
         }
     }
