@@ -36,6 +36,17 @@ class HttpEmpresas {
         }
     }
 
+    async  postActualizarEmpresa(req, res) {
+        try {
+            const empresa = req.body.empresa;
+            const resultado = await libEmpresas.actualizarEmpresa(empresa);
+            return {resultado};
+        }catch (err) {
+            console.error('Error al actualizar la empresa:', err);
+            throw err; 
+        }
+    }
+
     async  postEliminarEmpresa(req, res) {
         try {
             const empresaCod = req.body.empresaCod;

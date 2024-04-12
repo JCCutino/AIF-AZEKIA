@@ -19,6 +19,26 @@ async function agregarEmpresa(empresa) {
     }
 }
 
+async function actualizarEmpresa(empresa) {
+    try {
+        const response = await fetch('/actualizarEmpresa', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({empresa: empresa })
+        });
+        if (response.ok) {
+
+            const data = await response.json();
+            console.log('Empresa actualizada correctamente:', data);
+        } else {
+            console.error('Error al actualizar empresa:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al actualizar empresa:', error.message);
+    }
+}
 async function obtenerEmpresasAPI() {
     try {
         const response = await fetch('/obtenerEmpresas', {
@@ -100,17 +120,17 @@ async function mostrarDatosEnTabla(data) {
 async function main() {
     try {
         const empresa = {
-            empresaCod: 'E503',
+            empresaCod: 'E403',
             CIF: '64672383S	',
-            razonSocial: 'Rusvel',
-            direccion: 'Avenida SEVILLA 456',
+            razonSocial: 'Azekia',
+            direccion: 'Avenida SEVILLA 123',
             CP: '41720',
             municipio: 'Los palacios'
         };
         const empresaCod = "E005";
 
-
        await agregarEmpresa(empresa);
+       await actualizarEmpresa(empresa);
        await obtenerEmpresasAPI();
        // await eliminarEmpresa(empresaCod);
        // await obtenerEmpresasAPI();

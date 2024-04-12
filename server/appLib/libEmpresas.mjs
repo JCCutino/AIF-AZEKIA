@@ -48,6 +48,25 @@ class LibEmpresas {
         });
     }
 
+    actualizarEmpresa(empresa) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB(); 
+                const query = 'UPDATE Empresa SET CIF = ?, razonSocial = ?, direccion = ?, CP = ?, municipio = ? WHERE empresaCod = ?';
+                connection.query(query, [empresa.CIF, empresa.razonSocial, empresa.direccion, empresa.CP, empresa.municipio, empresa.empresaCod], (err, resultado) => {
+                    connection.end();
+                    if (err) {
+                        console.error('Error al actualizar empresa:', err);
+                        reject('Error al actualizar empresa');
+                    } else {
+                        resolve(resultado); 
+                    }
+                });
+            } catch (error) {
+                reject(error); 
+            }
+        });
+    } 
     comprobarEmpresaExistente(codEmpresa, CIF) {
         return new Promise(async (resolve, reject) => {
             try {

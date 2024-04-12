@@ -34,6 +34,11 @@ app.post('/agregarEmpresa', async (req, res) => {
   res.json({ resultado: resultado });
 });
 
+app.post('/actualizarEmpresa', async (req, res) => {
+  const resultado = await httpEmpresas.postActualizarEmpresa(req, res);
+  res.json({ resultado: resultado });
+}); 
+
 app.post('/eliminarEmpresa', async (req, res) => {
   const resultado = await httpEmpresas.postEliminarEmpresa(req, res);
   res.json({ resultado: resultado });
