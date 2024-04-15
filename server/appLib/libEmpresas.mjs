@@ -13,13 +13,8 @@ class LibEmpresas {
                         connection.end();
                         reject('Error al obtener empresas');
                     } else {
-                        if (resultados.length === 0) {
-                            connection.end();
-                            reject('Empresas no encontradas');
-                        } else {
-                            connection.end();
-                            resolve(resultados);
-                        }
+                        connection.end();
+                        resolve(resultados || []);
                     }
                 });
             } catch (error) {

@@ -61,8 +61,15 @@ async function obtenerEmpresasAPI() {
 
         if (response.ok) {
             const data = await response.json();
-            mostrarDatosEnTabla(data);
             console.log('Resultado de obtenerEmpresasAPI:', data);
+
+            if (data.err) {
+                // Si hay un error, muestra un mensaje de error
+                console.error('Error al obtener empresas:', data.errmsg);
+            } else {
+                // Si no hay error, procesa los datos y muestra la tabla
+                mostrarDatosEnTabla(data);
+            }
         } else {
             console.error('Error al llamar a la API:', response.statusText);
         }
@@ -96,9 +103,9 @@ async function eliminarEmpresa(empresaCod) {
 async function mostrarDatosEnTabla(data) {
             const tabla = document.getElementById('tablaEmpresas');
 
-            if (data.datosEmpresa && data.datosEmpresa.empresas && Array.isArray(data.datosEmpresa.empresas)) {
+            if (data.empresas && Array.isArray(data.empresas)) {
 
-                data.datosEmpresa.empresas.forEach(empresa => {
+                data.empresas.forEach(empresa => {
                     const fila = document.createElement('tr');
         
                     Object.values(empresa).forEach(valor => {

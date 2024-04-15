@@ -13,12 +13,16 @@ class HttpEmpresas {
     async postObtenerEmpresas(req, res) {
         try {
             const empresas = await libEmpresas.obtenerEmpresas();
-            return { empresas };
+            if (empresas && empresas.length > 0) {
+                res.status(200).send({ err: false, empresas });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay empresas añadidas en este momento' });
+            }
         } catch (err) {
-            console.error('Error al obtener las empresas:', err);
-            throw err;
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
+    
 
     async postAgregarEmpresa(req, res) {
         // de esta función se espera:
@@ -69,7 +73,7 @@ class HttpEmpresas {
                 }
             }
         } catch (err) {
-            res.send(500)
+            res.send(500);
         }
     }
 
@@ -79,16 +83,13 @@ class HttpEmpresas {
             const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
 
             if (empresaExistePorCIF) {
-                const error = 'La empresa ya existe en la base de datos';
-                return { error };
+                res.send(200, { err: true, errmsg: 'La empresa ya existe en la base de datos' });
             }
             const resultado = await libEmpresas.actualizarEmpresa(empresa);
-            const exito = 'La empresa se ha actualizado con exito';
-
-            return { exito };
+            res.send(200, { err: false, empresa: { empresa } });
         } catch (err) {
             console.error('Error al actualizar la empresa:', err);
-            return res.status(500).json({ error: 'Error al actualizar la empresa' });
+            res.send(500);
         }
     }
 
@@ -96,10 +97,9 @@ class HttpEmpresas {
         try {
             const empresaCod = req.body.empresaCod;
             const empresas = await libEmpresas.eliminarEmpresa(empresaCod);
-            return { empresas };
+            res.send(200, { err: false});
         } catch (err) {
-            console.error('Error al obtener las empresas:', err);
-            throw err;
+            res.send(500);
         }
     }
 

@@ -22,9 +22,6 @@ app.use(bodyParser.json());
 
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
-app.get('/clientes', httpUsuarios.mostrarClientes);
-app.get('/facturas', httpUsuarios.mostrarFacturas);
-
 
 app.get('/clientes', httpUsuarios.mostrarClientes);
 
@@ -38,10 +35,7 @@ app.get('/impuestos', httpUsuarios.mostrarImpuestos);
 
 // Funciones de empresas 
 
-app.post('/obtenerEmpresas', async (req, res) => {
-    const empresas = await httpEmpresas.postObtenerEmpresas(req, res);
-    res.json({ datosEmpresa: empresas });
-});
+app.post('/obtenerEmpresas', httpEmpresas.postObtenerEmpresas);
 
 app.post('/agregarEmpresa', httpEmpresas.postAgregarEmpresa);
 
