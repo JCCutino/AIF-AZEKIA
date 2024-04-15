@@ -113,7 +113,7 @@ async function abrirModalEditable(empresaId) {
         if (response.ok) {
             const data = await response.json();
             // Buscar la empresa con el ID proporcionado
-            const empresa = data.datosEmpresa.empresas.find(emp => emp.empresaCod === empresaId);
+            const empresa = data.empresas.find(emp => emp.empresaCod === empresaId);
             
             if (empresa) {
                 // Llenar los campos del formulario del modal con los detalles de la empresa
@@ -210,7 +210,7 @@ async function guardarEmpresa() {
         console.log(empresa);
         await agregarEmpresa(empresa);
         // Cerrar el modal después de agregar la empresa con éxito
-        cerrarModalAgregarEmpresa();
+        cerrarModal();
         await obtenerEmpresasAPI();
         // Aquí podrías actualizar la tabla de empresas si lo deseas
       } catch (error) {
