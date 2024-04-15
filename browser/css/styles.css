@@ -81,6 +81,16 @@
         border: solid 1px black;
       }
       
+      #editarEmpresaForm{
+        margin-top: 80px;
+      }
+      #editarEmpresaForm label{
+        font-weight: bold;
+      }
+
+      #editarEmpresaForm input{
+        border: solid 1px black;
+      }
       .close:hover,
       .close:focus {
         color: black;
@@ -100,6 +110,9 @@
       }
       .inputlg{
         width: 300px;
+      }
+      #codEmpresaeditar{
+        border: none;
       }
       .btnGuardar{
         margin-left: 10px;

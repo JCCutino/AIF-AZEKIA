@@ -118,11 +118,30 @@ async function abrirModalEditable(empresaId) {
             if (empresa) {
                 // Llenar los campos del formulario del modal con los detalles de la empresa
                 document.getElementById("codEmpresaeditar").value = empresa.empresaCod;
+                document.getElementById("codEmpresaeditar").readOnly = true;
                 document.getElementById("cifeditar").value = empresa.CIF;
                 document.getElementById("razonSocialeditar").value = empresa.razonSocial;
                 document.getElementById("direccioneditar").value = empresa.direccion;
                 document.getElementById("cpeditar").value = empresa.CP;
                 document.getElementById("municipioeditar").value = empresa.municipio;
+
+                // Obtener el elemento del input
+                const inputElement = document.getElementById("codEmpresaeditar");
+
+                // Verificar si ya existe un span antes de agregar uno nuevo
+                const existingSpan = inputElement.nextSibling;
+                if (existingSpan && existingSpan.tagName === "SPAN") {
+                    // Si existe un span, simplemente actualizar su contenido y ocultar el input
+                    existingSpan.textContent = empresa.empresaCod;
+                    inputElement.style.display = "none";
+                } else {
+                    // Si no existe un span, crear uno nuevo y agregarlo después del input, y ocultar el input
+                    const spanElement = document.createElement("span");
+                    spanElement.textContent = empresa.empresaCod;
+                    inputElement.parentNode.insertBefore(spanElement, inputElement.nextSibling);
+                    inputElement.style.display = "none";
+                }
+
 
                 // Mostrar el modal de edición
                 const modalEditarEmpresa = document.getElementById('modalEditarEmpresa');
@@ -218,6 +237,37 @@ async function guardarEmpresa() {
       }
     }  
 
+    async function actualizadaempresa() {
+        // Obtener los datos del formulario
+        const codEmpresa = document.getElementById("codEmpresaeditar").value;
+        const cif = document.getElementById("cifeditar").value;
+        const razonSocial = document.getElementById("razonSocialeditar").value;
+        const direccion = document.getElementById("direccioneditar").value;
+        const cp = document.getElementById("cpeditar").value;
+        const municipio = document.getElementById("municipioeditar").value;
+      
+        // Crear un objeto empresa con los datos del formulario
+        const empresa = {
+          empresaCod: codEmpresa,
+          CIF: cif,
+          razonSocial: razonSocial,
+          direccion: direccion,
+          CP: cp,
+          municipio: municipio
+        };
+    
+        try {
+            // Llamar a la función agregarEmpresa con el objeto empresa como argumento
+            console.log(empresa);
+            await actualizarEmpresa(empresa);
+            // Cerrar el modal después de agregar la empresa con éxito
+            cerrarModal();
+            await obtenerEmpresasAPI();
+          } catch (error) {
+            console.error('Error al agregar empresa:', error.message);
+          }
+        }  
+    
 async function main() {
     try {
 
