@@ -126,50 +126,51 @@ async function mostrarDatosEnTabla(data) {
             }
 }
 
-// async function guardarEmpresa() {
-//     // Obtener los datos del formulario
-//     const codEmpresa = document.getElementById("codEmpresa").value;
-//     const cif = document.getElementById("cif").value;
-//     const razonSocial = document.getElementById("razonSocial").value;
-//     const direccion = document.getElementById("direccion").value;
-//     const cp = document.getElementById("cp").value;
-//     const municipio = document.getElementById("municipio").value;
+async function guardarEmpresa() {
+    // Obtener los datos del formulario
+    const codEmpresa = document.getElementById("codEmpresa").value;
+    const cif = document.getElementById("cif").value;
+    const razonSocial = document.getElementById("razonSocial").value;
+    const direccion = document.getElementById("direccion").value;
+    const cp = document.getElementById("cp").value;
+    const municipio = document.getElementById("municipio").value;
   
-//     // Crear un objeto empresa con los datos del formulario
-//     const empresa = {
-//       codEmpresa: codEmpresa,
-//       cif: cif,
-//       razonSocial: razonSocial,
-//       direccion: direccion,
-//       cp: cp,
-//       municipio: municipio
-//     };
+    // Crear un objeto empresa con los datos del formulario
+    const empresa = {
+      empresaCod: codEmpresa,
+      CIF: cif,
+      razonSocial: razonSocial,
+      direccion: direccion,
+      CP: cp,
+      municipio: municipio
+};
 
-//     try {
-//         // Llamar a la función agregarEmpresa con el objeto empresa como argumento
-//         await agregarEmpresa(empresa);
-//         // Cerrar el modal después de agregar la empresa con éxito
-//         cerrarModalAgregarEmpresa();
-//         // Aquí podrías actualizar la tabla de empresas si lo deseas
-//       } catch (error) {
-//         console.error('Error al agregar empresa:', error.message);
-//       }
-//     }  
+    try {
+        // Llamar a la función agregarEmpresa con el objeto empresa como argumento
+        console.log(empresa);
+        await agregarEmpresa(empresa);
+        // Cerrar el modal después de agregar la empresa con éxito
+        cerrarModalAgregarEmpresa();
+        // Aquí podrías actualizar la tabla de empresas si lo deseas
+      } catch (error) {
+        console.error('Error al agregar empresa:', error.message);
+      }
+}  
 
 async function main() {
     try {
-        const empresa = {
-            empresaCod: 'E623',
-            CIF: '64672382T	',
-            razonSocial: 'Juan',
-            direccion: 'Avenida SEVILLA 123',
-            CP: '41720',
-            municipio: 'Los palacios'
-        };
-        const empresaCod = "E005";
+        // const empresa = {
+        //     empresaCod: 'E623',
+        //     CIF: '64672382T	',
+        //     razonSocial: 'Juan',
+        //     direccion: 'Avenida SEVILLA 123',
+        //     CP: '41720',
+        //     municipio: 'Los palacios'
+        // };
+        // const empresaCod = "E005";
 
-       await agregarEmpresa(empresa);
-       await actualizarEmpresa(empresa);
+    //    await agregarEmpresa(empresa);
+    //    await actualizarEmpresa(empresa);
 
         await obtenerEmpresasAPI();
     } catch (error) {

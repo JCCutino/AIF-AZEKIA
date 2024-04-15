@@ -8,7 +8,7 @@
         width: 50%;
         border-collapse: collapse;
         margin: 20px auto;
-        margin-top: 60px;
+        margin-top: 10px;
       }
       h2{
         text-align: center;
@@ -147,12 +147,20 @@
         background-color: #888;
       }
 
+      .contenedorBtn{
+        display: flex;
+        justify-content: center; /* Centra horizontalmente */
+        align-items: center; /* Centra verticalmente */
+        margin-left: 680px;
+      }
+
       #btnAgregarEmpresa {
-        width: 100px; /* Ancho de tu imagen */
-        height: 100px; /* Alto de tu imagen */
+        width: 27px; /* Ancho de tu imagen */
+        height: 27px; /* Alto de tu imagen */
         background-image: url("../Images/anadir.png"); /* Ruta de la imagen */
         background-size: cover; /* Ajusta la imagen al tamaño del botón */
         background-repeat: no-repeat; /* Evita que la imagen se repita */
-        border: none; /* Quita el borde del botón */
+        background-color: transparent;
+        border: transparent; /* Quita el borde del botón */
         cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
       }
