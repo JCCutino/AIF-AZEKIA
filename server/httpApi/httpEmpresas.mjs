@@ -80,18 +80,24 @@ class HttpEmpresas {
     async postActualizarEmpresa(req, res) {
         try {
             const empresa = req.body.empresa;
-            const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
-
-            if (empresaExistePorCIF) {
-                res.send(200, { err: true, errmsg: 'La empresa ya existe en la base de datos' });
+            const cifAnterior = await libEmpresas.obtenerEmpresaPorCodEmpresa(empresa.empresaCod);
+            
+            if (cifAnterior && cifAnterior.CIF !== empresa.CIF) {
+                const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
+                if (empresaExistePorCIF) {
+                    res.status(200).send({ err: true, errmsg: 'El CIF de la empresa ya existe en la base de datos' });
+                    return; 
+                }
             }
+    
             const resultado = await libEmpresas.actualizarEmpresa(empresa);
-            res.send(200, { err: false, empresa: { empresa } });
+            res.status(200).send({ err: false, empresa: { empresa } });
         } catch (err) {
             console.error('Error al actualizar la empresa:', err);
-            res.send(500);
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
+    
 
     async postEliminarEmpresa(req, res) {
         try {

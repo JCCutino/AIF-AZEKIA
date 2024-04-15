@@ -23,6 +23,27 @@ class LibEmpresas {
         });
     }
 
+    async obtenerEmpresaPorCodEmpresa(codEmpresa) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'SELECT * FROM Empresa WHERE empresaCod = ?';
+                connection.query(query, [codEmpresa], (err, resultado) => {
+                    connection.end();
+                    if (err) {
+                        console.error('Error al obtener empresa por código de empresa:', err);
+                        reject('Error al obtener empresa por código de empresa');
+                    } else {
+                        resolve(resultado[0] || null);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+
     agregarEmpresa(empresa) {
         // esta función debe devolver un objeto con el resultado
         // de modo que las funciones que responden a ruta lo puedan devolver en un res inequivocamnete
