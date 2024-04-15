@@ -151,7 +151,7 @@
         display: flex;
         justify-content: center; /* Centra horizontalmente */
         align-items: center; /* Centra verticalmente */
-        margin-left: 680px;
+        margin-left: 650px;
       }
 
       #btnAgregarEmpresa {

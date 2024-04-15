@@ -83,13 +83,65 @@
       </div>
       <!-- Botón para guardar la empresa -->
       <div class="footerForm">
-        <button class="btnCancelar" type="button" onclick="cerrarModalAgregarEmpresa()">Cancelar</button>
+        <button class="btnCancelar" type="button" onclick="cerrarModal()">Cancelar</button>
         <button class="btnGuardar" type="button" onclick="guardarEmpresa()">Guardar</button>
       </div>
-    </form>
-    
+    </form>  
   </div>
 </div>
+
+<div id="modalEditarEmpresa" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="tituloForm">
+      <h3>Editar Detalles de la Empresa</h3>
+    </div>
+    <form id="editarEmpresaForm">
+
+      <div class="labelpck">
+        <div style="flex: 1; margin-right: 10px;">
+          <label for="codEmpresa">Cod Empresa:</label><br>
+          <input type="text" id="codEmpresaeditar" name="codEmpresa">
+        </div>
+
+        <div style="flex: 1; margin-left: 10px;">
+          <label for="cif">CIF:</label><br>
+          <input type="text" id="cifeditar" name="cif">
+        </div>
+      </div>
+    
+      <div class="labelUQ">
+        <label for="razonSocial">Razón Social:</label><br>
+        <input type="text" id="razonSocialeditar" name="razonSocial" class="inputlg">
+      </div>
+
+      <div class="labelUQ">
+        <label for="direccion">Dirección:</label><br>
+        <input type="text" id="direccioneditar" name="direccion" class="inputlg">
+      </div>
+    
+      <div class="labelpck">
+        <div style="flex: 1;">
+          <label for="cp">CP:</label><br>
+          <input type="text" id="cpeditar" name="cp">
+        </div>
+
+        <div style="flex: 1;">
+          <label for="municipio">Municipio:</label><br>
+          <input type="text" id="municipioeditar" name="municipio">
+        </div>
+      </div>
+      <!-- Botón para guardar la empresa -->
+      <div class="footerForm">
+        <button class="btnCancelar" type="button" onclick="cerrarModal()">Cancelar</button>
+        <button class="btnGuardar" type="button" onclick="guardarEmpresa()">Guardar</button>
+      </div>
+    </form>   
+  </div>
+</div>
+
+
+
+
 
 <script defer src="../../pages/empresas/empresa.js"></script>
 
