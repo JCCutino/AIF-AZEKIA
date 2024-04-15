@@ -110,12 +110,12 @@ async function abrirModalEditable(empresaId) {
             
             if (empresa) {
                 // Llenar los campos del formulario del modal con los detalles de la empresa
-                document.getElementById("codEmpresa").value = empresa.empresaCod;
-                document.getElementById("cif").value = empresa.CIF;
-                document.getElementById("razonSocial").value = empresa.razonSocial;
-                document.getElementById("direccion").value = empresa.direccion;
-                document.getElementById("cp").value = empresa.CP;
-                document.getElementById("municipio").value = empresa.municipio;
+                document.getElementById("codEmpresaeditar").value = empresa.empresaCod;
+                document.getElementById("cifeditar").value = empresa.CIF;
+                document.getElementById("razonSocialeditar").value = empresa.razonSocial;
+                document.getElementById("direccioneditar").value = empresa.direccion;
+                document.getElementById("cpeditar").value = empresa.CP;
+                document.getElementById("municipioeditar").value = empresa.municipio;
 
                 // Mostrar el modal de edición
                 const modalEditarEmpresa = document.getElementById('modalEditarEmpresa');
