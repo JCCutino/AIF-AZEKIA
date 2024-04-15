@@ -1,4 +1,5 @@
 import { dbConexion } from "./dbConexion.mjs";
+import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
@@ -150,6 +151,31 @@ class LibEmpresas {
     }
 
     
+   async verificarEmpresa(empresa) {
+        if (!libGenerales.verificarLongitud(empresa.empresaCod, 20)) {
+            return false;
+        }
+        if (!libGenerales.verificarLongitud(empresa.CIF, 20)) {
+            return false;
+        }
+        if (!libGenerales.verificarLongitud(empresa.razonSocial, 100)) {
+            return false;
+        }
+        if (!libGenerales.verificarLongitud(empresa.direccion, 150)) {
+            return false;
+        }
+        if (!libGenerales.verificarLongitud(empresa.CP, 10)) {
+            return false;
+        }
+        if (!libGenerales.verificarLongitud(empresa.municipio, 50)) {
+            return false;
+        }
+    
+        const empresaExistePorCodigo = await this.comprobarExistenciaEmpresaPorCodigo(empresa.empresaCod);
+        const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
+    
+        return !(empresaExistePorCodigo || empresaExistePorCIF);
+    }
     
 
 
