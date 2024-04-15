@@ -29,6 +29,10 @@ class LibEmpresas {
     }
 
     agregarEmpresa(empresa) {
+        // esta función debe devolver un objeto con el resultado
+        // de modo que las funciones que responden a ruta lo puedan devolver en un res inequivocamnete
+        // p.ej. true >> send(200, {err: false})
+        
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();

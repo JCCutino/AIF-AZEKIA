@@ -1,10 +1,10 @@
- POST http://localhost:3000/actualizarEmpresa HTTP/1.1
+ POST http://localhost:3000/agregarEmpresa HTTP/1.1
  content-type: application/json
  
   { 
     "empresa":{
-        "empresaCod": "E427",
-        "CIF": "64673383S\t",
+        "empresaCod": "E4437",
+        "CIF": "64673123S\t",
         "razonSocial": "Juan",
         "direccion": "PRUEBA API",
         "CP": "41720",

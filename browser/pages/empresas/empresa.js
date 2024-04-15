@@ -94,31 +94,25 @@ async function eliminarEmpresa(empresaCod) {
 
 
 async function mostrarDatosEnTabla(data) {
-            // Obtener la tabla HTML
             const tabla = document.getElementById('tablaEmpresas');
 
-            // Verificar si hay datos de empresas
             if (data.datosEmpresa && data.datosEmpresa.empresas && Array.isArray(data.datosEmpresa.empresas)) {
 
-                // Crear filas para cada empresa en los datos
                 data.datosEmpresa.empresas.forEach(empresa => {
                     const fila = document.createElement('tr');
         
-                    // Crear celdas para cada propiedad de la empresa
                     Object.values(empresa).forEach(valor => {
                         const celda = document.createElement('td');
                         celda.textContent = valor;
                         fila.appendChild(celda);
                     });
 
-                    // Agregar el botón a la última celda de la fila
                     const celdaBoton = document.createElement('td');
                     const boton = document.createElement('button');
                     boton.textContent = 'Ver'; 
                     celdaBoton.appendChild(boton);
                     fila.appendChild(celdaBoton);
                 
-                    // Agregar la fila a la tabla
                     tabla.appendChild(fila);
                 });
             } else {
@@ -159,19 +153,6 @@ async function guardarEmpresa() {
 
 async function main() {
     try {
-        // const empresa = {
-        //     empresaCod: 'E623',
-        //     CIF: '64672382T	',
-        //     razonSocial: 'Juan',
-        //     direccion: 'Avenida SEVILLA 123',
-        //     CP: '41720',
-        //     municipio: 'Los palacios'
-        // };
-        // const empresaCod = "E005";
-
-    //    await agregarEmpresa(empresa);
-    //    await actualizarEmpresa(empresa);
-
         await obtenerEmpresasAPI();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);

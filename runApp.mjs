@@ -43,10 +43,7 @@ app.post('/obtenerEmpresas', async (req, res) => {
     res.json({ datosEmpresa: empresas });
 });
 
-app.post('/agregarEmpresa', async (req, res) => {
-  const resultado = await httpEmpresas.postAgregarEmpresa(req, res);
-  res.json({ resultado: resultado });
-});
+app.post('/agregarEmpresa', httpEmpresas.postAgregarEmpresa);
 
 app.post('/actualizarEmpresa', async (req, res) => {
   const resultado = await httpEmpresas.postActualizarEmpresa(req, res);
