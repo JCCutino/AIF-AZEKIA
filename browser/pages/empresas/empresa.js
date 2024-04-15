@@ -80,6 +80,14 @@ async function obtenerEmpresasAPI() {
     }
 }
 
+function ClicEliminarEmpresa() {
+        // Obtener el valor de empresaCod del input
+        const empresaCod = document.getElementById("codEmpresaeditar").value;
+        // Llamar a la función eliminarEmpresa con empresaCod
+        eliminarEmpresa(empresaCod); 
+        cerrarModal();
+}
+
 async function eliminarEmpresa(empresaCod) {
     try {
         const response = await fetch('/eliminarEmpresa', {
@@ -89,9 +97,11 @@ async function eliminarEmpresa(empresaCod) {
             },
             body: JSON.stringify({empresaCod})
         });
+
         if (response.ok) {
             const data = await response.json();
             console.log('Empresa eliminada correctamente:', data);
+            await obtenerEmpresasAPI();
         } else {
             console.error('Error al eliminar empresa:', response.statusText);
         }
@@ -270,7 +280,6 @@ async function guardarEmpresa() {
     
 async function main() {
     try {
-
         await obtenerEmpresasAPI();
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
