@@ -39,15 +39,12 @@ app.post('/obtenerEmpresas', httpEmpresas.postObtenerEmpresas);
 
 app.post('/agregarEmpresa', httpEmpresas.postAgregarEmpresa);
 
-app.post('/actualizarEmpresa', async (req, res) => {
-  const resultado = await httpEmpresas.postActualizarEmpresa(req, res);
-  res.json({ resultado: resultado });
-}); 
+app.post('/actualizarEmpresa', httpEmpresas.postActualizarEmpresa);
 
-app.post('/eliminarEmpresa', async (req, res) => {
-  const resultado = await httpEmpresas.postEliminarEmpresa(req, res);
-  res.json({ resultado: resultado });
-});
+app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
+
+
+
 
 app.post('/obtenerFacturas', async (req, res) => {
   const facturas = await httpFacturas.postObtenerFacturas(req, res);
