@@ -68,6 +68,8 @@ async function obtenerEmpresasAPI() {
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
                 console.error('Error al obtener empresas:', data.errmsg);
+                mostrarDatosEnTabla(data);
+
             } else {
                 // Si no hay error, procesa los datos y muestra la tabla
                 mostrarDatosEnTabla(data);
