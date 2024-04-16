@@ -43,7 +43,15 @@ app.post('/actualizarEmpresa', httpEmpresas.postActualizarEmpresa);
 
 app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
 
+// Funciones de clientes
 
+app.post('/obtenerClientes', httpClientes.postObtenerClientes);
+
+app.post('/agregarCliente', httpClientes.postAgregarCliente);
+
+app.post('/actualizarCliente', httpClientes.postActualizarCliente);
+
+app.post('/eliminarCliente', httpClientes.postEliminarCliente);
 
 
 app.post('/obtenerFacturas', async (req, res) => {
