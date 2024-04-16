@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
+import httpClientes from './server/httpApi/httpClientes.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 
 dotenv.config();
