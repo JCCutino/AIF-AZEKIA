@@ -159,8 +159,10 @@ class LibClientes {
             return false;
         }
 
-      
-        return true;
+        const clienteExistePorCodigo = await this.comprobarExistenciaClientePorCodigo(cliente.clienteCod);
+        const clienteExistePorCIF = await this.comprobarExistenciaClientePorCIF(cliente.CIF);
+
+        return !(clienteExistePorCodigo || clienteExistePorCIF);
     }
 }
 
