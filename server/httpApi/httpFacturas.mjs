@@ -1,4 +1,5 @@
 import { libFacturas } from "../appLib/libFacturas.mjs";
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -10,13 +11,24 @@ class HttpFacturas {
 
     async  postObtenerFacturas(req, res) {
         try {
-            const pagina = req.body.pagina;
-            const resultadosTotales = req.body.resultadosTotales
-            const facturas = await libFacturas.obtenerFacturas(pagina, resultadosTotales);
-            return {facturas};
+            const facturas = await libFacturas.obtenerFacturas();
+            if (facturas && facturas.length > 0) { 
+                res.status(200).send({err: false, facturas});
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay facturas añadidas en este momento' });
+            }
         } catch (err) {
-            console.error('Error al obtener las facturas:', err);
-            throw err; 
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+
+    async postEliminarFactura(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const facturas = await libFacturas.eliminarFactura(empresaCod);
+            res.send(200, { err: false });
+        } catch (err) {
+            res.send(500);
         }
     }
 }

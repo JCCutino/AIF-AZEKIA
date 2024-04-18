@@ -1,29 +1,71 @@
+function formatearFecha(fecha) {
+    const fechaObj = new Date(fecha);
+    const dia = fechaObj.getDate().toString().padStart(2, '0');
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0'); 
+    const anio = fechaObj.getFullYear().toString().slice(-2); 
+
+    return `${dia}/${mes}/${anio}`;
+}
+
 async function mostrarDatosEnTabla(data) {
-    // Obtener la tabla HTML
+
     const tabla = document.getElementById('tablaFacturas');
 
-    // Verificar si hay datos de empresas
-    if (data.datosFactura && data.datosFactura.facturas && Array.isArray(data.datosFactura.facturas)) {
+    const filasDatos = Array.from(tabla.querySelectorAll('tr:not(:first-child)'));
 
-        // Crear filas para cada empresa en los datos
-        data.datosFactura.facturas.forEach(factura => {
-            const fila = document.createElement('tr');
+    filasDatos.forEach(fila => fila.remove());
 
-            // Crear celdas para cada propiedad de la empresa
-            Object.values(factura).forEach(valor => {
-                const celda = document.createElement('td');
-                celda.textContent = valor;
-                fila.appendChild(celda);
-            });
+            if (data.facturas && Array.isArray(data.facturas)) {
 
-            // Agregar el botón a la última celda de la fila
+                data.facturas.forEach(factura => {
+                    const fila = document.createElement('tr');
+        
+                    Object.entries(factura).forEach(([clave, valor]) => {
+                        const celda = document.createElement('td');
+                        if (clave === 'fechaEmision') {
+                            celda.textContent = formatearFecha(valor);
+                        } else {
+                            celda.textContent = valor;
+                        }
+                        fila.appendChild(celda);
+                    });
+
             const celdaBoton = document.createElement('td');
             const boton = document.createElement('button');
-            boton.textContent = 'Ver'; 
+            boton.textContent = 'Ver';
             celdaBoton.appendChild(boton);
             fila.appendChild(celdaBoton);
-        
-            // Agregar la fila a la tabla
+            boton.addEventListener('click', function() {
+                const empresaId = factura.empresaCod;
+                abrirModalborrar(empresaId);
+            });
+            
+            const confirmarBtn = document.getElementById("confirmarBtn");
+            const cancelarBtn = document.getElementById("cancelarBtn");
+            
+            boton.addEventListener('click', function(event) {
+                event.stopPropagation(); 
+                confirmarBtn.addEventListener('click', async function() {
+                    const empresaCod = factura.empresaCod;
+                    try {
+                        await eliminarFactura(empresaCod);
+                    } catch (error) {
+                        console.error('Error al eliminar la factura:', error.message);
+                    }
+                    modalborrar.style.display = "none";
+                });
+
+                cancelarBtn.addEventListener('click', function() {
+                    console.log('Se canceló la eliminación de la factura');
+                    modalborrar.style.display = "none";
+                });
+            });
+            
+            cancelarBtn.addEventListener('click', function() {
+                console.log('Se canceló la eliminación de la factura');
+                modalborrar.style.display = "none";
+            });
+
             tabla.appendChild(fila);
         });
     } else {
@@ -31,7 +73,8 @@ async function mostrarDatosEnTabla(data) {
     }
 }
 
-async function obtenerFacturassAPI(pagina = 1, resultadosTotales = 10) {
+
+async function obtenerFacturasAPI(pagina = 1, resultadosTotales = 10) {
     try {
         const response = await fetch('/obtenerFacturas', {
             method: 'POST',
@@ -51,6 +94,33 @@ async function obtenerFacturassAPI(pagina = 1, resultadosTotales = 10) {
     } catch (error) {
         console.error('Error al llamar a la API:', error.message);
     }
+}
+
+async function eliminarFactura(empresaCod) {
+    try {
+        const response = await fetch('/eliminarFactura', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({empresaCod})
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Factura eliminada correctamente:', data);
+            await obtenerFacturasAPI();
+        } else {
+            console.error('Error al eliminar factura:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al eliminar factura:', error.message);
+    }
+}
+
+async function abrirModalborrar(empresaId) {
+    const modalborrarFactura = document.getElementById('modalborrar');
+    modalborrarFactura.style.display = 'block';
 }
 
 async function main() {

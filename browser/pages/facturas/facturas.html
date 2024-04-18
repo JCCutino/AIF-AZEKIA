@@ -19,10 +19,16 @@
   <a href="/facturas">FACTURAS</a>
   <a href="/impuestos">IMPUESTOS</a>
 
+  <span class="usuario">Javier Ortega Cobos</span>
+
 </div>
 
 <!-- Tabla de Datos -->
 <h2>Listado de Empresas</h2>
+
+<div class="contenedorBtn">
+  <button onclick="mostrarModalAgregarEmpresa()" id="btnAgregar"></button>
+</div>
 
 <table id="tablaFacturas">
   <tr>
@@ -32,8 +38,17 @@
     <th>Bloqueada</th>
     <th>Cod Cliente</th>
     <th>Fecha Emision</th>
+    <th>Acciones</th>
   </tr>
 </table>
+
+<div id="modalborrar" class="modalborrar">
+  <div class="modal-contenido">
+    <p>¿Estás seguro de que quieres eliminar esta factura?</p>
+    <button id="confirmarBtn">Aceptar</button>
+    <button id="cancelarBtn">Cancelar</button>
+  </div>
+</div>
 
 <script defer src="../../pages/facturas/factura.js"></script>
 

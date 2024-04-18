@@ -2,25 +2,19 @@ import { dbConexion } from "./dbConexion.mjs";
 
 class LibFacturas {
 
-    obtenerFacturas(pagina = 1, resultadosPorPagina = 10) {
+    obtenerFacturas() {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const offset = (pagina - 1) * resultadosPorPagina;
-                const query = 'SELECT * FROM facturaventa LIMIT ?, ?';
-                connection.query(query, [offset, resultadosPorPagina], (err, resultados) => {
+                const query = 'SELECT * FROM facturaventa';
+                connection.query(query, (err, resultados) => {
                     if (err) {
                         console.error('Error al obtener facturas:', err);
                         connection.end(); 
                         reject('Error al obtener empresas');
                     } else {
-                        if (resultados.length === 0) {
-                            connection.end(); 
-                            reject('Facturas no encontradas');
-                        } else {
-                            connection.end(); 
-                            resolve(resultados); 
-                        }
+                        connection.end();
+                        resolve(resultados || []);
                     }
                 });
             } catch (error) {
@@ -29,7 +23,26 @@ class LibFacturas {
         });
     }
 
-    
+    eliminarFactura(empresaCod) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'DELETE FROM facturaventa WHERE empresaCod = ?';
+                connection.query(query, [empresaCod], (err, resultado) => {
+                    connection.end();
+                    if (err) {
+                        console.error('Error al eliminar factura:', err);
+                        reject('Error al eliminar factura');
+                    } else {
+                        resolve(resultado);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+ 
 }
 
 export const libFacturas = new LibFacturas();

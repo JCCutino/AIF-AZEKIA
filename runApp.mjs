@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
+import httpFacturas from './server/httpApi/httpFacturas.mjs';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url); 
@@ -33,6 +34,8 @@ app.get('/facturas', httpUsuarios.mostrarFacturas);
 
 app.get('/impuestos', httpUsuarios.mostrarImpuestos);
 
+app.get('/crearfactura', httpUsuarios.crearFactura);
+
 // Funciones de empresas 
 
 app.post('/obtenerEmpresas', httpEmpresas.postObtenerEmpresas);
@@ -44,6 +47,11 @@ app.post('/actualizarEmpresa', httpEmpresas.postActualizarEmpresa);
 app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
 
 
+//Funciones de facturas
+
+app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
+
+app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
 
 app.post('/obtenerFacturas', async (req, res) => {

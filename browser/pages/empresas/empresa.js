@@ -203,8 +203,6 @@ async function mostrarDatosEnTabla(data) {
             boton.addEventListener('click', function() {
                 // Obtén el identificador único de la empresa correspondiente a esta fila
                 const empresaId = empresa.empresaCod;
-
-                // Abre el modal editable y carga los valores de la fila seleccionada para su edición
                 abrirModalEditable(empresaId);
             });
         });

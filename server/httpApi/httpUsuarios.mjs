@@ -79,6 +79,15 @@ class HttpUsuarios {
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
+    async crearFactura(req, res) {
+        try {
+        res.sendFile(path.join(staticFilesPath, 'pages/crearfactura/crearfactura.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de turno:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }    
+    }
 }
 
 export default new HttpUsuarios();
