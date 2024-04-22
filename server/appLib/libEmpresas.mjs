@@ -151,7 +151,7 @@ class LibEmpresas {
     }
 
     
-   async verificarEmpresa(empresa) {
+   async verificarEmpresa(empresa, actualizar = false) {
 
     if (!libGenerales.verificarCamposVacios(empresa)) {
         return false;
@@ -175,10 +175,14 @@ class LibEmpresas {
         if (!libGenerales.verificarLongitud(empresa.municipio, 50)) {
             return false;
         }
-    
-        const empresaExistePorCodigo = await this.comprobarExistenciaEmpresaPorCodigo(empresa.empresaCod);
         const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
-    
+
+        if (actualizar === true) {
+            return true;
+        }
+
+        const empresaExistePorCodigo = await this.comprobarExistenciaEmpresaPorCodigo(empresa.empresaCod);
+
         return !(empresaExistePorCodigo || empresaExistePorCIF);
     }
     

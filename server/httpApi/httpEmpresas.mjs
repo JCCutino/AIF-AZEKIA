@@ -76,7 +76,7 @@ class HttpEmpresas {
                         // Si algunos valores no son del tipo de datos adecuado, enviar un mensaje de error
                         res.status(200).send({
                             err: true,
-                            errmsg: `Los siguientes atributos de empresa deben ser del tipo varchar: ${invalidValues.join(', ')}.`
+                            errmsg: `Los siguientes atributos de empresa deben ser del tipo varchar: ${atributosFaltantes.join(', ')}.`
                         });
                     }
                 } else {
@@ -109,8 +109,14 @@ class HttpEmpresas {
                 }
             }
 
-            const resultado = await libEmpresas.actualizarEmpresa(empresa);
-            res.status(200).send({ err: false, empresa: { empresa } });
+            const empresaValida = await libEmpresas.verificarEmpresa(empresa, true);
+
+            if (!empresaValida) {
+                res.status(200).send({ err: true, errmsg: 'La empresa no es válida' });
+            } else {
+                const resultado = await libEmpresas.actualizarEmpresa(empresa);
+                res.status(200).send({ err: false, empresa: resultado });
+            }
         } catch (err) {
             console.error('Error al actualizar la empresa:', err);
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });

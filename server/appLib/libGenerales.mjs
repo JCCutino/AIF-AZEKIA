@@ -1,20 +1,23 @@
 class LibGenerales {
     
 verificarLongitud(variable, numero) {
+
 if (typeof variable === 'number') {
     variable = variable.toString();
     }
     return variable.length <= numero;
 }
 
- verificarCamposVacios(empresa) {
-    for (const key in empresa) {
-        if (!empresa[key].length) {
+ verificarCamposVacios(objeto) {
+    for (const key in objeto) {
+        if (objeto[key] === null || objeto[key] === undefined || objeto[key] === '') {
+            console.log(objeto[key]);
             return false; 
         }
     }
     return true; 
 }
+
     
 
 }

@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
 import httpClientes from './server/httpApi/httpClientes.mjs';
+import httpImpuestos from './server/httpApi/httpImpuestos.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
 
@@ -56,6 +57,17 @@ app.post('/agregarCliente', httpClientes.postAgregarCliente);
 app.post('/actualizarCliente', httpClientes.postActualizarCliente);
 
 app.post('/eliminarCliente', httpClientes.postEliminarCliente);
+
+//Funciones de impuestos
+
+app.post('/obtenerImpuestos', httpImpuestos.postObtenerImpuestos);
+
+app.post('/agregarImpuesto', httpImpuestos.postAgregarImpuesto);
+
+app.post('/actualizarImpuesto', httpImpuestos.postActualizarImpuesto);
+
+app.post('/eliminarImpuesto', httpImpuestos.postEliminarImpuesto);
+
 //Funciones de facturas
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);

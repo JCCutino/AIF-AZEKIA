@@ -55,7 +55,7 @@ class HttpClientes {
                         // Si algunos valores no son del tipo de datos adecuado, enviar un mensaje de error
                         res.status(200).send({
                             err: true,
-                            errmsg: `Los siguientes atributos de cliente deben ser del tipo varchar: ${invalidValues.join(', ')}.`
+                            errmsg: `Los siguientes atributos de cliente deben ser del tipo varchar: ${atributosFaltantes.join(', ')}.`
                         });
                     }
                 } else {
