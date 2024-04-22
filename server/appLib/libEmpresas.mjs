@@ -152,6 +152,11 @@ class LibEmpresas {
 
     
    async verificarEmpresa(empresa) {
+
+    if (!libGenerales.verificarCamposVacios(empresa)) {
+        return false;
+    }
+
         if (!libGenerales.verificarLongitud(empresa.empresaCod, 20)) {
             return false;
         }

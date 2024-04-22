@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
+import httpClientes from './server/httpApi/httpClientes.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
 
@@ -46,7 +47,15 @@ app.post('/actualizarEmpresa', httpEmpresas.postActualizarEmpresa);
 
 app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
 
+// Funciones de clientes
 
+app.post('/obtenerClientes', httpClientes.postObtenerClientes);
+
+app.post('/agregarCliente', httpClientes.postAgregarCliente);
+
+app.post('/actualizarCliente', httpClientes.postActualizarCliente);
+
+app.post('/eliminarCliente', httpClientes.postEliminarCliente);
 //Funciones de facturas
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);

@@ -7,7 +7,16 @@ if (typeof variable === 'number') {
     return variable.length <= numero;
 }
 
+ verificarCamposVacios(empresa) {
+    for (const key in empresa) {
+        if (!empresa[key].length) {
+            return false; 
+        }
+    }
+    return true; 
+}
     
+
 }
 
 export const libGenerales = new LibGenerales();
