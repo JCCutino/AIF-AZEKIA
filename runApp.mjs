@@ -11,6 +11,7 @@ import httpImpuestos from './server/httpApi/httpImpuestos.mjs';
 import httpSeries from './server/httpApi/httpSeries.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
+import httpProyectos from './server/httpApi/httpProyectos.mjs';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url); 
@@ -79,6 +80,16 @@ app.post('/agregarSerie', httpSeries.postAgregarSerie);
 app.post('/actualizarSerie', httpSeries.postActualizarSerie);
 
 app.post('/eliminarSerie', httpSeries.postEliminarSerie);
+
+//Funciones de series
+
+app.post('/obtenerProyectos', httpProyectos.postObtenerProyectos);
+
+app.post('/agregarProyecto', httpProyectos.postAgregarProyecto);
+
+app.post('/actualizarProyecto', httpProyectos.postActualizarProyecto);
+
+app.post('/eliminarProyecto', httpProyectos.postEliminarProyecto);
 
 //Funciones de facturas
 

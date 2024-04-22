@@ -1,6 +1,7 @@
-POST http://localhost:3000/eliminarSerie HTTP/1.1
+POST http://localhost:3000/eliminarProyecto HTTP/1.1
 Content-Type: application/json
 
 {
-    "serieCod": "SER001"
+    "proyectoCod": "PRO002"
+   
 }

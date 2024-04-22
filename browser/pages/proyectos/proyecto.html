@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla de Datos</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+  <a href="/empresas">EMPRESAS</a>
+  <a href="/clientes">CLIENTES</a>
+  <a href="/proyectos">PROYECTOS</a>
+  <a href="/series">SERIES</a>
+  <a href="/facturas">FACTURAS</a>
+  <a href="/impuestos">IMPUESTOS</a>
+  <span class="usuario">Javier Ortega Cobos</span>
+</div>
+
+<!-- Tabla de Datos -->
+<h2>Listado de Proyectos</h2>
+
+<div class="contenedorBtn">
+  <button onclick="mostrarModalAgregarProyecto()" id="btnAgregar"></button>
+</div>
+
+<table id="tablaProyectos">
+  <tr>
+    <th>Proyecto Cod</th>
+    <th>Nombre</th>
+    <th>Fecha de Inicio</th>
+    <th>Fecha Fin Previsto</th>
+    <th>Empresa Cod</th>
+    <th>Cliente Cod</th>
+    <th>Importe Total Previsto</th>
+    <th>Importe Extra Previsto</th>
+    <th>Acciones</th>
+  </tr>
+  <!-- Aquí se insertarán los datos de la tabla Proyectos -->
+</table>
+
+<!-- Modal para agregar proyecto -->
+<div id="modalAgregarProyecto" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="tituloForm">
+      <h3>Formulario para Agregar Proyecto</h3>
+    </div>
+    <form id="formularioAgregarProyecto">
+      <div class="labelpck">
+        <label for="proyectoCod">Proyecto Cod:</label><br>
+        <input type="text" id="proyectoCod" name="proyectoCod">
+      </div>
+      <div class="labelUQ">
+        <label for="nombre">Nombre:</label><br>
+        <input type="text" id="nombre" name="nombre" class="inputlg">
+      </div>
+      <div class="labelpck">
+        <label for="fechaInicio">Fecha de Inicio:</label><br>
+        <input type="date" id="fechaInicio" name="fechaInicio">
+      </div>
+      <div class="labelpck">
+        <label for="fechaFinPrevisto">Fecha Fin Previsto:</label><br>
+        <input type="date" id="fechaFinPrevisto" name="fechaFinPrevisto">
+      </div>
+      <div class="labelpck">
+        <label for="empresaCod">Empresa Cod:</label><br>
+        <input type="text" id="empresaCod" name="empresaCod">
+      </div>
+      <div class="labelpck">
+        <label for="clienteCod">Cliente Cod:</label><br>
+        <input type="text" id="clienteCod" name="clienteCod">
+      </div>
+      <div class="labelpck">
+        <label for="importeTotalPrevisto">Importe Total Previsto:</label><br>
+        <input type="number" id="importeTotalPrevisto" name="importeTotalPrevisto" step="0.01" min="0">
+      </div>
+      <div class="labelpck">
+        <label for="importeExtraPrevisto">Importe Extra Previsto:</label><br>
+        <input type="number" id="importeExtraPrevisto" name="importeExtraPrevisto" step="0.01" min="0">
+      </div>
+      <!-- Botón para guardar proyecto -->
+      <div class="footerForm">
+        <button class="btnCancelar" type="button" onclick="cerrarModal()">Cancelar</button>
+        <button class="btnGuardar" type="button" onclick="guardarProyecto()">Guardar</button>
+      </div>
+    </form>  
+  </div>
+</div>
+
+<!-- Modal para editar proyecto -->
+<div id="modalEditarProyecto" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="tituloForm">
+      <h3>Editar Detalles del Proyecto</h3>
+    </div>
+    <form id="editarProyectoForm">
+      <!-- Aquí van los campos de edición -->
+    </form>   
+  </div>
+</div>
+
+<!-- Script para cargar datos de la tabla Proyectos -->
+<script defer src="../../pages/proyectos/proyecto.js"></script>
+
+</body>
+</html>
