@@ -96,6 +96,71 @@
       #editarEmpresaForm input{
         border: solid 1px black;
       }
+      #formularioAgregarCliente{
+        margin-top: 80px;
+      }
+      #formularioAgregarCliente label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarCliente input{
+        border: solid 1px black;
+      }
+      
+      #editarClienteForm{
+        margin-top: 80px;
+      }
+      #editarClienteForm label{
+        font-weight: bold;
+      }
+
+      #editarClienteForm input{
+        border: solid 1px black;
+      }
+
+      #formularioAgregarImpuesto{
+        margin-top: 80px;
+      }
+      #formularioAgregarImpuesto label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarImpuesto input{
+        border: solid 1px black;
+      }
+      
+      #editarImpuestoForm{
+        margin-top: 80px;
+      }
+      #editarImpuestoForm label{
+        font-weight: bold;
+      }
+
+      #editarImpuestoForm input{
+        border: solid 1px black;
+      }
+
+      #formularioAgregarSerie{
+        margin-top: 80px;
+      }
+      #formularioAgregarSerie label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarSerie input{
+        border: solid 1px black;
+      }
+      
+      #editarSerieForm{
+        margin-top: 80px;
+      }
+      #editarSerieForm label{
+        font-weight: bold;
+      }
+
+      #editarSerieForm input{
+        border: solid 1px black;
+      }
       .close:hover,
       .close:focus {
         color: black;
@@ -117,6 +182,9 @@
         width: 300px;
       }
       #codEmpresaeditar{
+        border: none;
+      }
+      #codClienteeditar{
         border: none;
       }
       .btnGuardar{

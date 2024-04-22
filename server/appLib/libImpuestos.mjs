@@ -108,7 +108,7 @@ class LibImpuestos {
             console.log("1");
             return false;
         }
-    
+        
         if (!libGenerales.verificarLongitud(impuesto.impuestoCod, 10)) {
             console.log("2");
             return false;
