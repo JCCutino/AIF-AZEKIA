@@ -43,15 +43,6 @@ class HttpUsuarios {
             res.status(500).send('Error al procesar la acción de mostrar series');
         }
     }
-
-    async  mostrarFacturas(req, res) {
-        try {
-            res.sendFile(path.join(staticFilesPath, 'pages/facturas/factura.html'));
-        } catch (error) {
-            console.error('Error al procesar la acción de mostrar facturas:', error);
-            res.status(500).send('Error al procesar la acción de mostrar facturas');
-        }
-    }
     
     async  mostrarImpuestos(req, res) {
         try {
@@ -61,6 +52,7 @@ class HttpUsuarios {
             res.status(500).send('Error al procesar la acción de mostrar impuestos');
         }
     }
+
     async mostrarClientes(req, res) {
         try {
         res.sendFile(path.join(staticFilesPath, 'pages/clientes/cliente.html'));
@@ -70,6 +62,7 @@ class HttpUsuarios {
             res.status(500).send('Error al conectar con la base de datos');
         }
     }
+
     async mostrarFacturas(req, res) {
         try {
         res.sendFile(path.join(staticFilesPath, 'pages/facturas/facturas.html'));
@@ -79,6 +72,7 @@ class HttpUsuarios {
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
+
     async crearFactura(req, res) {
         try {
         res.sendFile(path.join(staticFilesPath, 'pages/crearfactura/crearfactura.html'));
@@ -88,6 +82,7 @@ class HttpUsuarios {
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
+
 }
 
 export default new HttpUsuarios();
