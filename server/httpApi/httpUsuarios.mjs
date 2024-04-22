@@ -83,6 +83,16 @@ class HttpUsuarios {
         }    
     }
 
+    async mostrarPrueba(req, res) {
+        try {
+        res.sendFile(path.join(staticFilesPath, 'pages/prueba/prueba.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de turno:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }    
+    }
+
 }
 
 export default new HttpUsuarios();
