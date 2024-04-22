@@ -83,9 +83,11 @@ class HttpImpuestos {
     async postActualizarImpuesto(req, res) {
         try {
             const impuesto = req.body.impuesto;
-            const codAnterior = await libImpuestos.obtenerImpuestoPorCodigo(impuesto.impuestoCod);
+
+            console.log(impuesto);
 
             const impuestoValido = await libImpuestos.verificarImpuesto(impuesto, true);
+
 
             if (!impuestoValido) {
                 res.status(200).send({ err: true, errmsg: 'El impuesto no es válido' });

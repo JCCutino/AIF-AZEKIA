@@ -117,6 +117,28 @@
       #editarClienteForm input{
         border: solid 1px black;
       }
+
+      #formularioAgregarImpuesto{
+        margin-top: 80px;
+      }
+      #formularioAgregarImpuesto label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarImpuesto input{
+        border: solid 1px black;
+      }
+      
+      #editarImpuestoForm{
+        margin-top: 80px;
+      }
+      #editarImpuestoForm label{
+        font-weight: bold;
+      }
+
+      #editarImpuestoForm input{
+        border: solid 1px black;
+      }
       .close:hover,
       .close:focus {
         color: black;
