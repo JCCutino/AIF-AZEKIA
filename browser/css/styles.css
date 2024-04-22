@@ -139,6 +139,28 @@
       #editarImpuestoForm input{
         border: solid 1px black;
       }
+
+      #formularioAgregarSerie{
+        margin-top: 80px;
+      }
+      #formularioAgregarSerie label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarSerie input{
+        border: solid 1px black;
+      }
+      
+      #editarSerieForm{
+        margin-top: 80px;
+      }
+      #editarSerieForm label{
+        font-weight: bold;
+      }
+
+      #editarSerieForm input{
+        border: solid 1px black;
+      }
       .close:hover,
       .close:focus {
         color: black;
