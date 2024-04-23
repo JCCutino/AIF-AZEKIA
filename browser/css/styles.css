@@ -75,9 +75,16 @@
         border: solid 1px black;
         position: relative;
       }
-      #formularioAgregarEmpresa{
+      .modal-content-proyecto {
+        height: 480px;
+      }
+      #formularioAgregarEmpresa, #formularioAgregarProyecto, #editarProyectoForm{
         margin-top: 80px;
       }
+
+      #formularioAgregarEmpresa{
+        margin-top: 80px;
+      } 
       #formularioAgregarEmpresa label{
         font-weight: bold;
       }

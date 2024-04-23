@@ -1,3 +1,20 @@
+function formatearFecha(fecha) {
+    const fechaObj = new Date(fecha);
+    const dia = fechaObj.getDate().toString().padStart(2, '0');
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fechaObj.getFullYear().toString().slice(-2);
+
+    return `${dia}/${mes}/${anio}`;
+}
+function ajustarFechaParaInput(dateString) {
+    const date = new Date(dateString);
+
+    const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+
+    const formattedDate = adjustedDate.toISOString().split('T')[0];
+
+    return formattedDate;
+}
 function mostrarModalAgregarProyecto() {
     document.getElementById("modalAgregarProyecto").style.display = "block";
 }
@@ -15,7 +32,7 @@ async function agregarProyecto(proyecto) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({proyecto: proyecto })
+            body: JSON.stringify({ proyecto: proyecto })
         });
         if (response.ok) {
             const data = await response.json();
@@ -35,7 +52,7 @@ async function actualizarProyecto(proyecto) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({proyecto: proyecto })
+            body: JSON.stringify({ proyecto: proyecto })
         });
         if (response.ok) {
             const data = await response.json();
@@ -78,6 +95,64 @@ async function obtenerProyectosAPI() {
     }
 }
 
+
+async function obtenerEmpresasCod() {
+    try {
+        const response = await fetch('/obtenerEmpresasCod', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Resultado de obtenerEmpresasCod:', data);
+
+            if (data.err) {
+                // Si hay un error, muestra un mensaje de error
+                console.error('Error al obtener empresasCod:', data.errmsg);
+                mostrarDatosEnTabla(data);
+
+            } else {
+                agregarEmpresasCodSelect(data.empresasCod)
+            }
+        } else {
+            console.error('Error al llamar a la API:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al llamar a la API:', error.message);
+    }
+}
+
+
+async function obtenerClientesCod() {
+    try {
+        const response = await fetch('/obtenerClientesCod', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Resultado de obtenerClientesCod:', data);
+
+            if (data.err) {
+                // Si hay un error, muestra un mensaje de error
+                console.error('Error al obtener clientesCod:', data.errmsg);
+            } else {
+                agregarClientesCodSelect(data.clientesCod);
+
+            }
+        } else {
+            console.error('Error al llamar a la API:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al llamar a la API:', error.message);
+    }
+}
 async function eliminarProyecto(proyectoCod) {
     try {
         const response = await fetch('/eliminarProyecto', {
@@ -85,7 +160,7 @@ async function eliminarProyecto(proyectoCod) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({proyectoCod})
+            body: JSON.stringify({ proyectoCod })
         });
 
         if (response.ok) {
@@ -114,22 +189,23 @@ async function abrirModalEditableProyecto(proyectoCod) {
             const data = await response.json();
             // Buscar el proyecto con el código proporcionado
             const proyecto = data.proyectos.find(proy => proy.proyectoCod === proyectoCod);
-            
+
             if (proyecto) {
-                // Llenar los campos del formulario del modal con los detalles del proyecto
+                console.log(proyecto);
+                // Mostrar el modal de edición
+                const modalEditarProyecto = document.getElementById('modalEditarProyecto');
+                modalEditarProyecto.style.display = 'block';
+
                 document.getElementById("proyectoCodEditar").value = proyecto.proyectoCod;
                 document.getElementById("proyectoCodEditar").readOnly = true;
                 document.getElementById("nombreEditar").value = proyecto.nombre;
-                document.getElementById("fechaInicioEditar").value = proyecto.fechaInicio;
-                document.getElementById("fechaFinPrevistoEditar").value = proyecto.fechaFinPrevisto;
+                document.getElementById("fechaInicioEditar").value = ajustarFechaParaInput(proyecto.fechaInicio);
+                document.getElementById("fechaFinPrevistoEditar").value = ajustarFechaParaInput(proyecto.fechaFinPrevisto);
                 document.getElementById("empresaCodEditar").value = proyecto.empresaCod;
                 document.getElementById("clienteCodEditar").value = proyecto.clienteCod;
                 document.getElementById("importeTotalPrevistoEditar").value = proyecto.importeTotalPrevisto;
                 document.getElementById("importeExtraPrevistoEditar").value = proyecto.importeExtraPrevisto;
 
-                // Mostrar el modal de edición
-                const modalEditarProyecto = document.getElementById('modalEditarProyecto');
-                modalEditarProyecto.style.display = 'block';
             } else {
                 console.error('No se encontró el proyecto con el código proporcionado:', proyectoCod);
             }
@@ -140,6 +216,7 @@ async function abrirModalEditableProyecto(proyectoCod) {
         console.error('Error al abrir el modal editable del proyecto:', error.message);
     }
 }
+
 
 // Luego, definir la función mostrarDatosEnTabla
 async function mostrarDatosEnTabla(data) {
@@ -155,10 +232,14 @@ async function mostrarDatosEnTabla(data) {
     if (data.proyectos && Array.isArray(data.proyectos)) {
         data.proyectos.forEach(proyecto => {
             const fila = document.createElement('tr');
-    
-            Object.values(proyecto).forEach(valor => {
+
+            Object.entries(proyecto).forEach(([clave, valor]) => {
                 const celda = document.createElement('td');
-                celda.textContent = valor;
+                if (clave === 'fechaInicio' || clave === 'fechaFinPrevisto') {
+                    celda.textContent = formatearFecha(valor);
+                } else {
+                    celda.textContent = valor;
+                }
                 fila.appendChild(celda);
             });
 
@@ -173,7 +254,7 @@ async function mostrarDatosEnTabla(data) {
             tabla.appendChild(fila);
 
             // Agregar el evento click al botón "Ver"
-            boton.addEventListener('click', function() {
+            boton.addEventListener('click', function () {
                 // Obtener el identificador único del proyecto correspondiente a esta fila
                 const proyectoCod = proyecto.proyectoCod;
                 abrirModalEditableProyecto(proyectoCod);
@@ -216,7 +297,7 @@ async function guardarProyecto() {
     } catch (error) {
         console.error('Error al agregar proyecto:', error.message);
     }
-}  
+}
 
 async function actualizadaProyecto() {
     // Obtener los datos del formulario
@@ -253,13 +334,58 @@ async function actualizadaProyecto() {
 
 function ClicEliminarProyecto() {
     const proyectoCod = document.getElementById("proyectoCodEditar").value;
-    eliminarProyecto(proyectoCod); 
+    eliminarProyecto(proyectoCod);
     cerrarModal();
 }
+
+function agregarClientesCodSelect(clientesCod) {
+    var selectAgregarClienteCod = document.getElementById("clienteCod");
+    var selectEditarClienteCod = document.getElementById("clienteCodEditar");
+
+    selectAgregarClienteCod.innerHTML = "";
+    selectEditarClienteCod.innerHTML = "";
+
+    clientesCod.forEach(function (cliente) {
+        var optionAgregar = document.createElement("option");
+        optionAgregar.text = cliente.clienteCod;
+        optionAgregar.value = cliente.clienteCod;
+        selectAgregarClienteCod.add(optionAgregar);
+
+        var optionEditar = document.createElement("option");
+        optionEditar.text = cliente.clienteCod;
+        optionEditar.value = cliente.clienteCod;
+        selectEditarClienteCod.add(optionEditar);
+    });
+}
+
+function agregarEmpresasCodSelect(empresasCod) {
+    var selectAgregarEmpresaCod = document.getElementById("empresaCod");
+    var selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
+
+    selectAgregarEmpresaCod.innerHTML = "";
+    selectEditarEmpresaCod.innerHTML = "";
+
+    empresasCod.forEach(function (empresa) {
+        var optionAgregar = document.createElement("option");
+        optionAgregar.text = empresa.empresaCod;
+        optionAgregar.value = empresa.empresaCod;
+        selectAgregarEmpresaCod.add(optionAgregar);
+
+        var optionEditar = document.createElement("option");
+        optionEditar.text = empresa.empresaCod;
+        optionEditar.value = empresa.empresaCod;
+        selectEditarEmpresaCod.add(optionEditar);
+    });
+}
+
+
+
 async function main() {
     try {
         // Al cargar la página, obtener y mostrar los datos de los proyectos
         await obtenerProyectosAPI();
+        await obtenerClientesCod();
+        await obtenerEmpresasCod()
     } catch (error) {
         console.error('Error en la ejecución principal:', error);
     }
