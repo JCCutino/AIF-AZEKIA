@@ -1,33 +1,35 @@
 
 function mostrarModalAgregarEmpresa() {
     document.getElementById("modalAgregarEmpresa").style.display = "block";
-  }
-  
-  // Función para cerrar el modal de agregar empresas
-  function cerrarModal() {
+}
+
+function cerrarModal() {
     document.getElementById("modalAgregarEmpresa").style.display = "none";
     document.getElementById("modalEditarEmpresa").style.display = "none";
-  }
+}
 
-  async function agregarEmpresa(empresa) {
+async function agregarEmpresa(empresa) {
     try {
         const response = await fetch('/agregarEmpresa', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({empresa: empresa })
+            body: JSON.stringify({ empresa: empresa })
         });
         if (response.ok) {
 
             const data = await response.json();
             if (data.err) {
-                mostrarError('Error al agregar la empresa:'+ data.errmsg);
-            }        } else {
-            mostrarError('Error al añadir empresa:'+ response.statusText);
+                mostrarError('Error al agregar la empresa:' + data.errmsg);
+            }else{
+                cerrarModal();
+            }
+        } else {
+            mostrarError('Error al añadir empresa:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al añadir empresa:'+ error.message);
+        mostrarError('Error al añadir empresa:' + error.message);
     }
 }
 
@@ -39,18 +41,21 @@ async function actualizarEmpresa(empresa) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({empresa: empresa })
+            body: JSON.stringify({ empresa: empresa })
         });
         if (response.ok) {
 
             const data = await response.json();
             if (data.err) {
-                mostrarError('Error al actualizar la empresa:'+ data.errmsg);
-            }        } else {
-            mostrarError('Error al actualizar empresa:'+ response.statusText);
+                mostrarError('Error al actualizar la empresa:' + data.errmsg);
+            }else{
+                cerrarModal();
+            }
+        } else {
+            mostrarError('Error al actualizar empresa:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al actualizar empresa:'+ error.message);
+        mostrarError('Error al actualizar empresa:' + error.message);
     }
 }
 
@@ -68,7 +73,7 @@ async function obtenerEmpresasAPI() {
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                mostrarError('Error al obtener empresas:'+ data.errmsg);
+                mostrarError('Error al obtener empresas:' + data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -76,19 +81,19 @@ async function obtenerEmpresasAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al llamar a la API:'+ error.message);
+        mostrarError('Error al llamar a la API:' + error.message);
     }
 }
 
 function ClicEliminarEmpresa() {
-        // Obtener el valor de empresaCod del input
-        const empresaCod = document.getElementById("codEmpresaeditar").value;
-        // Llamar a la función eliminarEmpresa con empresaCod
-        eliminarEmpresa(empresaCod); 
-        cerrarModal();
+    // Obtener el valor de empresaCod del input
+    const empresaCod = document.getElementById("codEmpresaeditar").value;
+    // Llamar a la función eliminarEmpresa con empresaCod
+    eliminarEmpresa(empresaCod);
+    cerrarModal();
 }
 
 async function eliminarEmpresa(empresaCod) {
@@ -98,17 +103,17 @@ async function eliminarEmpresa(empresaCod) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({empresaCod})
+            body: JSON.stringify({ empresaCod })
         });
 
         if (response.ok) {
             const data = await response.json();
             await obtenerEmpresasAPI();
         } else {
-            mostrarError('Error al eliminar empresa:'+ response.statusText);
+            mostrarError('Error al eliminar empresa:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al eliminar empresa:'+ error.message);
+        mostrarError('Error al eliminar empresa:' + error.message);
     }
 }
 
@@ -126,7 +131,7 @@ async function abrirModalEditable(empresaId) {
             const data = await response.json();
             // Buscar la empresa con el ID proporcionado
             const empresa = data.empresas.find(emp => emp.empresaCod === empresaId);
-            
+
             if (empresa) {
                 // Llenar los campos del formulario del modal con los detalles de la empresa
                 document.getElementById("codEmpresaeditar").value = empresa.empresaCod;
@@ -159,13 +164,13 @@ async function abrirModalEditable(empresaId) {
                 const modalEditarEmpresa = document.getElementById('modalEditarEmpresa');
                 modalEditarEmpresa.style.display = 'block';
             } else {
-                mostrarError('No se encontró la empresa con el ID proporcionado:'+ empresaId);
+                mostrarError('No se encontró la empresa con el ID proporcionado:' + empresaId);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al abrir el modal editable:'+ error.message);
+        mostrarError('Error al abrir el modal editable:' + error.message);
     }
 }
 
@@ -180,16 +185,16 @@ async function mostrarDatosEnTabla(data) {
     // Eliminar todas las filas de datos existentes
     filasDatos.forEach(fila => fila.remove());
 
-            if (data.empresas && Array.isArray(data.empresas)) {
+    if (data.empresas && Array.isArray(data.empresas)) {
 
-                data.empresas.forEach(empresa => {
-                    const fila = document.createElement('tr');
-        
-                    Object.values(empresa).forEach(valor => {
-                        const celda = document.createElement('td');
-                        celda.textContent = valor;
-                        fila.appendChild(celda);
-                    });
+        data.empresas.forEach(empresa => {
+            const fila = document.createElement('tr');
+
+            Object.values(empresa).forEach(valor => {
+                const celda = document.createElement('td');
+                celda.textContent = valor;
+                fila.appendChild(celda);
+            });
 
             // Agregar el botón a la última celda de la fila
             const celdaBoton = document.createElement('td');
@@ -202,7 +207,7 @@ async function mostrarDatosEnTabla(data) {
             tabla.appendChild(fila);
 
             // Agregar el evento click al botón "Ver"
-            boton.addEventListener('click', function() {
+            boton.addEventListener('click', function () {
                 // Obtén el identificador único de la empresa correspondiente a esta fila
                 const empresaId = empresa.empresaCod;
                 abrirModalEditable(empresaId);
@@ -223,64 +228,62 @@ async function guardarEmpresa() {
     const direccion = document.getElementById("direccion").value;
     const cp = document.getElementById("cp").value;
     const municipio = document.getElementById("municipio").value;
-  
+
     // Crear un objeto empresa con los datos del formulario
     const empresa = {
-      empresaCod: codEmpresa,
-      CIF: cif,
-      razonSocial: razonSocial,
-      direccion: direccion,
-      CP: cp,
-      municipio: municipio
+        empresaCod: codEmpresa,
+        CIF: cif,
+        razonSocial: razonSocial,
+        direccion: direccion,
+        CP: cp,
+        municipio: municipio
     };
 
     try {
-     
+
         await agregarEmpresa(empresa);
-        // Cerrar el modal después de agregar la empresa con éxito
-        cerrarModal();
+
         await obtenerEmpresasAPI();
         // Aquí podrías actualizar la tabla de empresas si lo deseas
-      } catch (error) {
-        mostrarError('Error al agregar empresa:'+ error.message);
-      }
-    }  
+    } catch (error) {
+        mostrarError('Error al agregar empresa:' + error.message);
+    }
+}
 
-    async function actualizadaempresa() {
-        // Obtener los datos del formulario
-        const codEmpresa = document.getElementById("codEmpresaeditar").value;
-        const cif = document.getElementById("cifeditar").value;
-        const razonSocial = document.getElementById("razonSocialeditar").value;
-        const direccion = document.getElementById("direccioneditar").value;
-        const cp = document.getElementById("cpeditar").value;
-        const municipio = document.getElementById("municipioeditar").value;
-      
-        // Crear un objeto empresa con los datos del formulario
-        const empresa = {
-          empresaCod: codEmpresa,
-          CIF: cif,
-          razonSocial: razonSocial,
-          direccion: direccion,
-          CP: cp,
-          municipio: municipio
-        };
-    
-        try {
-        
-            await actualizarEmpresa(empresa);
-            // Cerrar el modal después de agregar la empresa con éxito
-            cerrarModal();
-            await obtenerEmpresasAPI();
-          } catch (error) {
-            mostrarError('Error al agregar empresa:'+ error.message);
-          }
-        }  
-    
+async function actualizadaempresa() {
+    // Obtener los datos del formulario
+    const codEmpresa = document.getElementById("codEmpresaeditar").value;
+    const cif = document.getElementById("cifeditar").value;
+    const razonSocial = document.getElementById("razonSocialeditar").value;
+    const direccion = document.getElementById("direccioneditar").value;
+    const cp = document.getElementById("cpeditar").value;
+    const municipio = document.getElementById("municipioeditar").value;
+
+    // Crear un objeto empresa con los datos del formulario
+    const empresa = {
+        empresaCod: codEmpresa,
+        CIF: cif,
+        razonSocial: razonSocial,
+        direccion: direccion,
+        CP: cp,
+        municipio: municipio
+    };
+
+    try {
+
+        await actualizarEmpresa(empresa);
+
+        await obtenerEmpresasAPI();
+    } catch (error) {
+        mostrarError('Error al agregar empresa:' + error.message);
+    }
+}
+
 async function main() {
     try {
         await obtenerEmpresasAPI();
     } catch (error) {
-        mostrarError('Error en la ejecución principal:'+ error);
+        mostrarError('Error en la ejecución principal:' + error);
     }
 }
 

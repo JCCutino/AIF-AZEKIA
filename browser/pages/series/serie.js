@@ -21,7 +21,10 @@ async function agregarSerie(serie) {
             const data = await response.json();
             if (data.err) {
                 mostrarError('Error al añadir la serie: ' + data.errmsg);
-            }        } else {
+            }else{
+                cerrarModal();
+            }
+        } else {
             mostrarError('Error al añadir serie:' + response.statusText);
         }
     } catch (error) {
@@ -42,11 +45,14 @@ async function actualizarSerie(serie) {
             const data = await response.json();
             if (data.err) {
                 mostrarError('Error al actualizar la serie:' + data.errmsg);
-            }        } else {
+            }else{
+                cerrarModal();
+            }
+        } else {
             mostrarError('Error al actualizar serie:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al actualizar serie:'+  error.message);
+        mostrarError('Error al actualizar serie:' + error.message);
     }
 }
 
@@ -64,7 +70,7 @@ async function obtenerSeriesAPI() {
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                mostrarError('Error al obtener series:'+ data.errmsg);
+                mostrarError('Error al obtener series:' + data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -72,10 +78,10 @@ async function obtenerSeriesAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al llamar a la API:'+ error.message);
+        mostrarError('Error al llamar a la API:' + error.message);
     }
 }
 
@@ -93,10 +99,10 @@ async function eliminarSerie(serieCod) {
             const data = await response.json();
             await obtenerSeriesAPI();
         } else {
-            mostrarError('Error al eliminar serie:'+ response.statusText);
+            mostrarError('Error al eliminar serie:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al eliminar serie:'+ error.message);
+        mostrarError('Error al eliminar serie:' + error.message);
     }
 }
 
@@ -114,7 +120,7 @@ async function abrirModalEditableSerie(serieCod) {
             const data = await response.json();
             // Buscar la serie con el código proporcionado
             const serie = data.series.find(ser => ser.serieCod === serieCod);
-            
+
             if (serie) {
                 // Llenar los campos del formulario del modal con los detalles de la serie
                 document.getElementById("serieCodEditar").value = serie.serieCod;
@@ -126,13 +132,13 @@ async function abrirModalEditableSerie(serieCod) {
                 const modalEditarSerie = document.getElementById('modalEditarSerie');
                 modalEditarSerie.style.display = 'block';
             } else {
-                mostrarError('No se encontró la serie con el código proporcionado:'+ serieCod);
+                mostrarError('No se encontró la serie con el código proporcionado:' + serieCod);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al abrir el modal editable de la serie:'+ error.message);
+        mostrarError('Error al abrir el modal editable de la serie:' + error.message);
     }
 }
 
@@ -150,7 +156,7 @@ async function mostrarDatosEnTabla(data) {
     if (data.series && Array.isArray(data.series)) {
         data.series.forEach(serie => {
             const fila = document.createElement('tr');
-    
+
             Object.values(serie).forEach(valor => {
                 const celda = document.createElement('td');
                 celda.textContent = valor;
@@ -168,7 +174,7 @@ async function mostrarDatosEnTabla(data) {
             tabla.appendChild(fila);
 
             // Agregar el evento click al botón "Ver"
-            boton.addEventListener('click', function() {
+            boton.addEventListener('click', function () {
                 // Obtener el identificador único de la serie correspondiente a esta fila
                 const serieCod = serie.serieCod;
                 abrirModalEditableSerie(serieCod);
@@ -184,57 +190,53 @@ async function guardarSerie() {
     const serieCod = document.getElementById("serieCod").value;
     const descripcion = document.getElementById("descripcion").value;
     const ultimoNumUsadoString = document.getElementById("ultimoNumUsado").value;
-   
+
     const ultimoNumUsado = parseInt(ultimoNumUsadoString);
 
 
     const serie = {
-      serieCod: serieCod,
-      descripcion: descripcion,
-      ultimoNumUsado: ultimoNumUsado
+        serieCod: serieCod,
+        descripcion: descripcion,
+        ultimoNumUsado: ultimoNumUsado
     };
 
     try {
         // Llamar a la función agregarSerie con el objeto serie como argumento
         await agregarSerie(serie);
-        // Cerrar el modal después de agregar la serie con éxito
-        cerrarModal();
         // Actualizar la tabla de series
         await obtenerSeriesAPI();
     } catch (error) {
-        mostrarError('Error al agregar serie:'+ error.message);
+        mostrarError('Error al agregar serie:' + error.message);
     }
-}  
+}
 
 async function actualizadaSerie() {
-       // Obtener los datos del formulario
-       const serieCod = document.getElementById("serieCodEditar").value;
-       const descripcion = document.getElementById("descripcionEditar").value;
-       const ultimoNumUsadoString = document.getElementById("ultimoNumUsadoEditar").value;
-      
-       const ultimoNumUsado = parseInt(ultimoNumUsadoString);
-   
-   
-       const serie = {
-         serieCod: serieCod,
-         descripcion: descripcion,
-         ultimoNumUsado: ultimoNumUsado
-       };
+    // Obtener los datos del formulario
+    const serieCod = document.getElementById("serieCodEditar").value;
+    const descripcion = document.getElementById("descripcionEditar").value;
+    const ultimoNumUsadoString = document.getElementById("ultimoNumUsadoEditar").value;
+
+    const ultimoNumUsado = parseInt(ultimoNumUsadoString);
+
+
+    const serie = {
+        serieCod: serieCod,
+        descripcion: descripcion,
+        ultimoNumUsado: ultimoNumUsado
+    };
 
     try {
         await actualizarSerie(serie);
-        // Cerrar el modal después de actualizar la serie con éxito
-        cerrarModal();
         // Actualizar la tabla de series
         await obtenerSeriesAPI();
     } catch (error) {
-        mostrarError('Error al actualizar serie:'+ error.message);
+        mostrarError('Error al actualizar serie:' + error.message);
     }
 }
 
 function ClicEliminarSerie() {
     const serieCod = document.getElementById("serieCodEditar").value;
-    eliminarSerie(serieCod); 
+    eliminarSerie(serieCod);
     cerrarModal();
 }
 async function main() {
@@ -242,7 +244,7 @@ async function main() {
         // Al cargar la página, obtener y mostrar los datos de las series
         await obtenerSeriesAPI();
     } catch (error) {
-        mostrarError('Error en la ejecución principal:'+ error);
+        mostrarError('Error en la ejecución principal:' + error);
     }
 }
 
