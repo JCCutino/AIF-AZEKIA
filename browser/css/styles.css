@@ -75,9 +75,16 @@
         border: solid 1px black;
         position: relative;
       }
-      #formularioAgregarEmpresa{
+      .modal-content-proyecto {
+        height: 480px;
+      }
+      #formularioAgregarEmpresa, #formularioAgregarProyecto, #editarProyectoForm{
         margin-top: 80px;
       }
+
+      #formularioAgregarEmpresa{
+        margin-top: 80px;
+      } 
       #formularioAgregarEmpresa label{
         font-weight: bold;
       }
@@ -299,3 +306,17 @@
       #cancelarBtn:hover {
         background-color: #d32f2f;
       }
+
+      .dialogo-error {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffcccc;
+        color: #ff0000;
+        padding: 20px;
+        border: 2px solid #ff0000;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }

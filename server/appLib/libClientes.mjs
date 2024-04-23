@@ -2,7 +2,26 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibClientes {
-
+    obtenerClientesCod() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'SELECT clienteCod FROM Cliente';
+                connection.query(query, (err, resultados) => {
+                    if (err) {
+                        console.error('Error al obtener clientesCod:', err);
+                        connection.end();
+                        reject('Error al obtener clientesCod');
+                    } else {
+                        connection.end();
+                        resolve(resultados || []);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
     obtenerClientes() {
         return new Promise(async (resolve, reject) => {
             try {

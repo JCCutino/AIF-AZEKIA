@@ -10,6 +10,18 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpEmpresas {
 
+    async postObtenerEmpresasCod(req, res) {
+        try {
+            const empresasCod = await libEmpresas.obtenerEmpresasCod();
+            if (empresasCod && empresasCod.length > 0) {
+                res.status(200).send({ err: false, empresasCod });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay empresas añadidas en este momento' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
     async postObtenerEmpresas(req, res) {
         try {
             const empresas = await libEmpresas.obtenerEmpresas();

@@ -21,12 +21,13 @@ function mostrarModalAgregarCliente() {
         if (response.ok) {
 
             const data = await response.json();
-            console.log('Cliente añadida correctamente:', data);
-        } else {
-            console.error('Error al añadir cliente:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al agregar el cliente:'+ data.errmsg);
+            }        } else {
+            mostrarError('Error al añadir cliente:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al añadir cliente:', error.message);
+        mostrarError('Error al añadir cliente:'+ error.message);
     }
 }
 
@@ -43,12 +44,13 @@ async function actualizarCliente(cliente) {
         if (response.ok) {
 
             const data = await response.json();
-            console.log('Cliente actualizada correctamente:', data);
-        } else {
-            console.error('Error al actualizar cliente:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al actualizar el cliente:'+ data.errmsg);
+            }        } else {
+            mostrarError('Error al actualizar cliente:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al actualizar cliente:', error.message);
+        mostrarError('Error al actualizar cliente:'+ error.message);
     }
 }
 
@@ -63,11 +65,10 @@ async function obtenerClientesAPI() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerClientesAPI:', data);
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener clientes:', data.errmsg);
+                mostrarError('Error al obtener clientes:'+ data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -75,10 +76,10 @@ async function obtenerClientesAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 
@@ -102,13 +103,12 @@ async function eliminarCliente(clienteCod) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Cliente eliminada correctamente:', data);
             await obtenerClientesAPI();
         } else {
-            console.error('Error al eliminar cliente:', response.statusText);
+            mostrarError('Error al eliminar cliente:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al eliminar cliente:', error.message);
+        mostrarError('Error al eliminar cliente:'+ error.message);
     }
 }
 
@@ -159,13 +159,13 @@ async function abrirModalEditable(clienteId) {
                 const modalEditarCliente = document.getElementById('modalEditarCliente');
                 modalEditarCliente.style.display = 'block';
             } else {
-                console.error('No se encontró la cliente con el ID proporcionado:', clienteId);
+                mostrarError('No se encontró la cliente con el ID proporcionado:'+ clienteId);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al abrir el modal editable:', error.message);
+        mostrarError('Error al abrir el modal editable:'+ error.message);
     }
 }
 
@@ -209,7 +209,7 @@ async function mostrarDatosEnTabla(data) {
             });
         });
     } else {
-        console.error('No se encontraron datos de clientes válidos en la respuesta.');
+        mostrarError('No se encontraron datos de clientes válidos en la respuesta.');
     }
 }
 
@@ -235,15 +235,14 @@ async function guardarCliente() {
     };
 
     try {
-        // Llamar a la función agregarCliente con el objeto cliente como argumento
-        console.log(cliente);
+    
         await agregarCliente(cliente);
         // Cerrar el modal después de agregar la cliente con éxito
         cerrarModal();
         await obtenerClientesAPI();
         // Aquí podrías actualizar la tabla de clientes si lo deseas
       } catch (error) {
-        console.error('Error al agregar cliente:', error.message);
+        mostrarError('Error al agregar cliente:'+ error.message);
       }
     }  
 
@@ -274,7 +273,7 @@ async function guardarCliente() {
             cerrarModal();
             await obtenerClientesAPI();
           } catch (error) {
-            console.error('Error al agregar cliente:', error.message);
+            mostrarError('Error al agregar cliente:'+ error.message);
           }
         }  
     
@@ -282,7 +281,7 @@ async function main() {
     try {
         await obtenerClientesAPI();
     } catch (error) {
-        console.error('Error en la ejecución principal:', error);
+        mostrarError('Error en la ejecución principal:'+ error);
     }
 }
 

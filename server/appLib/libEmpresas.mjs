@@ -3,6 +3,27 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
+    obtenerEmpresasCod() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'SELECT empresaCod FROM Empresa';
+                connection.query(query, (err, resultados) => {
+                    if (err) {
+                        console.error('Error al obtener empresasCod:', err);
+                        connection.end();
+                        reject('Error al obtener empresas');
+                    } else {
+                        connection.end();
+                        resolve(resultados || []);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
     obtenerEmpresas() {
         return new Promise(async (resolve, reject) => {
             try {

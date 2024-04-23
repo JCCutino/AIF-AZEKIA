@@ -50,7 +50,7 @@ async function mostrarDatosEnTabla(data) {
                     try {
                         await eliminarFactura(empresaCod);
                     } catch (error) {
-                        console.error('Error al eliminar la factura:', error.message);
+                        mostrarError('Error al eliminar la factura:', error.message);
                     }
                     modalborrar.style.display = "none";
                 });
@@ -69,7 +69,7 @@ async function mostrarDatosEnTabla(data) {
             tabla.appendChild(fila);
         });
     } else {
-        console.error('No se encontraron datos de empresas válidos en la respuesta.');
+        mostrarError('No se encontraron datos de facturas válidos en la respuesta.');
     }
 }
 
@@ -89,10 +89,10 @@ async function obtenerFacturasAPI(pagina = 1, resultadosTotales = 10) {
             mostrarDatosEnTabla(data);
             console.log('Resultado de obtenerFacturasAPI:', data);
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:', response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:', error.message);
     }
 }
 
@@ -111,10 +111,10 @@ async function eliminarFactura(empresaCod) {
             console.log('Factura eliminada correctamente:', data);
             await obtenerFacturasAPI();
         } else {
-            console.error('Error al eliminar factura:', response.statusText);
+            mostrarError('Error al eliminar factura:', response.statusText);
         }
     } catch (error) {
-        console.error('Error al eliminar factura:', error.message);
+        mostrarError('Error al eliminar factura:', error.message);
     }
 }
 
@@ -127,7 +127,7 @@ async function main() {
     try {
        await obtenerFacturasAPI();
     } catch (error) {
-        console.error('Error en la ejecución principal:', error);
+        mostrarError('Error en la ejecución principal:', error);
     }
 }
 main(); 
