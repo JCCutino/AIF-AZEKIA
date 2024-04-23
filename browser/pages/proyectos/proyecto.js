@@ -36,18 +36,20 @@ async function agregarProyecto(proyecto) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Proyecto añadido correctamente:', data);
+            if (data.err) {
+                mostrarError(data.errmsg);
+            }
         } else {
-            console.error('Error al añadir proyecto:', response.statusText);
+            mostrarError('Error al añadir proyecto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al añadir proyecto:', error.message);
+        mostrarError('Error al añadir proyecto:'+ error.message);
     }
 }
 
 async function actualizarProyecto(proyecto) {
     try {
-        const response = await fetch('/actualizarProyecto', {
+        const response = await fetch('/actualizarProyecto'+ {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,12 +58,14 @@ async function actualizarProyecto(proyecto) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Proyecto actualizado correctamente:', data);
+            if (data.err) {
+                mostrarError(data.errmsg);
+            }
         } else {
-            console.error('Error al actualizar proyecto:', response.statusText);
+            mostrarError('Error al actualizar proyecto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al actualizar proyecto:', error.message);
+        mostrarError('Error al actualizar proyecto:'+ error.message);
     }
 }
 
@@ -76,22 +80,19 @@ async function obtenerProyectosAPI() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerProyectosAPI:', data);
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener proyectos:', data.errmsg);
-                mostrarDatosEnTabla(data);
-
+                mostrarError('Error al obtener proyectos:'+ data.errmsg);
             } else {
                 // Si no hay error, procesa los datos y muestra la tabla
                 mostrarDatosEnTabla(data);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 
@@ -107,21 +108,20 @@ async function obtenerEmpresasCod() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerEmpresasCod:', data);
 
             if (data.err) {
-                // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener empresasCod:', data.errmsg);
-                mostrarDatosEnTabla(data);
+                mostrarError('Error al obtener empresasCod:'+ data.errmsg)
 
             } else {
                 agregarEmpresasCodSelect(data.empresasCod)
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            
+            mostrarError('Error al llamar a la API:'+ response.statusText);
+
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 
@@ -137,20 +137,18 @@ async function obtenerClientesCod() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerClientesCod:', data);
 
             if (data.err) {
-                // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener clientesCod:', data.errmsg);
+                mostrarError('Error al obtener clientesCod:'+ data.errmsg);
             } else {
                 agregarClientesCodSelect(data.clientesCod);
 
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 async function eliminarProyecto(proyectoCod) {
@@ -165,13 +163,12 @@ async function eliminarProyecto(proyectoCod) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Proyecto eliminado correctamente:', data);
             await obtenerProyectosAPI();
         } else {
-            console.error('Error al eliminar proyecto:', response.statusText);
+            mostrarError('Error al eliminar proyecto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al eliminar proyecto:', error.message);
+        mostrarError('Error al eliminar proyecto:'+ error.message);
     }
 }
 
@@ -191,7 +188,6 @@ async function abrirModalEditableProyecto(proyectoCod) {
             const proyecto = data.proyectos.find(proy => proy.proyectoCod === proyectoCod);
 
             if (proyecto) {
-                console.log(proyecto);
                 // Mostrar el modal de edición
                 const modalEditarProyecto = document.getElementById('modalEditarProyecto');
                 modalEditarProyecto.style.display = 'block';
@@ -207,13 +203,13 @@ async function abrirModalEditableProyecto(proyectoCod) {
                 document.getElementById("importeExtraPrevistoEditar").value = proyecto.importeExtraPrevisto;
 
             } else {
-                console.error('No se encontró el proyecto con el código proporcionado:', proyectoCod);
+                mostrarError('No se encontró el proyecto con el código proporcionado:'+ proyectoCod);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al abrir el modal editable del proyecto:', error.message);
+        mostrarError('Error al abrir el modal editable del proyecto:'+ error.message);
     }
 }
 
@@ -261,7 +257,7 @@ async function mostrarDatosEnTabla(data) {
             });
         });
     } else {
-        console.error('No se encontraron datos de proyectos válidos en la respuesta.');
+        mostrarError('No se encontraron datos de proyectos válidos en la respuesta.');
     }
 }
 
@@ -295,7 +291,7 @@ async function guardarProyecto() {
         // Actualizar la tabla de proyectos
         await obtenerProyectosAPI();
     } catch (error) {
-        console.error('Error al agregar proyecto:', error.message);
+        mostrarError('Error al agregar proyecto:'+ error.message);
     }
 }
 
@@ -328,7 +324,7 @@ async function actualizadaProyecto() {
         // Actualizar la tabla de proyectos
         await obtenerProyectosAPI();
     } catch (error) {
-        console.error('Error al actualizar proyecto:', error.message);
+        mostrarError('Error al actualizar proyecto:'+ error.message);
     }
 }
 
@@ -379,15 +375,15 @@ function agregarEmpresasCodSelect(empresasCod) {
 }
 
 
-
 async function main() {
     try {
         // Al cargar la página, obtener y mostrar los datos de los proyectos
         await obtenerProyectosAPI();
         await obtenerClientesCod();
         await obtenerEmpresasCod()
+
     } catch (error) {
-        console.error('Error en la ejecución principal:', error);
+        mostrarError('Error en la ejecución principal:'+ error);
     }
 }
 

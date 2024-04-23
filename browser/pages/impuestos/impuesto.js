@@ -19,12 +19,13 @@ async function agregarImpuesto(impuesto) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Impuesto añadido correctamente:', data);
-        } else {
-            console.error('Error al añadir impuesto:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al añadir el impuesto:'+ data.errmsg);
+            }        } else {
+            mostrarError('Error al añadir impuesto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al añadir impuesto:', error.message);
+        mostrarError('Error al añadir impuesto:'+ error.message);
     }
 }
 
@@ -39,12 +40,13 @@ async function actualizarImpuesto(impuesto) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Impuesto actualizado correctamente:', data);
-        } else {
-            console.error('Error al actualizar impuesto:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al actualizar el impuesto:'+ data.errmsg);
+            }        } else {
+            mostrarError('Error al actualizar impuesto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al actualizar impuesto:', error.message);
+        mostrarError('Error al actualizar impuesto:'+ error.message);
     }
 }
 
@@ -59,11 +61,10 @@ async function obtenerImpuestosAPI() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerImpuestosAPI:', data);
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener impuestos:', data.errmsg);
+                mostrarError('Error al obtener impuestos:'+ data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -71,10 +72,10 @@ async function obtenerImpuestosAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 
@@ -90,13 +91,12 @@ async function eliminarImpuesto(impuestoCod) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Impuesto eliminado correctamente:', data);
             await obtenerImpuestosAPI();
         } else {
-            console.error('Error al eliminar impuesto:', response.statusText);
+            mostrarError('Error al eliminar impuesto:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al eliminar impuesto:', error.message);
+        mostrarError('Error al eliminar impuesto:'+ error.message);
     }
 }
 
@@ -126,13 +126,13 @@ async function abrirModalEditableImpuesto(impuestoCod) {
                 const modalEditarImpuesto = document.getElementById('modalEditarImpuesto');
                 modalEditarImpuesto.style.display = 'block';
             } else {
-                console.error('No se encontró el impuesto con el código proporcionado:', impuestoCod);
+                mostrarError('No se encontró el impuesto con el código proporcionado:'+ impuestoCod);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al abrir el modal editable del impuesto:', error.message);
+        mostrarError('Error al abrir el modal editable del impuesto:'+ error.message);
     }
 }
 
@@ -175,7 +175,7 @@ async function mostrarDatosEnTabla(data) {
             });
         });
     } else {
-        console.error('No se encontraron datos de impuestos válidos en la respuesta.');
+        mostrarError('No se encontraron datos de impuestos válidos en la respuesta.');
     }
 }
 
@@ -187,7 +187,6 @@ async function guardarImpuesto() {
    
     const porcentaje = parseFloat(porcentajeString);
 
-    console.log(typeof(porcentaje));
 
     const impuesto = {
       impuestoCod: impuestoCod,
@@ -203,7 +202,7 @@ async function guardarImpuesto() {
         // Actualizar la tabla de impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        console.error('Error al agregar impuesto:', error.message);
+        mostrarError('Error al agregar impuesto:'+ error.message);
     }
 }  
 
@@ -221,7 +220,6 @@ async function actualizadaImpuesto() {
          tipoImpuesto: tipoImpuesto,
          porcentaje: porcentaje
        };
-       console.log(impuesto);
 
     try {
         await actualizarImpuesto(impuesto);
@@ -230,7 +228,7 @@ async function actualizadaImpuesto() {
         // Actualizar la tabla de impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        console.error('Error al actualizar impuesto:', error.message);
+        mostrarError('Error al actualizar impuesto:'+ error.message);
     }
 }
 
@@ -244,7 +242,7 @@ async function main() {
         // Al cargar la página, obtener y mostrar los datos de los impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        console.error('Error en la ejecución principal:', error);
+        mostrarError('Error en la ejecución principal:'+ error);
     }
 }
 

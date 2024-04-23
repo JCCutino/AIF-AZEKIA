@@ -19,12 +19,13 @@ async function agregarSerie(serie) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Serie añadida correctamente:', data);
-        } else {
-            console.error('Error al añadir serie:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al añadir la serie: ' + data.errmsg);
+            }        } else {
+            mostrarError('Error al añadir serie:' + response.statusText);
         }
     } catch (error) {
-        console.error('Error al añadir serie:', error.message);
+        mostrarError('Error al añadir serie:' + error.message);
     }
 }
 
@@ -39,12 +40,13 @@ async function actualizarSerie(serie) {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log('Serie actualizada correctamente:', data);
-        } else {
-            console.error('Error al actualizar serie:', response.statusText);
+            if (data.err) {
+                mostrarError('Error al actualizar la serie:' + data.errmsg);
+            }        } else {
+            mostrarError('Error al actualizar serie:' + response.statusText);
         }
     } catch (error) {
-        console.error('Error al actualizar serie:', error.message);
+        mostrarError('Error al actualizar serie:'+  error.message);
     }
 }
 
@@ -59,11 +61,10 @@ async function obtenerSeriesAPI() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Resultado de obtenerSeriesAPI:', data);
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                console.error('Error al obtener series:', data.errmsg);
+                mostrarError('Error al obtener series:'+ data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -71,10 +72,10 @@ async function obtenerSeriesAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al llamar a la API:', error.message);
+        mostrarError('Error al llamar a la API:'+ error.message);
     }
 }
 
@@ -90,13 +91,12 @@ async function eliminarSerie(serieCod) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Serie eliminada correctamente:', data);
             await obtenerSeriesAPI();
         } else {
-            console.error('Error al eliminar serie:', response.statusText);
+            mostrarError('Error al eliminar serie:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al eliminar serie:', error.message);
+        mostrarError('Error al eliminar serie:'+ error.message);
     }
 }
 
@@ -126,13 +126,13 @@ async function abrirModalEditableSerie(serieCod) {
                 const modalEditarSerie = document.getElementById('modalEditarSerie');
                 modalEditarSerie.style.display = 'block';
             } else {
-                console.error('No se encontró la serie con el código proporcionado:', serieCod);
+                mostrarError('No se encontró la serie con el código proporcionado:'+ serieCod);
             }
         } else {
-            console.error('Error al llamar a la API:', response.statusText);
+            mostrarError('Error al llamar a la API:'+ response.statusText);
         }
     } catch (error) {
-        console.error('Error al abrir el modal editable de la serie:', error.message);
+        mostrarError('Error al abrir el modal editable de la serie:'+ error.message);
     }
 }
 
@@ -175,7 +175,7 @@ async function mostrarDatosEnTabla(data) {
             });
         });
     } else {
-        console.error('No se encontraron datos de series válidos en la respuesta.');
+        mostrarError('No se encontraron datos de series válidos en la respuesta.');
     }
 }
 
@@ -187,7 +187,6 @@ async function guardarSerie() {
    
     const ultimoNumUsado = parseInt(ultimoNumUsadoString);
 
-    console.log(typeof(ultimoNumUsado));
 
     const serie = {
       serieCod: serieCod,
@@ -203,7 +202,7 @@ async function guardarSerie() {
         // Actualizar la tabla de series
         await obtenerSeriesAPI();
     } catch (error) {
-        console.error('Error al agregar serie:', error.message);
+        mostrarError('Error al agregar serie:'+ error.message);
     }
 }  
 
@@ -221,7 +220,6 @@ async function actualizadaSerie() {
          descripcion: descripcion,
          ultimoNumUsado: ultimoNumUsado
        };
-       console.log(serie);
 
     try {
         await actualizarSerie(serie);
@@ -230,7 +228,7 @@ async function actualizadaSerie() {
         // Actualizar la tabla de series
         await obtenerSeriesAPI();
     } catch (error) {
-        console.error('Error al actualizar serie:', error.message);
+        mostrarError('Error al actualizar serie:'+ error.message);
     }
 }
 
@@ -244,7 +242,7 @@ async function main() {
         // Al cargar la página, obtener y mostrar los datos de las series
         await obtenerSeriesAPI();
     } catch (error) {
-        console.error('Error en la ejecución principal:', error);
+        mostrarError('Error en la ejecución principal:'+ error);
     }
 }
 
