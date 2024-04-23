@@ -2,7 +2,6 @@ function mostrarModalAgregarImpuesto() {
     document.getElementById("modalAgregarImpuesto").style.display = "block";
 }
 
-// Función para cerrar el modal de agregar impuestos
 function cerrarModal() {
     document.getElementById("modalAgregarImpuesto").style.display = "none";
     document.getElementById("modalEditarImpuesto").style.display = "none";
@@ -15,17 +14,20 @@ async function agregarImpuesto(impuesto) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({impuesto: impuesto })
+            body: JSON.stringify({ impuesto: impuesto })
         });
         if (response.ok) {
             const data = await response.json();
             if (data.err) {
-                mostrarError('Error al añadir el impuesto:'+ data.errmsg);
-            }        } else {
-            mostrarError('Error al añadir impuesto:'+ response.statusText);
+                mostrarError('Error al añadir el impuesto:' + data.errmsg);
+            }else{
+                cerrarModal();
+            }
+        } else {
+            mostrarError('Error al añadir impuesto:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al añadir impuesto:'+ error.message);
+        mostrarError('Error al añadir impuesto:' + error.message);
     }
 }
 
@@ -36,17 +38,20 @@ async function actualizarImpuesto(impuesto) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({impuesto: impuesto })
+            body: JSON.stringify({ impuesto: impuesto })
         });
         if (response.ok) {
             const data = await response.json();
             if (data.err) {
-                mostrarError('Error al actualizar el impuesto:'+ data.errmsg);
-            }        } else {
-            mostrarError('Error al actualizar impuesto:'+ response.statusText);
+                mostrarError('Error al actualizar el impuesto:' + data.errmsg);
+            }else{
+                cerrarModal();
+            }
+        } else {
+            mostrarError('Error al actualizar impuesto:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al actualizar impuesto:'+ error.message);
+        mostrarError('Error al actualizar impuesto:' + error.message);
     }
 }
 
@@ -64,7 +69,7 @@ async function obtenerImpuestosAPI() {
 
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
-                mostrarError('Error al obtener impuestos:'+ data.errmsg);
+                mostrarError('Error al obtener impuestos:' + data.errmsg);
                 mostrarDatosEnTabla(data);
 
             } else {
@@ -72,10 +77,10 @@ async function obtenerImpuestosAPI() {
                 mostrarDatosEnTabla(data);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al llamar a la API:'+ error.message);
+        mostrarError('Error al llamar a la API:' + error.message);
     }
 }
 
@@ -86,17 +91,17 @@ async function eliminarImpuesto(impuestoCod) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({impuestoCod})
+            body: JSON.stringify({ impuestoCod })
         });
 
         if (response.ok) {
             const data = await response.json();
             await obtenerImpuestosAPI();
         } else {
-            mostrarError('Error al eliminar impuesto:'+ response.statusText);
+            mostrarError('Error al eliminar impuesto:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al eliminar impuesto:'+ error.message);
+        mostrarError('Error al eliminar impuesto:' + error.message);
     }
 }
 
@@ -114,7 +119,7 @@ async function abrirModalEditableImpuesto(impuestoCod) {
             const data = await response.json();
             // Buscar el impuesto con el código proporcionado
             const impuesto = data.impuestos.find(imp => imp.impuestoCod === impuestoCod);
-            
+
             if (impuesto) {
                 // Llenar los campos del formulario del modal con los detalles del impuesto
                 document.getElementById("impuestoCodEditar").value = impuesto.impuestoCod;
@@ -126,13 +131,13 @@ async function abrirModalEditableImpuesto(impuestoCod) {
                 const modalEditarImpuesto = document.getElementById('modalEditarImpuesto');
                 modalEditarImpuesto.style.display = 'block';
             } else {
-                mostrarError('No se encontró el impuesto con el código proporcionado:'+ impuestoCod);
+                mostrarError('No se encontró el impuesto con el código proporcionado:' + impuestoCod);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al abrir el modal editable del impuesto:'+ error.message);
+        mostrarError('Error al abrir el modal editable del impuesto:' + error.message);
     }
 }
 
@@ -150,7 +155,7 @@ async function mostrarDatosEnTabla(data) {
     if (data.impuestos && Array.isArray(data.impuestos)) {
         data.impuestos.forEach(impuesto => {
             const fila = document.createElement('tr');
-    
+
             Object.values(impuesto).forEach(valor => {
                 const celda = document.createElement('td');
                 celda.textContent = valor;
@@ -168,7 +173,7 @@ async function mostrarDatosEnTabla(data) {
             tabla.appendChild(fila);
 
             // Agregar el evento click al botón "Ver"
-            boton.addEventListener('click', function() {
+            boton.addEventListener('click', function () {
                 // Obtener el identificador único del impuesto correspondiente a esta fila
                 const impuestoCod = impuesto.impuestoCod;
                 abrirModalEditableImpuesto(impuestoCod);
@@ -184,57 +189,53 @@ async function guardarImpuesto() {
     const impuestoCod = document.getElementById("impuestoCod").value;
     const tipoImpuesto = document.getElementById("tipoImpuesto").value;
     const porcentajeString = document.getElementById("porcentaje").value;
-   
+
     const porcentaje = parseFloat(porcentajeString);
 
 
     const impuesto = {
-      impuestoCod: impuestoCod,
-      tipoImpuesto: tipoImpuesto,
-      porcentaje: porcentaje
+        impuestoCod: impuestoCod,
+        tipoImpuesto: tipoImpuesto,
+        porcentaje: porcentaje
     };
 
     try {
         // Llamar a la función agregarImpuesto con el objeto impuesto como argumento
         await agregarImpuesto(impuesto);
-        // Cerrar el modal después de agregar el impuesto con éxito
-        cerrarModal();
         // Actualizar la tabla de impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        mostrarError('Error al agregar impuesto:'+ error.message);
+        mostrarError('Error al agregar impuesto:' + error.message);
     }
-}  
+}
 
 async function actualizadaImpuesto() {
-       // Obtener los datos del formulario
-       const impuestoCod = document.getElementById("impuestoCodEditar").value;
-       const tipoImpuesto = document.getElementById("tipoImpuestoEditar").value;
-       const porcentajeString = document.getElementById("porcentajeEditar").value;
-      
-       const porcentaje = parseFloat(porcentajeString);
-   
-   
-       const impuesto = {
-         impuestoCod: impuestoCod,
-         tipoImpuesto: tipoImpuesto,
-         porcentaje: porcentaje
-       };
+    // Obtener los datos del formulario
+    const impuestoCod = document.getElementById("impuestoCodEditar").value;
+    const tipoImpuesto = document.getElementById("tipoImpuestoEditar").value;
+    const porcentajeString = document.getElementById("porcentajeEditar").value;
+
+    const porcentaje = parseFloat(porcentajeString);
+
+
+    const impuesto = {
+        impuestoCod: impuestoCod,
+        tipoImpuesto: tipoImpuesto,
+        porcentaje: porcentaje
+    };
 
     try {
         await actualizarImpuesto(impuesto);
-        // Cerrar el modal después de actualizar el impuesto con éxito
-        cerrarModal();
         // Actualizar la tabla de impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        mostrarError('Error al actualizar impuesto:'+ error.message);
+        mostrarError('Error al actualizar impuesto:' + error.message);
     }
 }
 
 function ClicEliminarImpuesto() {
     const impuestoCod = document.getElementById("impuestoCodEditar").value;
-    eliminarImpuesto(impuestoCod); 
+    eliminarImpuesto(impuestoCod);
     cerrarModal();
 }
 async function main() {
@@ -242,7 +243,7 @@ async function main() {
         // Al cargar la página, obtener y mostrar los datos de los impuestos
         await obtenerImpuestosAPI();
     } catch (error) {
-        mostrarError('Error en la ejecución principal:'+ error);
+        mostrarError('Error en la ejecución principal:' + error);
     }
 }
 

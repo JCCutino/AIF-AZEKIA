@@ -124,12 +124,12 @@ class LibClientes {
         });
     }
     
-    comprobarExistenciaClientePorCIF(CIF) {
+    comprobarExistenciaClientePorCIF(CIF, clienteCod) {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE CIF = ?';
-                connection.query(query, [CIF], (err, resultado) => {
+                const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE CIF = ? AND clienteCod != ?';
+                connection.query(query, [CIF, clienteCod], (err, resultado) => {
                     connection.end();
                     if (err) {
                         console.error('Error al comprobar cliente existente por CIF:', err);
@@ -179,7 +179,7 @@ class LibClientes {
         }
 
         const clienteExistePorCodigo = await this.comprobarExistenciaClientePorCodigo(cliente.clienteCod);
-        const clienteExistePorCIF = await this.comprobarExistenciaClientePorCIF(cliente.CIF);
+        const clienteExistePorCIF = await this.comprobarExistenciaClientePorCIF(cliente.CIF , cliente.clienteCod);
 
         return !(clienteExistePorCodigo || clienteExistePorCIF);
     }

@@ -19,7 +19,6 @@ function mostrarModalAgregarProyecto() {
     document.getElementById("modalAgregarProyecto").style.display = "block";
 }
 
-// Función para cerrar el modal de agregar proyecto
 function cerrarModal() {
     document.getElementById("modalAgregarProyecto").style.display = "none";
     document.getElementById("modalEditarProyecto").style.display = "none";
@@ -38,6 +37,8 @@ async function agregarProyecto(proyecto) {
             const data = await response.json();
             if (data.err) {
                 mostrarError(data.errmsg);
+            }else{
+                cerrarModal();
             }
         } else {
             mostrarError('Error al añadir proyecto:'+ response.statusText);
@@ -49,7 +50,7 @@ async function agregarProyecto(proyecto) {
 
 async function actualizarProyecto(proyecto) {
     try {
-        const response = await fetch('/actualizarProyecto'+ {
+        const response = await fetch('/actualizarProyecto', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -60,6 +61,8 @@ async function actualizarProyecto(proyecto) {
             const data = await response.json();
             if (data.err) {
                 mostrarError(data.errmsg);
+            }else{
+                cerrarModal();
             }
         } else {
             mostrarError('Error al actualizar proyecto:'+ response.statusText);
@@ -286,8 +289,6 @@ async function guardarProyecto() {
     try {
         // Llamar a la función agregarProyecto con el objeto proyecto como argumento
         await agregarProyecto(proyecto);
-        // Cerrar el modal después de agregar el proyecto con éxito
-        cerrarModal();
         // Actualizar la tabla de proyectos
         await obtenerProyectosAPI();
     } catch (error) {
@@ -319,8 +320,6 @@ async function actualizadaProyecto() {
 
     try {
         await actualizarProyecto(proyecto);
-        // Cerrar el modal después de actualizar el proyecto con éxito
-        cerrarModal();
         // Actualizar la tabla de proyectos
         await obtenerProyectosAPI();
     } catch (error) {

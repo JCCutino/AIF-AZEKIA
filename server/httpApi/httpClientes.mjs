@@ -92,7 +92,7 @@ class HttpClientes {
             const cifAnterior = await libClientes.obtenerClientePorCodigo(cliente.clienteCod);
 
             if (cifAnterior && cifAnterior.CIF !== cliente.CIF) {
-                const clienteExistePorCIF = await libClientes.comprobarExistenciaClientePorCIF(cliente.CIF);
+                const clienteExistePorCIF = await libClientes.comprobarExistenciaClientePorCIF(cliente.CIF, cliente.clienteCod);
                 if (clienteExistePorCIF) {
                     res.status(200).send({ err: true, errmsg: 'El CIF del cliente ya existe en la base de datos' });
                     return;
