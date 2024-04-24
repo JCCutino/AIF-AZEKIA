@@ -129,12 +129,12 @@ class LibEmpresas {
         });
     }
     
-    comprobarExistenciaEmpresaPorCIF(CIF) {
+    comprobarExistenciaEmpresaPorCIF(CIF, empresaCod) {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ?';
-                connection.query(query, [CIF], (err, resultado) => {
+                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ? AND empresaCod != ?';
+                connection.query(query, [CIF, empresaCod], (err, resultado) => {
                     connection.end();
                     if (err) {
                         console.error('Error al comprobar empresa existente por CIF:', err);
@@ -196,7 +196,7 @@ class LibEmpresas {
         if (!libGenerales.verificarLongitud(empresa.municipio, 50)) {
             return false;
         }
-        const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
+        const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF, empresa.empresaCod);
 
         if (actualizar === true) {
             return true;
