@@ -114,7 +114,7 @@ class HttpEmpresas {
             const cifAnterior = await libEmpresas.obtenerEmpresaPorCodEmpresa(empresa.empresaCod);
 
             if (cifAnterior && cifAnterior.CIF !== empresa.CIF) {
-                const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
+                const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF, empresa.empresaCod);
                 if (empresaExistePorCIF) {
                     res.status(200).send({ err: true, errmsg: 'El CIF de la empresa ya existe en la base de datos' });
                     return;
