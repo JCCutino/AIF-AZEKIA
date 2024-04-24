@@ -75,9 +75,16 @@
         border: solid 1px black;
         position: relative;
       }
-      #formularioAgregarEmpresa{
+      .modal-content-proyecto {
+        height: 480px;
+      }
+      #formularioAgregarEmpresa, #formularioAgregarProyecto, #editarProyectoForm{
         margin-top: 80px;
       }
+
+      #formularioAgregarEmpresa{
+        margin-top: 80px;
+      } 
       #formularioAgregarEmpresa label{
         font-weight: bold;
       }
@@ -94,6 +101,71 @@
       }
 
       #editarEmpresaForm input{
+        border: solid 1px black;
+      }
+      #formularioAgregarCliente{
+        margin-top: 80px;
+      }
+      #formularioAgregarCliente label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarCliente input{
+        border: solid 1px black;
+      }
+      
+      #editarClienteForm{
+        margin-top: 80px;
+      }
+      #editarClienteForm label{
+        font-weight: bold;
+      }
+
+      #editarClienteForm input{
+        border: solid 1px black;
+      }
+
+      #formularioAgregarImpuesto{
+        margin-top: 80px;
+      }
+      #formularioAgregarImpuesto label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarImpuesto input{
+        border: solid 1px black;
+      }
+      
+      #editarImpuestoForm{
+        margin-top: 80px;
+      }
+      #editarImpuestoForm label{
+        font-weight: bold;
+      }
+
+      #editarImpuestoForm input{
+        border: solid 1px black;
+      }
+
+      #formularioAgregarSerie{
+        margin-top: 80px;
+      }
+      #formularioAgregarSerie label{
+        font-weight: bold;
+      }
+
+      #formularioAgregarSerie input{
+        border: solid 1px black;
+      }
+      
+      #editarSerieForm{
+        margin-top: 80px;
+      }
+      #editarSerieForm label{
+        font-weight: bold;
+      }
+
+      #editarSerieForm input{
         border: solid 1px black;
       }
       .close:hover,
@@ -117,6 +189,9 @@
         width: 300px;
       }
       #codEmpresaeditar{
+        border: none;
+      }
+      #codClienteeditar{
         border: none;
       }
       .btnGuardar{
@@ -231,3 +306,17 @@
       #cancelarBtn:hover {
         background-color: #d32f2f;
       }
+
+      .dialogo-error {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffcccc;
+        color: #ff0000;
+        padding: 20px;
+        border: 2px solid #ff0000;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }

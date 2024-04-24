@@ -7,8 +7,11 @@ import dotenv from 'dotenv';
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
 import httpClientes from './server/httpApi/httpClientes.mjs';
+import httpImpuestos from './server/httpApi/httpImpuestos.mjs';
+import httpSeries from './server/httpApi/httpSeries.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
+import httpProyectos from './server/httpApi/httpProyectos.mjs';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url); 
@@ -39,6 +42,8 @@ app.get('/crearfactura', httpUsuarios.crearFactura);
 
 // Funciones de empresas 
 
+app.post('/obtenerEmpresasCod', httpEmpresas.postObtenerEmpresasCod);
+
 app.post('/obtenerEmpresas', httpEmpresas.postObtenerEmpresas);
 
 app.post('/agregarEmpresa', httpEmpresas.postAgregarEmpresa);
@@ -49,6 +54,8 @@ app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
 
 // Funciones de clientes
 
+app.post('/obtenerClientesCod', httpClientes.postObtenerClientesCod);
+
 app.post('/obtenerClientes', httpClientes.postObtenerClientes);
 
 app.post('/agregarCliente', httpClientes.postAgregarCliente);
@@ -56,6 +63,38 @@ app.post('/agregarCliente', httpClientes.postAgregarCliente);
 app.post('/actualizarCliente', httpClientes.postActualizarCliente);
 
 app.post('/eliminarCliente', httpClientes.postEliminarCliente);
+
+//Funciones de impuestos
+
+app.post('/obtenerImpuestos', httpImpuestos.postObtenerImpuestos);
+
+app.post('/agregarImpuesto', httpImpuestos.postAgregarImpuesto);
+
+app.post('/actualizarImpuesto', httpImpuestos.postActualizarImpuesto);
+
+app.post('/eliminarImpuesto', httpImpuestos.postEliminarImpuesto);
+
+
+//Funciones de series
+
+app.post('/obtenerSeries', httpSeries.postObtenerSeries);
+
+app.post('/agregarSerie', httpSeries.postAgregarSerie);
+
+app.post('/actualizarSerie', httpSeries.postActualizarSerie);
+
+app.post('/eliminarSerie', httpSeries.postEliminarSerie);
+
+//Funciones de proyectos
+
+app.post('/obtenerProyectos', httpProyectos.postObtenerProyectos);
+
+app.post('/agregarProyecto', httpProyectos.postAgregarProyecto);
+
+app.post('/actualizarProyecto', httpProyectos.postActualizarProyecto);
+
+app.post('/eliminarProyecto', httpProyectos.postEliminarProyecto);
+
 //Funciones de facturas
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);

@@ -10,6 +10,18 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpEmpresas {
 
+    async postObtenerEmpresasCod(req, res) {
+        try {
+            const empresasCod = await libEmpresas.obtenerEmpresasCod();
+            if (empresasCod && empresasCod.length > 0) {
+                res.status(200).send({ err: false, empresasCod });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay empresas añadidas en este momento' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
     async postObtenerEmpresas(req, res) {
         try {
             const empresas = await libEmpresas.obtenerEmpresas();
@@ -76,7 +88,7 @@ class HttpEmpresas {
                         // Si algunos valores no son del tipo de datos adecuado, enviar un mensaje de error
                         res.status(200).send({
                             err: true,
-                            errmsg: `Los siguientes atributos de empresa deben ser del tipo varchar: ${invalidValues.join(', ')}.`
+                            errmsg: `Los siguientes atributos de empresa deben ser del tipo varchar: ${atributosFaltantes.join(', ')}.`
                         });
                     }
                 } else {
@@ -102,15 +114,21 @@ class HttpEmpresas {
             const cifAnterior = await libEmpresas.obtenerEmpresaPorCodEmpresa(empresa.empresaCod);
 
             if (cifAnterior && cifAnterior.CIF !== empresa.CIF) {
-                const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
+                const empresaExistePorCIF = await libEmpresas.comprobarExistenciaEmpresaPorCIF(empresa.CIF, empresa.empresaCod);
                 if (empresaExistePorCIF) {
                     res.status(200).send({ err: true, errmsg: 'El CIF de la empresa ya existe en la base de datos' });
                     return;
                 }
             }
 
-            const resultado = await libEmpresas.actualizarEmpresa(empresa);
-            res.status(200).send({ err: false, empresa: { empresa } });
+            const empresaValida = await libEmpresas.verificarEmpresa(empresa, true);
+
+            if (!empresaValida) {
+                res.status(200).send({ err: true, errmsg: 'La empresa no es válida' });
+            } else {
+                const resultado = await libEmpresas.actualizarEmpresa(empresa);
+                res.status(200).send({ err: false, empresa: resultado });
+            }
         } catch (err) {
             console.error('Error al actualizar la empresa:', err);
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });

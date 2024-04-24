@@ -3,6 +3,27 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
+    obtenerEmpresasCod() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const connection = await dbConexion.conectarDB();
+                const query = 'SELECT empresaCod FROM Empresa';
+                connection.query(query, (err, resultados) => {
+                    if (err) {
+                        console.error('Error al obtener empresasCod:', err);
+                        connection.end();
+                        reject('Error al obtener empresas');
+                    } else {
+                        connection.end();
+                        resolve(resultados || []);
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
     obtenerEmpresas() {
         return new Promise(async (resolve, reject) => {
             try {
@@ -108,12 +129,12 @@ class LibEmpresas {
         });
     }
     
-    comprobarExistenciaEmpresaPorCIF(CIF) {
+    comprobarExistenciaEmpresaPorCIF(CIF, empresaCod) {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ?';
-                connection.query(query, [CIF], (err, resultado) => {
+                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ? AND empresaCod != ?';
+                connection.query(query, [CIF, empresaCod], (err, resultado) => {
                     connection.end();
                     if (err) {
                         console.error('Error al comprobar empresa existente por CIF:', err);
@@ -151,7 +172,7 @@ class LibEmpresas {
     }
 
     
-   async verificarEmpresa(empresa) {
+   async verificarEmpresa(empresa, actualizar = false) {
 
     if (!libGenerales.verificarCamposVacios(empresa)) {
         return false;
@@ -175,10 +196,14 @@ class LibEmpresas {
         if (!libGenerales.verificarLongitud(empresa.municipio, 50)) {
             return false;
         }
-    
+        const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF, empresa.empresaCod);
+
+        if (actualizar === true) {
+            return true;
+        }
+
         const empresaExistePorCodigo = await this.comprobarExistenciaEmpresaPorCodigo(empresa.empresaCod);
-        const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF);
-    
+
         return !(empresaExistePorCodigo || empresaExistePorCIF);
     }
     
