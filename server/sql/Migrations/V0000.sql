@@ -113,9 +113,9 @@ GO
 
 /* For security reasons the login is created disabled and with a random password. */
 /****** Object:  Login [app_aif]    Script Date: 24/04/2024 10:12:39 ******/
-CREATE LOGIN [app_aif] WITH PASSWORD=N'HraB7cbO9rVhcFTzrIJQu2YeuB3mQijueFJXA5+9nMQ=', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[Espa�ol], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+CREATE LOGIN [app_aif] WITH PASSWORD=N'HraB7cbO9rVhcFTzrIJQu2YeuB3mQijueFJXA5+9nMQ=', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[Español], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
 GO
-    1
+    
 USE [app_aif]
 
 GO
