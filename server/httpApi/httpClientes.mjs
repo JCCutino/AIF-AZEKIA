@@ -25,6 +25,7 @@ class HttpClientes {
     async postObtenerClientes(req, res) {
         try {
             const clientes = await libClientes.obtenerClientes();
+            console.log('clientes:', clientes)
             if (clientes && clientes.length > 0) {
                 res.status(200).send({ err: false, clientes });
             } else {
@@ -32,6 +33,8 @@ class HttpClientes {
             }
         } catch (err) {
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+            console.log('4');
+
         }
     }
 

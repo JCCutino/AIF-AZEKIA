@@ -1,3 +1,14 @@
-POST http://localhost:3000/obtenerClientesCod HTTP/1.1
+POST http://localhost:3000/agregarCliente HTTP/1.1
 Content-Type: application/json
 
+{
+"cliente": 
+    {
+      "clienteCod": "005",
+      "CIF": "12345678B",
+      "razonSocial": "Empresa de Prueba",
+      "direccion": "Calle de la Prueba, 123",
+      "CP": "12345",
+      "municipio": "Ciudad de la Prueba"
+    }
+    }

@@ -1,7 +1,7 @@
 USE [app_aif]
 GO
 
-CREATE TABLE [dbo].[Empresa](
+CREATE TABLE [Empresa](
 	[empresaCod] [varchar](20) NOT NULL,
 	[CIF] [varchar](20) NOT NULL,
 	[razonSocial] [varchar](100) NOT NULL,
