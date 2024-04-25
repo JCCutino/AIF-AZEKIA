@@ -2,106 +2,94 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibProyectos {
-    async obtenerProyectos() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Proyecto';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener proyectos:', err);
-                        connection.end();
-                        reject('Error al obtener proyectos');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerProyectos() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Proyecto';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener proyectos:', error);
+            throw 'Error al obtener proyectos';
+        }
     }
-
-    async obtenerProyectoPorCodigo(proyectoCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Proyecto WHERE proyectoCod = ?';
-                connection.query(query, [proyectoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al obtener proyecto por código:', err);
-                        reject('Error al obtener proyecto por código');
-                    } else {
-                        resolve(resultado[0] || null);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  obtenerProyectoPorCodigo(proyectoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Proyecto WHERE proyectoCod = @proyectoCod';
+            request.input('proyectoCod', proyectoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0] || null;
+        } catch (error) {
+            console.error('Error al obtener proyecto por código:', error);
+            throw 'Error al obtener proyecto por código';
+        }
     }
-
-    async agregarProyecto(proyecto) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'INSERT INTO Proyecto (proyectoCod, nombre, fechaInicio, fechaFinPrevisto, empresaCod, clienteCod, importeTotalPrevisto, importeExtraPrevisto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-                connection.query(query, [proyecto.proyectoCod, proyecto.nombre, proyecto.fechaInicio, proyecto.fechaFinPrevisto, proyecto.empresaCod, proyecto.clienteCod, proyecto.importeTotalPrevisto, proyecto.importeExtraPrevisto], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al agregar proyecto:', err);
-                        reject('Error al agregar proyecto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  agregarProyecto(proyecto) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'INSERT INTO Proyecto (proyectoCod, nombre, fechaInicio, fechaFinPrevisto, empresaCod, clienteCod, importeTotalPrevisto, importeExtraPrevisto) VALUES (@proyectoCod, @nombre, @fechaInicio, @fechaFinPrevisto, @empresaCod, @clienteCod, @importeTotalPrevisto, @importeExtraPrevisto)';
+            request.input('proyectoCod', proyecto.proyectoCod);
+            request.input('nombre', proyecto.nombre);
+            request.input('fechaInicio', proyecto.fechaInicio);
+            request.input('fechaFinPrevisto', proyecto.fechaFinPrevisto);
+            request.input('empresaCod', proyecto.empresaCod);
+            request.input('clienteCod', proyecto.clienteCod);
+            request.input('importeTotalPrevisto', proyecto.importeTotalPrevisto);
+            request.input('importeExtraPrevisto', proyecto.importeExtraPrevisto);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la inserción
+        } catch (error) {
+            console.error('Error al agregar proyecto:', error);
+            throw 'Error al agregar proyecto';
+        }
     }
-
-    async actualizarProyecto(proyecto) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'UPDATE Proyecto SET nombre = ?, fechaInicio = ?, fechaFinPrevisto = ?, empresaCod = ?, clienteCod = ?, importeTotalPrevisto = ?, importeExtraPrevisto = ? WHERE proyectoCod = ?';
-                connection.query(query, [proyecto.nombre, proyecto.fechaInicio, proyecto.fechaFinPrevisto, proyecto.empresaCod, proyecto.clienteCod, proyecto.importeTotalPrevisto, proyecto.importeExtraPrevisto, proyecto.proyectoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al actualizar proyecto:', err);
-                        reject('Error al actualizar proyecto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  actualizarProyecto(proyecto) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'UPDATE Proyecto SET nombre = @nombre, fechaInicio = @fechaInicio, fechaFinPrevisto = @fechaFinPrevisto, empresaCod = @empresaCod, clienteCod = @clienteCod, importeTotalPrevisto = @importeTotalPrevisto, importeExtraPrevisto = @importeExtraPrevisto WHERE proyectoCod = @proyectoCod';
+            request.input('nombre', proyecto.nombre);
+            request.input('fechaInicio', proyecto.fechaInicio);
+            request.input('fechaFinPrevisto', proyecto.fechaFinPrevisto);
+            request.input('empresaCod', proyecto.empresaCod);
+            request.input('clienteCod', proyecto.clienteCod);
+            request.input('importeTotalPrevisto', proyecto.importeTotalPrevisto);
+            request.input('importeExtraPrevisto', proyecto.importeExtraPrevisto);
+            request.input('proyectoCod', proyecto.proyectoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la actualización
+        } catch (error) {
+            console.error('Error al actualizar proyecto:', error);
+            throw 'Error al actualizar proyecto';
+        }
     }
-
-    async eliminarProyecto(proyectoCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'DELETE FROM Proyecto WHERE proyectoCod = ?';
-                connection.query(query, [proyectoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al eliminar proyecto:', err);
-                        reject('Error al eliminar proyecto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  eliminarProyecto(proyectoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'DELETE FROM Proyecto WHERE proyectoCod = @proyectoCod';
+            request.input('proyectoCod', proyectoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la eliminación
+        } catch (error) {
+            console.error('Error al eliminar proyecto:', error);
+            throw 'Error al eliminar proyecto';
+        }
     }
+    
 
     async verificarProyecto(proyecto, actualizar = false) {
         if (!libGenerales.verificarCamposVacios(proyecto)) {

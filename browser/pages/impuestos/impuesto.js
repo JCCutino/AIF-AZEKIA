@@ -70,8 +70,6 @@ async function obtenerImpuestosAPI() {
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
                 mostrarError('Error al obtener impuestos:' + data.errmsg);
-                mostrarDatosEnTabla(data);
-
             } else {
                 // Si no hay error, procesa los datos y muestra la tabla
                 mostrarDatosEnTabla(data);
