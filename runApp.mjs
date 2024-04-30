@@ -101,6 +101,10 @@ app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 
 app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
+//Funciones de prueba
+app.get('/prueba', httpUsuarios.mostrarPrueba);
+
+
 
 app.post('/obtenerFacturas', async (req, res) => {
   const facturas = await httpFacturas.postObtenerFacturas(req, res);

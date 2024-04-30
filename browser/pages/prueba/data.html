@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura</title>
+    <style>
+        .container {
+            width: 21cm;
+            height: 29.7cm;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .header {
+            text-align: left;
+            width: 100%;
+        }
+        .logo {
+            width: 100px;
+            margin-left: 40px;
+            margin-top: 50px; 
+        }
+        .box {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            margin-left: 40px;
+            margin-bottom: 80px;
+        }
+        .details-box {
+            padding: 5px;
+        }
+        .factura {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+        }
+        .factura .invoice-title {
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th{
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color:rgb(177, 176, 176)
+        } 
+         td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        tfoot td {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images.png" alt="Logo de la Empresa" class="logo">
+        </div>
+        <div class="box">
+            <div class="details-box">
+                <h2>Empresa</h2>
+                <p>Azekia</p>
+                <p>Avenida de Sevilla, 138</p>
+                <p>555-555-555</p>
+            </div>
+            <div class="details-box">
+                <h2>Cliente</h2>
+                <p>Javier Ortega Cobos</p>
+                <p>Calle Darro, 3</p>
+                <p>555-555-555</p>
+            </div>
+       </div>
+        <div class="factura">
+            <div class="invoice-title">
+                <h2>Factura Nº: 223654</h2>
+                <p>Fecha de Emisión: 23 abril 2024</p>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>[Descripción del Producto/Servicio]</td>
+                    <td>[Cantidad]</td>
+                    <td>[Precio Unitario]</td>
+                    <td>[Total]</td>
+                </tr>
+                <tr>
+                    <td>[Descripción del Producto/Servicio]</td>
+                    <td>[Cantidad]</td>
+                    <td>[Precio Unitario]</td>
+                    <td>[Total]</td>
+                </tr>
+                <tr>
+                    <td>[Descripción del Producto/Servicio]</td>
+                    <td>[Cantidad]</td>
+                    <td>[Precio Unitario]</td>
+                    <td>[Total]</td>
+                </tr>
+                <!-- Repite esta fila para cada producto/servicio -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Subtotal:</td>
+                    <td>[Subtotal]</td>
+                </tr>
+                <tr>
+                    <td colspan="3">IVA:</td>
+                    <td>[IVA]</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Total:</td>
+                    <td>[Total]</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</body>
+</html>
