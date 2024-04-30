@@ -7,6 +7,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpUsuarios {
+   
+    async  mostrarLogin(req, res) {
+        try {
+            res.sendFile(path.join(staticFilesPath, 'pages/login/login.html'));
+        } catch (error) {
+            console.error('Error al procesar la acción de mostrar login:', error);
+            res.status(500).send('Error al procesar la acción de mostrar login');
+        }
+    }
 
     async  mostrarEmpresas(req, res) {
         try {

@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
+app.get('/', httpUsuarios.mostrarLogin);
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
