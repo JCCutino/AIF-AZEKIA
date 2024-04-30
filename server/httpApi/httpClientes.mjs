@@ -9,11 +9,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpClientes {
-    async postObtenerClientesCod(req, res) {
+    async postObtenerClientesDatosBasicos(req, res) {
         try {
-            const clientesCod = await libClientes.obtenerClientesCod();
-            if (clientesCod && clientesCod.length > 0) {
-                res.status(200).send({ err: false, clientesCod });
+            const datosCliente = await libClientes.obtenerClientesDatosBasicos();
+            if (datosCliente && datosCliente.length > 0) {
+                res.status(200).send({ err: false, datosCliente });
             } else {
                 res.status(200).send({ err: true, errmsg: 'No hay clientes añadidos en este momento' });
             }

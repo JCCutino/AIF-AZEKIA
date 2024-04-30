@@ -6,7 +6,12 @@ class LibProyectos {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT * FROM Proyecto';
+            const query = `
+                SELECT Proyecto.*, Cliente.razonSocial AS razonSocialCliente, Empresa.razonSocial AS razonSocialEmpresa
+                FROM Proyecto
+                JOIN Cliente ON Proyecto.clienteCod = Cliente.clienteCod
+                JOIN Empresa ON Proyecto.empresaCod = Empresa.empresaCod
+            `;
             const resultados = await request.query(query);
             await pool.close();
             return resultados.recordset || [];
@@ -15,6 +20,7 @@ class LibProyectos {
             throw 'Error al obtener proyectos';
         }
     }
+    
     
     async  obtenerProyectoPorCodigo(proyectoCod) {
         try {

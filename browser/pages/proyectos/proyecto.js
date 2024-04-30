@@ -102,7 +102,7 @@ async function obtenerProyectosAPI() {
 
 async function obtenerEmpresasCod() {
     try {
-        const response = await fetch('/obtenerEmpresasCod', {
+        const response = await fetch('/obtenerEmpresasDatosBasicos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ async function obtenerEmpresasCod() {
                 mostrarError('Error al obtener empresasCod:'+ data.errmsg)
 
             } else {
-                agregarEmpresasCodSelect(data.empresasCod)
+                agregarEmpresasCodSelect(data.datosEmpresa)
             }
         } else {
             
@@ -131,7 +131,7 @@ async function obtenerEmpresasCod() {
 
 async function obtenerClientesCod() {
     try {
-        const response = await fetch('/obtenerClientesCod', {
+        const response = await fetch('/obtenerClientesDatosBasicos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ async function obtenerClientesCod() {
             if (data.err) {
                 mostrarError('Error al obtener clientesCod:'+ data.errmsg);
             } else {
-                agregarClientesCodSelect(data.clientesCod);
+                agregarClientesCodSelect(data.datosCliente);
 
             }
         } else {
@@ -215,9 +215,6 @@ async function abrirModalEditableProyecto(proyectoCod) {
         mostrarError('Error al abrir el modal editable del proyecto:'+ error.message);
     }
 }
-
-
-// Luego, definir la función mostrarDatosEnTabla
 async function mostrarDatosEnTabla(data) {
     // Obtener la tabla HTML
     const tabla = document.getElementById('tablaProyectos');
@@ -232,8 +229,22 @@ async function mostrarDatosEnTabla(data) {
         data.proyectos.forEach(proyecto => {
             const fila = document.createElement('tr');
 
-            Object.entries(proyecto).forEach(([clave, valor]) => {
+            // Orden de las propiedades del proyecto para mostrar en la tabla
+            const propiedades = [
+                'proyectoCod',
+                'nombre',
+                'fechaInicio',
+                'fechaFinPrevisto',
+                'razonSocialEmpresa',
+                'razonSocialCliente',
+                'importeTotalPrevisto',
+                'importeExtraPrevisto'
+            ];
+
+            propiedades.forEach(clave => {
                 const celda = document.createElement('td');
+                const valor = proyecto[clave];
+                // Verificar si la clave es una fecha para formatearla
                 if (clave === 'fechaInicio' || clave === 'fechaFinPrevisto') {
                     celda.textContent = formatearFecha(valor);
                 } else {
@@ -242,19 +253,15 @@ async function mostrarDatosEnTabla(data) {
                 fila.appendChild(celda);
             });
 
-            // Agregar el botón "Ver" a la última celda de la fila
             const celdaBoton = document.createElement('td');
             const boton = document.createElement('button');
             boton.textContent = 'Ver';
             celdaBoton.appendChild(boton);
             fila.appendChild(celdaBoton);
 
-            // Agregar la fila a la tabla
             tabla.appendChild(fila);
 
-            // Agregar el evento click al botón "Ver"
             boton.addEventListener('click', function () {
-                // Obtener el identificador único del proyecto correspondiente a esta fila
                 const proyectoCod = proyecto.proyectoCod;
                 abrirModalEditableProyecto(proyectoCod);
             });
@@ -263,6 +270,7 @@ async function mostrarDatosEnTabla(data) {
         mostrarError('No se encontraron datos de proyectos válidos en la respuesta.');
     }
 }
+
 
 async function guardarProyecto() {
     // Obtener los datos del formulario
@@ -333,41 +341,41 @@ function ClicEliminarProyecto() {
     cerrarModal();
 }
 
-function agregarClientesCodSelect(clientesCod) {
+function agregarClientesCodSelect(datosCliente) {
     let selectAgregarClienteCod = document.getElementById("clienteCod");
     let selectEditarClienteCod = document.getElementById("clienteCodEditar");
 
     selectAgregarClienteCod.innerHTML = "";
     selectEditarClienteCod.innerHTML = "";
 
-    clientesCod.forEach( (cliente) => {
+    datosCliente.forEach((cliente) => {
         let optionAgregar = document.createElement("option");
-        optionAgregar.text = cliente.clienteCod;
-        optionAgregar.value = cliente.clienteCod;
+        optionAgregar.text = cliente.razonSocial; 
+        optionAgregar.value = cliente.clienteCod; 
         selectAgregarClienteCod.add(optionAgregar);
 
         let optionEditar = document.createElement("option");
-        optionEditar.text = cliente.clienteCod;
-        optionEditar.value = cliente.clienteCod;
+        optionEditar.text = cliente.razonSocial; 
+        optionEditar.value = cliente.clienteCod; 
         selectEditarClienteCod.add(optionEditar);
     });
 }
 
-function agregarEmpresasCodSelect(empresasCod) {
+function agregarEmpresasCodSelect(datosEmpresa) {
     let selectAgregarEmpresaCod = document.getElementById("empresaCod");
     let selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
 
     selectAgregarEmpresaCod.innerHTML = "";
     selectEditarEmpresaCod.innerHTML = "";
 
-    empresasCod.forEach(  (empresa) => {
+    datosEmpresa.forEach(  (empresa) => {
         let optionAgregar = document.createElement("option");
-        optionAgregar.text = empresa.empresaCod;
+        optionAgregar.text = empresa.razonSocial;
         optionAgregar.value = empresa.empresaCod;
         selectAgregarEmpresaCod.add(optionAgregar);
 
         let optionEditar = document.createElement("option");
-        optionEditar.text = empresa.empresaCod;
+        optionEditar.text = empresa.razonSocial;
         optionEditar.value = empresa.empresaCod;
         selectEditarEmpresaCod.add(optionEditar);
     });

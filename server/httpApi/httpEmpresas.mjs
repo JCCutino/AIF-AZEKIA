@@ -10,11 +10,11 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpEmpresas {
 
-    async postObtenerEmpresasCod(req, res) {
+    async postObtenerEmpresasDatosBasicos(req, res) {
         try {
-            const empresasCod = await libEmpresas.obtenerEmpresasCod();
-            if (empresasCod && empresasCod.length > 0) {
-                res.status(200).send({ err: false, empresasCod });
+            const datosEmpresa = await libEmpresas.obtenerEmpresasDatosBasicos();
+            if (datosEmpresa && datosEmpresa.length > 0) {
+                res.status(200).send({ err: false, datosEmpresa });
             } else {
                 res.status(200).send({ err: true, errmsg: 'No hay empresas añadidas en este momento' });
             }

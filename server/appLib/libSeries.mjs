@@ -6,7 +6,11 @@ class LibSeries {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT * FROM Serie';
+            const query = `SELECT Serie.*, Empresa.razonSocial AS razonSocialEmpresa
+                        FROM Serie
+                        JOIN Empresa ON Serie.empresaCod = Empresa.empresaCod 
+                        ORDER BY Serie.serieCod
+                        `;
             const resultados = await request.query(query);
             await pool.close();
             return resultados.recordset || [];
@@ -35,8 +39,9 @@ class LibSeries {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'INSERT INTO Serie (serieCod, descripcion, ultimoNumUsado) VALUES (@serieCod, @descripcion, @ultimoNumUsado)';
+            const query = 'INSERT INTO Serie (serieCod, empresaCod, descripcion, ultimoNumUsado) VALUES (@serieCod, @empresaCod, @descripcion, @ultimoNumUsado)';
             request.input('serieCod', serie.serieCod);
+            request.input('empresaCod', serie.empresaCod);
             request.input('descripcion', serie.descripcion);
             request.input('ultimoNumUsado', serie.ultimoNumUsado);
             const resultado = await request.query(query);
@@ -52,9 +57,10 @@ class LibSeries {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'UPDATE Serie SET descripcion = @descripcion, ultimoNumUsado = @ultimoNumUsado WHERE serieCod = @serieCod';
+            const query = 'UPDATE Serie SET descripcion = @descripcion, empresaCod = @empresaCod, ultimoNumUsado = @ultimoNumUsado WHERE serieCod = @serieCod';
             request.input('descripcion', serie.descripcion);
             request.input('ultimoNumUsado', serie.ultimoNumUsado);
+            request.input('empresaCod', serie.empresaCod);
             request.input('serieCod', serie.serieCod);
             const resultado = await request.query(query);
             await pool.close();
@@ -93,6 +99,11 @@ class LibSeries {
             return false;
         }
     
+
+        if (typeof serie.empresaCod !== 'string' || typeof serie.serieCod !== 'string') {
+            return false;
+        }
+     
         if (isNaN(serie.ultimoNumUsado) || !Number.isInteger(serie.ultimoNumUsado)) {
             return false;
         }

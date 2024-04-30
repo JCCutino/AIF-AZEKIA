@@ -27,7 +27,7 @@ class HttpSeries {
 
             if (Object.prototype.toString.call(serie) === '[object Object]') {
 
-                const atributosRequeridos = ['serieCod', 'descripcion', 'ultimoNumUsado'];
+                const atributosRequeridos = ['serieCod', 'empresaCod', 'descripcion', 'ultimoNumUsado'];
                 const atributosSerie = Object.keys(serie);
 
                 const atributosFaltantes = atributosRequeridos.filter(key => !atributosSerie.includes(key));
