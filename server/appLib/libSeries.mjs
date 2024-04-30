@@ -2,107 +2,84 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibSeries {
-    async obtenerSeries() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Serie';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener series:', err);
-                        connection.end();
-                        reject('Error al obtener series');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerSeries() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Serie';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener series:', error);
+            throw 'Error al obtener series';
+        }
     }
-
-    async obtenerSeriePorCodigo(serieCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Serie WHERE serieCod = ?';
-                connection.query(query, [serieCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al obtener serie por código:', err);
-                        reject('Error al obtener serie por código');
-                    } else {
-                        resolve(resultado[0] || null);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  obtenerSeriePorCodigo(serieCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Serie WHERE serieCod = @serieCod';
+            request.input('serieCod', serieCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0] || null;
+        } catch (error) {
+            console.error('Error al obtener serie por código:', error);
+            throw 'Error al obtener serie por código';
+        }
     }
-
-    async agregarSerie(serie) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'INSERT INTO Serie (serieCod, descripcion, ultimoNumUsado) VALUES (?, ?, ?)';
-                connection.query(query, [serie.serieCod, serie.descripcion, serie.ultimoNumUsado], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al agregar serie:', err);
-                        reject('Error al agregar serie');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  agregarSerie(serie) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'INSERT INTO Serie (serieCod, descripcion, ultimoNumUsado) VALUES (@serieCod, @descripcion, @ultimoNumUsado)';
+            request.input('serieCod', serie.serieCod);
+            request.input('descripcion', serie.descripcion);
+            request.input('ultimoNumUsado', serie.ultimoNumUsado);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la inserción
+        } catch (error) {
+            console.error('Error al agregar serie:', error);
+            throw 'Error al agregar serie';
+        }
     }
-
-    async actualizarSerie(serie) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'UPDATE Serie SET descripcion = ?, ultimoNumUsado = ? WHERE serieCod = ?';
-                connection.query(query, [serie.descripcion, serie.ultimoNumUsado, serie.serieCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al actualizar serie:', err);
-                        reject('Error al actualizar serie');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  actualizarSerie(serie) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'UPDATE Serie SET descripcion = @descripcion, ultimoNumUsado = @ultimoNumUsado WHERE serieCod = @serieCod';
+            request.input('descripcion', serie.descripcion);
+            request.input('ultimoNumUsado', serie.ultimoNumUsado);
+            request.input('serieCod', serie.serieCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la actualización
+        } catch (error) {
+            console.error('Error al actualizar serie:', error);
+            throw 'Error al actualizar serie';
+        }
     }
-
-    async eliminarSerie(serieCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'DELETE FROM Serie WHERE serieCod = ?';
-                connection.query(query, [serieCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al eliminar serie:', err);
-                        reject('Error al eliminar serie');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  eliminarSerie(serieCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'DELETE FROM Serie WHERE serieCod = @serieCod';
+            request.input('serieCod', serieCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la eliminación
+        } catch (error) {
+            console.error('Error al eliminar serie:', error);
+            throw 'Error al eliminar serie';
+        }
     }
-
+    
     async verificarSerie(serie, actualizar = false) {
         if (!libGenerales.verificarCamposVacios(serie)) {
             return false;

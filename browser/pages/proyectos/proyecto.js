@@ -334,19 +334,19 @@ function ClicEliminarProyecto() {
 }
 
 function agregarClientesCodSelect(clientesCod) {
-    var selectAgregarClienteCod = document.getElementById("clienteCod");
-    var selectEditarClienteCod = document.getElementById("clienteCodEditar");
+    let selectAgregarClienteCod = document.getElementById("clienteCod");
+    let selectEditarClienteCod = document.getElementById("clienteCodEditar");
 
     selectAgregarClienteCod.innerHTML = "";
     selectEditarClienteCod.innerHTML = "";
 
-    clientesCod.forEach(function (cliente) {
-        var optionAgregar = document.createElement("option");
+    clientesCod.forEach( (cliente) => {
+        let optionAgregar = document.createElement("option");
         optionAgregar.text = cliente.clienteCod;
         optionAgregar.value = cliente.clienteCod;
         selectAgregarClienteCod.add(optionAgregar);
 
-        var optionEditar = document.createElement("option");
+        let optionEditar = document.createElement("option");
         optionEditar.text = cliente.clienteCod;
         optionEditar.value = cliente.clienteCod;
         selectEditarClienteCod.add(optionEditar);
@@ -354,19 +354,19 @@ function agregarClientesCodSelect(clientesCod) {
 }
 
 function agregarEmpresasCodSelect(empresasCod) {
-    var selectAgregarEmpresaCod = document.getElementById("empresaCod");
-    var selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
+    let selectAgregarEmpresaCod = document.getElementById("empresaCod");
+    let selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
 
     selectAgregarEmpresaCod.innerHTML = "";
     selectEditarEmpresaCod.innerHTML = "";
 
-    empresasCod.forEach(function (empresa) {
-        var optionAgregar = document.createElement("option");
+    empresasCod.forEach(  (empresa) => {
+        let optionAgregar = document.createElement("option");
         optionAgregar.text = empresa.empresaCod;
         optionAgregar.value = empresa.empresaCod;
         selectAgregarEmpresaCod.add(optionAgregar);
 
-        var optionEditar = document.createElement("option");
+        let optionEditar = document.createElement("option");
         optionEditar.text = empresa.empresaCod;
         optionEditar.value = empresa.empresaCod;
         selectEditarEmpresaCod.add(optionEditar);

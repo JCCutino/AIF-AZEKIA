@@ -71,8 +71,6 @@ async function obtenerSeriesAPI() {
             if (data.err) {
                 // Si hay un error, muestra un mensaje de error
                 mostrarError('Error al obtener series:' + data.errmsg);
-                mostrarDatosEnTabla(data);
-
             } else {
                 // Si no hay error, procesa los datos y muestra la tabla
                 mostrarDatosEnTabla(data);

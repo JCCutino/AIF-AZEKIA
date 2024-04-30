@@ -2,106 +2,84 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibImpuestos {
-    async obtenerImpuestos() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Impuestos';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener impuestos:', err);
-                        connection.end();
-                        reject('Error al obtener impuestos');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerImpuestos() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Impuesto';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener impuestos:', error);
+            throw 'Error al obtener impuestos';
+        }
     }
-
-    async obtenerImpuestoPorCodigo(impuestoCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Impuestos WHERE impuestoCod = ?';
-                connection.query(query, [impuestoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al obtener impuesto por código:', err);
-                        reject('Error al obtener impuesto por código');
-                    } else {
-                        resolve(resultado[0] || null);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  obtenerImpuestoPorCodigo(impuestoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Impuesto WHERE impuestoCod = @impuestoCod';
+            request.input('impuestoCod', impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0] || null;
+        } catch (error) {
+            console.error('Error al obtener impuesto por código:', error);
+            throw 'Error al obtener impuesto por código';
+        }
     }
-
-    async agregarImpuesto(impuesto) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'INSERT INTO Impuestos (impuestoCod, tipoImpuesto, porcentaje) VALUES (?, ?, ?)';
-                connection.query(query, [impuesto.impuestoCod, impuesto.tipoImpuesto, impuesto.porcentaje], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al agregar impuesto:', err);
-                        reject('Error al agregar impuesto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  agregarImpuesto(impuesto) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'INSERT INTO Impuesto (impuestoCod, tipoImpuesto, porcentaje) VALUES (@impuestoCod, @tipoImpuesto, @porcentaje)';
+            request.input('impuestoCod', impuesto.impuestoCod);
+            request.input('tipoImpuesto', impuesto.tipoImpuesto);
+            request.input('porcentaje', impuesto.porcentaje);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la inserción
+        } catch (error) {
+            console.error('Error al agregar impuesto:', error);
+            throw 'Error al agregar impuesto';
+        }
     }
-
-    async actualizarImpuesto(impuesto) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'UPDATE Impuestos SET tipoImpuesto = ?, porcentaje = ? WHERE impuestoCod = ?';
-                connection.query(query, [impuesto.tipoImpuesto, impuesto.porcentaje, impuesto.impuestoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al actualizar impuesto:', err);
-                        reject('Error al actualizar impuesto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  actualizarImpuesto(impuesto) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'UPDATE Impuesto SET tipoImpuesto = @tipoImpuesto, porcentaje = @porcentaje WHERE impuestoCod = @impuestoCod';
+            request.input('tipoImpuesto', impuesto.tipoImpuesto);
+            request.input('porcentaje', impuesto.porcentaje);
+            request.input('impuestoCod', impuesto.impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la actualización
+        } catch (error) {
+            console.error('Error al actualizar impuesto:', error);
+            throw 'Error al actualizar impuesto';
+        }
     }
-
-    async eliminarImpuesto(impuestoCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'DELETE FROM Impuestos WHERE impuestoCod = ?';
-                connection.query(query, [impuestoCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al eliminar impuesto:', err);
-                        reject('Error al eliminar impuesto');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async  eliminarImpuesto(impuestoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'DELETE FROM Impuesto WHERE impuestoCod = @impuestoCod';
+            request.input('impuestoCod', impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la eliminación
+        } catch (error) {
+            console.error('Error al eliminar impuesto:', error);
+            throw 'Error al eliminar impuesto';
+        }
     }
+    
 
     async verificarImpuesto(impuesto, actualizar = false) {
         if (!libGenerales.verificarCamposVacios(impuesto)) {

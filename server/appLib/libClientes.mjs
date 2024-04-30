@@ -2,167 +2,138 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibClientes {
-    obtenerClientesCod() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT clienteCod FROM Cliente';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener clientesCod:', err);
-                        connection.end();
-                        reject('Error al obtener clientesCod');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerClientesCod() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT clienteCod FROM Cliente';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener clientesCod:', error);
+            throw error;
+        }
     }
-    obtenerClientes() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Cliente';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener clientes:', err);
-                        connection.end();
-                        reject('Error al obtener clientes');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    
+    async obtenerClientes() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Cliente';
+            const resultados = await request.query(query);
+           await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener clientes:', error);
+            throw error; 
+        }
     }
-
-    async obtenerClientePorCodigo(clienteCod) {
-        return new Promise(async (resolve, reject) => {
+    
+    async  obtenerClientePorCodigo(clienteCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Cliente WHERE clienteCod = @clienteCod';
+            request.input('clienteCod', clienteCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0] || null;
+        } catch (error) {
+            console.error('Error al obtener cliente por código de cliente:', error);
+            throw 'Error al obtener cliente por código de cliente';
+        }
+    }
+    
+  async agregarCliente(cliente) {
+            console.log('Cliente:', cliente);
             try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Cliente WHERE clienteCod = ?';
-                connection.query(query, [clienteCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al obtener cliente por código de cliente:', err);
-                        reject('Error al obtener cliente por código de cliente');
-                    } else {
-                        resolve(resultado[0] || null);
-                    }
-                });
+                const pool = await dbConexion.conectarDB();
+                const request = pool.request();
+                const query = 'INSERT INTO Cliente (clienteCod, CIF, razonSocial, direccion, CP, municipio) VALUES (@clienteCod, @CIF, @razonSocial, @direccion, @CP, @municipio)';
+                request.input('clienteCod', cliente.clienteCod);
+                request.input('CIF', cliente.CIF);
+                request.input('razonSocial', cliente.razonSocial);
+                request.input('direccion', cliente.direccion);
+                request.input('CP', cliente.CP);
+                request.input('municipio', cliente.municipio);
+            
+                const resultado = await request.query(query);
+                pool.close();
+                return(resultado);
             } catch (error) {
-                reject(error);
+                console.error('Error al agregar cliente:', error);
+                return (error);
             }
-        });
+    }
+    
+    async  actualizarCliente(cliente) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'UPDATE Cliente SET CIF = @CIF, razonSocial = @razonSocial, direccion = @direccion, CP = @CP, municipio = @municipio WHERE clienteCod = @clienteCod';
+            request.input('CIF', cliente.CIF);
+            request.input('razonSocial', cliente.razonSocial);
+            request.input('direccion', cliente.direccion);
+            request.input('CP', cliente.CP);
+            request.input('municipio', cliente.municipio);
+            request.input('clienteCod', cliente.clienteCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la actualización
+        } catch (error) {
+            console.error('Error al actualizar cliente:', error);
+            throw 'Error al actualizar cliente';
+        }
     }
     
 
-    agregarCliente(cliente) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'INSERT INTO Cliente (clienteCod, CIF, razonSocial, direccion, CP, municipio) VALUES (?, ?, ?, ?, ?, ?)';
-                connection.query(query, [cliente.clienteCod, cliente.CIF, cliente.razonSocial, cliente.direccion, cliente.CP, cliente.municipio], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al agregar cliente:', err);
-                        reject('Error al agregar cliente');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    actualizarCliente(cliente) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB(); 
-                const query = 'UPDATE Cliente SET CIF = ?, razonSocial = ?, direccion = ?, CP = ?, municipio = ? WHERE clienteCod = ?';
-                connection.query(query, [cliente.CIF, cliente.razonSocial, cliente.direccion, cliente.CP, cliente.municipio, cliente.clienteCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al actualizar cliente:', err);
-                        reject('Error al actualizar cliente');
-                    } else {
-                        resolve(resultado); 
-                    }
-                });
-            } catch (error) {
-                reject(error); 
-            }
-        });
-    } 
-
-    comprobarExistenciaClientePorCodigo(clienteCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE clienteCod = ?';
-                connection.query(query, [clienteCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al comprobar cliente existente por código:', err);
-                        reject('Error al comprobar cliente existente por código');
-                    } else {
-                        resolve(resultado[0].count > 0);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  comprobarExistenciaClientePorCodigo(clienteCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE clienteCod = @clienteCod';
+            request.input('clienteCod', clienteCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar cliente existente por código:', error);
+            throw error;
+        }
     }
     
-    comprobarExistenciaClientePorCIF(CIF, clienteCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE CIF = ? AND clienteCod != ?';
-                connection.query(query, [CIF, clienteCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al comprobar cliente existente por CIF:', err);
-                        reject('Error al comprobar cliente existente por CIF');
-                    } else {
-                        resolve(resultado[0].count > 0);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  comprobarExistenciaClientePorCIF(CIF, clienteCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Cliente WHERE CIF = @CIF AND clienteCod != @clienteCod';
+            request.input('CIF', CIF);
+            request.input('clienteCod', clienteCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar cliente existente por CIF:', error);
+            throw error;
+        }
     }
     
-    eliminarCliente(clienteCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'DELETE FROM Cliente WHERE clienteCod = ?';
-                connection.query(query, [clienteCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al eliminar cliente:', err);
-                        reject('Error al eliminar cliente');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  eliminarCliente(clienteCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'DELETE FROM Cliente WHERE clienteCod = @clienteCod';
+            request.input('clienteCod', clienteCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; 
+        } catch (error) {
+            console.error('Error al eliminar cliente:', error);
+            throw 'Error al eliminar cliente';
+        }
     }
+    
 
    async verificarCliente(cliente) {
         if (!libGenerales.verificarCamposVacios(cliente)) {
