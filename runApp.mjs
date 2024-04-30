@@ -42,7 +42,7 @@ app.get('/crearfactura', httpUsuarios.crearFactura);
 
 // Funciones de empresas 
 
-app.post('/obtenerEmpresasCod', httpEmpresas.postObtenerEmpresasCod);
+app.post('/obtenerEmpresasDatosBasicos', httpEmpresas.postObtenerEmpresasDatosBasicos);
 
 app.post('/obtenerEmpresas', httpEmpresas.postObtenerEmpresas);
 
@@ -54,7 +54,7 @@ app.post('/eliminarEmpresa', httpEmpresas.postEliminarEmpresa);
 
 // Funciones de clientes
 
-app.post('/obtenerClientesCod', httpClientes.postObtenerClientesCod);
+app.post('/obtenerClientesDatosBasicos', httpClientes.postObtenerClientesDatosBasicos);
 
 app.post('/obtenerClientes', httpClientes.postObtenerClientes);
 
