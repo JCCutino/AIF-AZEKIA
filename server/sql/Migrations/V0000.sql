@@ -122,4 +122,10 @@ GO
 /****** Object:  User [app_aif]    Script Date: 24/04/2024 10:12:15 ******/
 CREATE USER [app_aif] FOR LOGIN [app_aif] WITH DEFAULT_SCHEMA=[dbo]
 GO
+ALTER ROLE [db_datareader] ADD MEMBER [app_aif]
+GO
 
+ALTER ROLE [db_datawriter] ADD MEMBER [app_aif]
+GO
+
+SELECT SUSER_NAME();

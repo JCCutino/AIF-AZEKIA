@@ -3,174 +3,134 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
-    obtenerEmpresasCod() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT empresaCod FROM Empresa';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener empresasCod:', err);
-                        connection.end();
-                        reject('Error al obtener empresas');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    obtenerEmpresas() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Empresa';
-                connection.query(query, (err, resultados) => {
-                    if (err) {
-                        console.error('Error al obtener empresas:', err);
-                        connection.end();
-                        reject('Error al obtener empresas');
-                    } else {
-                        connection.end();
-                        resolve(resultados || []);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    async obtenerEmpresaPorCodEmpresa(codEmpresa) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT * FROM Empresa WHERE empresaCod = ?';
-                connection.query(query, [codEmpresa], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al obtener empresa por código de empresa:', err);
-                        reject('Error al obtener empresa por código de empresa');
-                    } else {
-                        resolve(resultado[0] || null);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerEmpresasCod() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT empresaCod FROM Empresa';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener empresasCod:', error);
+            throw 'Error al obtener empresasCod';
+        }
     }
     
-
-    agregarEmpresa(empresa) {
-        // esta función debe devolver un objeto con el resultado
-        // de modo que las funciones que responden a ruta lo puedan devolver en un res inequivocamnete
-        // p.ej. true >> send(200, {err: false})
-        
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'INSERT INTO Empresa (empresaCod, CIF, razonSocial, direccion, CP, municipio) VALUES (?, ?, ?, ?, ?, ?)';
-                connection.query(query, [empresa.empresaCod, empresa.CIF, empresa.razonSocial, empresa.direccion, empresa.CP, empresa.municipio], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al agregar empresa:', err);
-                        reject('Error al agregar empresa');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    actualizarEmpresa(empresa) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB(); 
-                const query = 'UPDATE Empresa SET CIF = ?, razonSocial = ?, direccion = ?, CP = ?, municipio = ? WHERE empresaCod = ?';
-                connection.query(query, [empresa.CIF, empresa.razonSocial, empresa.direccion, empresa.CP, empresa.municipio, empresa.empresaCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al actualizar empresa:', err);
-                        reject('Error al actualizar empresa');
-                    } else {
-                        resolve(resultado); 
-                    }
-                });
-            } catch (error) {
-                reject(error); 
-            }
-        });
-    } 
-    comprobarExistenciaEmpresaPorCodigo(codEmpresa) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE empresaCod = ?';
-                connection.query(query, [codEmpresa], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al comprobar empresa existente por código:', err);
-                        reject('Error al comprobar empresa existente por código');
-                    } else {
-                        resolve(resultado[0].count > 0);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerEmpresas() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Empresa';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener empresas:', error);
+            throw 'Error al obtener empresas';
+        }
     }
     
-    comprobarExistenciaEmpresaPorCIF(CIF, empresaCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = ? AND empresaCod != ?';
-                connection.query(query, [CIF, empresaCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al comprobar empresa existente por CIF:', err);
-                        reject('Error al comprobar empresa existente por CIF');
-                    } else {
-                        resolve(resultado[0].count > 0);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  obtenerEmpresaPorCodEmpresa(codEmpresa) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM Empresa WHERE empresaCod = @empresaCod';
+            request.input('empresaCod', codEmpresa);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0] || null;
+        } catch (error) {
+            console.error('Error al obtener empresa por código de empresa:', error);
+            throw 'Error al obtener empresa por código de empresa';
+        }
     }
     
-    
-    
-    eliminarEmpresa(empresaCod) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const connection = await dbConexion.conectarDB();
-                const query = 'DELETE FROM Empresa WHERE empresaCod = ?';
-                connection.query(query, [empresaCod], (err, resultado) => {
-                    connection.end();
-                    if (err) {
-                        console.error('Error al eliminar empresa:', err);
-                        reject('Error al eliminar empresa');
-                    } else {
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async  agregarEmpresa(empresa) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'INSERT INTO Empresa (empresaCod, CIF, razonSocial, direccion, CP, municipio) VALUES (@empresaCod, @CIF, @razonSocial, @direccion, @CP, @municipio)';
+            request.input('empresaCod', empresa.empresaCod);
+            request.input('CIF', empresa.CIF);
+            request.input('razonSocial', empresa.razonSocial);
+            request.input('direccion', empresa.direccion);
+            request.input('CP', empresa.CP);
+            request.input('municipio', empresa.municipio);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la inserción
+        } catch (error) {
+            console.error('Error al agregar empresa:', error);
+            throw 'Error al agregar empresa';
+        }
     }
-
+    
+    async  actualizarEmpresa(empresa) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'UPDATE Empresa SET CIF = @CIF, razonSocial = @razonSocial, direccion = @direccion, CP = @CP, municipio = @municipio WHERE empresaCod = @empresaCod';
+            request.input('CIF', empresa.CIF);
+            request.input('razonSocial', empresa.razonSocial);
+            request.input('direccion', empresa.direccion);
+            request.input('CP', empresa.CP);
+            request.input('municipio', empresa.municipio);
+            request.input('empresaCod', empresa.empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la actualización
+        } catch (error) {
+            console.error('Error al actualizar empresa:', error);
+            throw 'Error al actualizar empresa';
+        }
+    }
+    
+    async  comprobarExistenciaEmpresaPorCodigo(codEmpresa) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE empresaCod = @empresaCod';
+            request.input('empresaCod', codEmpresa);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar empresa existente por código:', error);
+            throw 'Error al comprobar empresa existente por código';
+        }
+    }
+    
+    async  comprobarExistenciaEmpresaPorCIF(CIF, empresaCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Empresa WHERE CIF = @CIF AND empresaCod != @empresaCod';
+            request.input('CIF', CIF);
+            request.input('empresaCod', empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar empresa existente por CIF:', error);
+            throw 'Error al comprobar empresa existente por CIF';
+        }
+    }
+    
+    async  eliminarEmpresa(empresaCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'DELETE FROM Empresa WHERE empresaCod = @empresaCod';
+            request.input('empresaCod', empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.rowsAffected[0]; // Número de filas afectadas por la eliminación
+        } catch (error) {
+            console.error('Error al eliminar empresa:', error);
+            throw 'Error al eliminar empresa';
+        }
+    }
     
    async verificarEmpresa(empresa, actualizar = false) {
 
