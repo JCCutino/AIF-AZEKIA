@@ -56,6 +56,34 @@ async function actualizarSerie(serie) {
     }
 }
 
+async function obtenerEmpresasCod() {
+    try {
+        const response = await fetch('/obtenerEmpresasDatosBasicos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                mostrarError('Error al obtener empresasCod:'+ data.errmsg)
+
+            } else {
+                agregarEmpresasCodSelect(data.datosEmpresa)
+            }
+        } else {
+            
+            mostrarError('Error al llamar a la API:'+ response.statusText);
+
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API:'+ error.message);
+    }
+}
+
 async function obtenerSeriesAPI() {
     try {
         const response = await fetch('/obtenerSeries', {
@@ -140,7 +168,6 @@ async function abrirModalEditableSerie(serieCod) {
     }
 }
 
-// Luego, definir la función mostrarDatosEnTabla
 async function mostrarDatosEnTabla(data) {
     // Obtener la tabla HTML
     const tabla = document.getElementById('tablaSeries');
@@ -155,25 +182,30 @@ async function mostrarDatosEnTabla(data) {
         data.series.forEach(serie => {
             const fila = document.createElement('tr');
 
-            Object.values(serie).forEach(valor => {
+            // Orden de las propiedades del serie para mostrar en la tabla
+            const propiedades = [
+                'razonSocialEmpresa',
+                'serieCod',
+                'descripcion',
+                'ultimoNumUsado'
+            ];
+
+            propiedades.forEach(clave => {
                 const celda = document.createElement('td');
+                const valor = serie[clave];
                 celda.textContent = valor;
                 fila.appendChild(celda);
             });
 
-            // Agregar el botón "Ver" a la última celda de la fila
             const celdaBoton = document.createElement('td');
             const boton = document.createElement('button');
             boton.textContent = 'Ver';
             celdaBoton.appendChild(boton);
             fila.appendChild(celdaBoton);
 
-            // Agregar la fila a la tabla
             tabla.appendChild(fila);
 
-            // Agregar el evento click al botón "Ver"
             boton.addEventListener('click', function () {
-                // Obtener el identificador único de la serie correspondiente a esta fila
                 const serieCod = serie.serieCod;
                 abrirModalEditableSerie(serieCod);
             });
@@ -186,6 +218,7 @@ async function mostrarDatosEnTabla(data) {
 async function guardarSerie() {
     // Obtener los datos del formulario
     const serieCod = document.getElementById("serieCod").value;
+    const empresaCod = document.getElementById("empresaCod").value;
     const descripcion = document.getElementById("descripcion").value;
     const ultimoNumUsadoString = document.getElementById("ultimoNumUsado").value;
 
@@ -194,6 +227,7 @@ async function guardarSerie() {
 
     const serie = {
         serieCod: serieCod,
+        empresaCod: empresaCod,
         descripcion: descripcion,
         ultimoNumUsado: ultimoNumUsado
     };
@@ -211,6 +245,7 @@ async function guardarSerie() {
 async function actualizadaSerie() {
     // Obtener los datos del formulario
     const serieCod = document.getElementById("serieCodEditar").value;
+    const empresaCod = document.getElementById("empresaCodEditar").value;
     const descripcion = document.getElementById("descripcionEditar").value;
     const ultimoNumUsadoString = document.getElementById("ultimoNumUsadoEditar").value;
 
@@ -219,6 +254,7 @@ async function actualizadaSerie() {
 
     const serie = {
         serieCod: serieCod,
+        empresaCod: empresaCod,
         descripcion: descripcion,
         ultimoNumUsado: ultimoNumUsado
     };
@@ -241,9 +277,30 @@ async function main() {
     try {
         // Al cargar la página, obtener y mostrar los datos de las series
         await obtenerSeriesAPI();
+        await obtenerEmpresasCod()
     } catch (error) {
         mostrarError('Error en la ejecución principal:' + error);
     }
+}
+
+function agregarEmpresasCodSelect(datosEmpresa) {
+    let selectAgregarEmpresaCod = document.getElementById("empresaCod");
+    let selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
+
+    selectAgregarEmpresaCod.innerHTML = "";
+    selectEditarEmpresaCod.innerHTML = "";
+
+    datosEmpresa.forEach(  (empresa) => {
+        let optionAgregar = document.createElement("option");
+        optionAgregar.text = empresa.razonSocial;
+        optionAgregar.value = empresa.empresaCod;
+        selectAgregarEmpresaCod.add(optionAgregar);
+
+        let optionEditar = document.createElement("option");
+        optionEditar.text = empresa.razonSocial;
+        optionEditar.value = empresa.empresaCod;
+        selectEditarEmpresaCod.add(optionEditar);
+    });
 }
 
 // Llamar a la función principal

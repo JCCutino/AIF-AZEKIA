@@ -2,11 +2,11 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibClientes {
-    async  obtenerClientesCod() {
+    async  obtenerClientesDatosBasicos() {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT clienteCod FROM Cliente';
+            const query = 'SELECT clienteCod, razonSocial FROM Cliente';
             const resultados = await request.query(query);
             await pool.close();
             return resultados.recordset || [];

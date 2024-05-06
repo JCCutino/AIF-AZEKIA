@@ -3,11 +3,11 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
-    async  obtenerEmpresasCod() {
+    async  obtenerEmpresasDatosBasicos() {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT empresaCod FROM Empresa';
+            const query = 'SELECT empresaCod, razonSocial FROM Empresa';
             const resultados = await request.query(query);
             await pool.close();
             return resultados.recordset || [];
