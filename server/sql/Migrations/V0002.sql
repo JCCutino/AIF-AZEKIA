@@ -1,7 +1,4 @@
-USE [master]
-GO
-
-/****** Object:  Database [app_aif]    Script Date: 06/05/2024 10:33:14 ******/
+/****** Object:  Database [app_aif]    Script Date: 06/05/2024 11:36:55 ******/
 CREATE DATABASE [app_aif]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -114,8 +111,12 @@ ALTER DATABASE [app_aif] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_P
 GO
 
 ALTER DATABASE [app_aif] SET  READ_WRITE 
+
 GO
 
+USE [app_aif]
+
+GO
 /****** Object:  Table [dbo].[Cliente]    Script Date: 06/05/2024 10:18:55 ******/
 SET ANSI_NULLS ON
 GO
@@ -158,6 +159,72 @@ CREATE TABLE [dbo].[Empresa](
 ) ON [PRIMARY]
 GO
 
+/****** Object:  Table [dbo].[Serie]    Script Date: 06/05/2024 10:22:57 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Serie](
+	[empresaCod] [varchar](20) NOT NULL,
+	[serieCod] [varchar](10) NOT NULL,
+	[descripcion] [varchar](100) NOT NULL,
+	[ultimoNumUsado] [int] NOT NULL,
+ CONSTRAINT [PK_Serie] PRIMARY KEY CLUSTERED 
+(
+	[empresaCod] ASC,
+	[serieCod] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Serie]  WITH CHECK ADD  CONSTRAINT [FK_Serie_Empresa] FOREIGN KEY([empresaCod])
+REFERENCES [dbo].[Empresa] ([empresaCod])
+GO
+
+ALTER TABLE [dbo].[Serie] CHECK CONSTRAINT [FK_Serie_Empresa]
+GO
+
+
+/****** Object:  Table [dbo].[Proyecto]    Script Date: 06/05/2024 10:22:06 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Proyecto](
+	[proyectoCod] [varchar](20) NOT NULL,
+	[nombre] [varchar](100) NOT NULL,
+	[fechaInicio] [date] NOT NULL,
+	[fechaFinPrevisto] [date] NOT NULL,
+	[empresaCod] [varchar](20) NOT NULL,
+	[clienteCod] [varchar](20) NOT NULL,
+	[importeTotalPrevisto] [decimal](10, 2) NOT NULL,
+	[importeExtraPrevisto] [decimal](10, 2) NOT NULL,
+ CONSTRAINT [PK_Proyecto] PRIMARY KEY CLUSTERED 
+(
+	[proyectoCod] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Proyecto]  WITH CHECK ADD  CONSTRAINT [FK_Proyecto_Cliente] FOREIGN KEY([clienteCod])
+REFERENCES [dbo].[Cliente] ([clienteCod])
+GO
+
+ALTER TABLE [dbo].[Proyecto] CHECK CONSTRAINT [FK_Proyecto_Cliente]
+GO
+
+ALTER TABLE [dbo].[Proyecto]  WITH CHECK ADD  CONSTRAINT [FK_Proyecto_Empresa] FOREIGN KEY([empresaCod])
+REFERENCES [dbo].[Empresa] ([empresaCod])
+GO
+
+ALTER TABLE [dbo].[Proyecto] CHECK CONSTRAINT [FK_Proyecto_Empresa]
+GO
+
+
 /****** Object:  Table [dbo].[FacturaVenta]    Script Date: 06/05/2024 10:21:34 ******/
 SET ANSI_NULLS ON
 GO
@@ -193,6 +260,24 @@ REFERENCES [dbo].[Serie] ([empresaCod], [serieCod])
 GO
 
 ALTER TABLE [dbo].[FacturaVenta] CHECK CONSTRAINT [FK_FacturaVenta_Serie]
+GO
+
+/****** Object:  Table [dbo].[Impuesto]    Script Date: 06/05/2024 10:21:55 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Impuesto](
+	[impuestoCod] [varchar](10) NOT NULL,
+	[tipoImpuesto] [varchar](50) NOT NULL,
+	[porcentaje] [decimal](5, 2) NOT NULL,
+ CONSTRAINT [PK_Impuesto] PRIMARY KEY CLUSTERED 
+(
+	[impuestoCod] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
 
 /****** Object:  Table [dbo].[FacturaVentaLinea]    Script Date: 06/05/2024 10:21:46 ******/
@@ -255,61 +340,6 @@ GO
 ALTER TABLE [dbo].[FacturaVentaLinea] CHECK CONSTRAINT [FK_FacturaVentaLinea_Proyecto]
 GO
 
-/****** Object:  Table [dbo].[Impuesto]    Script Date: 06/05/2024 10:21:55 ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[Impuesto](
-	[impuestoCod] [varchar](10) NOT NULL,
-	[tipoImpuesto] [varchar](50) NOT NULL,
-	[porcentaje] [decimal](5, 2) NOT NULL,
- CONSTRAINT [PK_Impuesto] PRIMARY KEY CLUSTERED 
-(
-	[impuestoCod] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
-/****** Object:  Table [dbo].[Proyecto]    Script Date: 06/05/2024 10:22:06 ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[Proyecto](
-	[proyectoCod] [varchar](20) NOT NULL,
-	[nombre] [varchar](100) NOT NULL,
-	[fechaInicio] [date] NOT NULL,
-	[fechaFinPrevisto] [date] NOT NULL,
-	[empresaCod] [varchar](20) NOT NULL,
-	[clienteCod] [varchar](20) NOT NULL,
-	[importeTotalPrevisto] [decimal](10, 2) NOT NULL,
-	[importeExtraPrevisto] [decimal](10, 2) NOT NULL,
- CONSTRAINT [PK_Proyecto] PRIMARY KEY CLUSTERED 
-(
-	[proyectoCod] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
-ALTER TABLE [dbo].[Proyecto]  WITH CHECK ADD  CONSTRAINT [FK_Proyecto_Cliente] FOREIGN KEY([clienteCod])
-REFERENCES [dbo].[Cliente] ([clienteCod])
-GO
-
-ALTER TABLE [dbo].[Proyecto] CHECK CONSTRAINT [FK_Proyecto_Cliente]
-GO
-
-ALTER TABLE [dbo].[Proyecto]  WITH CHECK ADD  CONSTRAINT [FK_Proyecto_Empresa] FOREIGN KEY([empresaCod])
-REFERENCES [dbo].[Empresa] ([empresaCod])
-GO
-
-ALTER TABLE [dbo].[Proyecto] CHECK CONSTRAINT [FK_Proyecto_Empresa]
-GO
-
 
 /****** Object:  Table [dbo].[ProyectoCertificado]    Script Date: 06/05/2024 10:22:35 ******/
 SET ANSI_NULLS ON
@@ -364,32 +394,5 @@ GO
 ALTER TABLE [dbo].[ProyectoProducido] CHECK CONSTRAINT [FK_ProyectoProducido_Proyecto]
 GO
 
-
-/****** Object:  Table [dbo].[Serie]    Script Date: 06/05/2024 10:22:57 ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[Serie](
-	[empresaCod] [varchar](20) NOT NULL,
-	[serieCod] [varchar](10) NOT NULL,
-	[descripcion] [varchar](100) NOT NULL,
-	[ultimoNumUsado] [int] NOT NULL,
- CONSTRAINT [PK_Serie] PRIMARY KEY CLUSTERED 
-(
-	[empresaCod] ASC,
-	[serieCod] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
-ALTER TABLE [dbo].[Serie]  WITH CHECK ADD  CONSTRAINT [FK_Serie_Empresa] FOREIGN KEY([empresaCod])
-REFERENCES [dbo].[Empresa] ([empresaCod])
-GO
-
-ALTER TABLE [dbo].[Serie] CHECK CONSTRAINT [FK_Serie_Empresa]
-GO
 
 
