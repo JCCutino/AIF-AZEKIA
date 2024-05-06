@@ -1,3 +1,32 @@
+USE master;
+GO
+
+IF EXISTS (SELECT * FROM sys.databases WHERE name = 'app_aif')
+BEGIN
+    ALTER DATABASE [app_aif] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    -- Verificar si hay conexiones activas
+    DECLARE @Connections INT;
+    SET @Connections = (
+        SELECT COUNT(*)
+        FROM sys.dm_exec_sessions
+        WHERE database_id = DB_ID('app_aif')
+    );
+
+    IF @Connections = 0
+    BEGIN
+        -- Si no hay conexiones activas, eliminar la base de datos
+        DROP DATABASE [app_aif];
+    END
+    ELSE
+    BEGIN
+        -- Si hay conexiones activas, esperar un momento y volver a intentarlo
+        WAITFOR DELAY '00:00:05'; -- Esperar 5 segundos
+        DROP DATABASE [app_aif];
+    END
+END
+GO
+
+
 /****** Object:  Database [app_aif]    Script Date: 06/05/2024 11:36:55 ******/
 CREATE DATABASE [app_aif]
  CONTAINMENT = NONE
