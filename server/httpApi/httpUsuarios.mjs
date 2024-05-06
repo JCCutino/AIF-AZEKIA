@@ -75,7 +75,7 @@ class HttpUsuarios {
 
     async crearFactura(req, res) {
         try {
-        res.sendFile(path.join(staticFilesPath, 'pages/crearfactura/crearfactura.html'));
+        res.sendFile(path.join(staticFilesPath, 'pages/crearFacturas/crearfactura.html'));
         
     } catch (error) {
             console.error('Error al procesar la acción de turno:', error);
