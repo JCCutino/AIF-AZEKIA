@@ -197,7 +197,7 @@ async function abrirModalEditableProyecto(proyectoCod) {
 
                 document.getElementById("proyectoCodEditar").value = proyecto.proyectoCod;
                 document.getElementById("proyectoCodEditar").readOnly = true;
-                document.getElementById("nombreEditar").value = proyecto.nombre;
+                document.getElementById("nombreEditarProyecto").value = proyecto.nombre;
                 document.getElementById("fechaInicioEditar").value = ajustarFechaParaInput(proyecto.fechaInicio);
                 document.getElementById("fechaFinPrevistoEditar").value = ajustarFechaParaInput(proyecto.fechaFinPrevisto);
                 document.getElementById("empresaCodEditar").value = proyecto.empresaCod;

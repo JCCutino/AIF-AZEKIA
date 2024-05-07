@@ -64,7 +64,7 @@
       }
       
       .modal-content {
-        background-color: #fefefe;
+        background-color: #ffffff;
         margin: 10% auto;
         padding: 20px;
         border: 1px solid #888;
@@ -78,12 +78,45 @@
       .modal-content-proyecto {
         height: 480px;
       }
-      #formularioAgregarEmpresa, #formularioAgregarProyecto, #editarProyectoForm{
-        margin-top: 80px;
+      #formularioEditarProyecto{
+        margin-top: 50px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
+      }
+
+      #formularioEditarProyecto label{
+        margin-right: 5px;
+        font-weight: bold;
+      }
+      #nombreEditarProyecto{
+        margin-top: 5px;
+      }
+
+      #formularioAgregarProyecto{
+        margin-top: 50px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
+      }
+
+      #formularioAgregarProyecto label{
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      #nombreProyecto{
+        margin-top: 5px;
       }
 
       #formularioAgregarEmpresa{
-        margin-top: 80px;
+        margin-top: 70px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       } 
       #formularioAgregarEmpresa label{
         font-weight: bold;
@@ -93,10 +126,14 @@
         border: solid 1px black;
       }
       
-      #editarEmpresaForm{
-        margin-top: 80px;
+      #formularioEditarEmpresa{
+        margin-top: 50px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       }
-      #editarEmpresaForm label{
+      #formularioEditarEmpresa label{
         font-weight: bold;
       }
 
@@ -104,7 +141,11 @@
         border: solid 1px black;
       }
       #formularioAgregarCliente{
-        margin-top: 80px;
+        margin-top: 70px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       }
       #formularioAgregarCliente label{
         font-weight: bold;
@@ -114,58 +155,100 @@
         border: solid 1px black;
       }
       
-      #editarClienteForm{
-        margin-top: 80px;
+      #formularioEditarCliente{
+        margin-top: 50px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       }
-      #editarClienteForm label{
+      #formularioEditarCliente label{
         font-weight: bold;
+        margin-right: 5px;
       }
 
-      #editarClienteForm input{
+      #formularioEditarCliente input{
         border: solid 1px black;
+        margin-top: 5px;
       }
 
       #formularioAgregarImpuesto{
         margin-top: 80px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       }
       #formularioAgregarImpuesto label{
         font-weight: bold;
+        margin-right: 10px;
       }
 
       #formularioAgregarImpuesto input{
         border: solid 1px black;
       }
-      
-      #editarImpuestoForm{
-        margin-top: 80px;
-      }
-      #editarImpuestoForm label{
-        font-weight: bold;
+
+      #tipoImpuesto{
+        margin-top: 5px;
       }
 
-      #editarImpuestoForm input{
+      #formularioEditarImpuesto{
+        margin-top: 80px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
+      }
+
+      #formularioEditarImpuesto label{
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      #tipoImpuestoEditar{
+        margin-top: 5px;
+      }
+
+      #formularioEditarImpuesto input{
         border: solid 1px black;
       }
 
       #formularioAgregarSerie{
-        margin-top: 80px;
+        margin-top: 70px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
       }
       #formularioAgregarSerie label{
         font-weight: bold;
+        margin-right: 5px;
       }
 
       #formularioAgregarSerie input{
         border: solid 1px black;
       }
-      
-      #editarSerieForm{
-        margin-top: 80px;
+
+      #descripcionSerie{
+        margin-top: 5px;
       }
-      #editarSerieForm label{
+      
+      #formularioEditarSerie{
+        margin-top: 80px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
+      }
+      #formularioEditarSerie label{
         font-weight: bold;
+        margin-right: 5px;
       }
 
-      #editarSerieForm input{
+      #descripcionEditar{
+        margin-top: 5px;
+      }
+
+      #formularioEditarSerie input{
         border: solid 1px black;
       }
       .close:hover,
