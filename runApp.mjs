@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url'; 
 import dotenv from 'dotenv';
+import morgan from 'morgan';
+
 
 import httpEmpresas from './server/httpApi/httpEmpresas.mjs';
 import httpClientes from './server/httpApi/httpClientes.mjs';
@@ -19,13 +21,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-
+app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, '/browser')));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.get('/', httpUsuarios.mostrarLogin);
+
+app.post('/login', httpUsuarios.postLogin);
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
@@ -103,7 +107,7 @@ app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
 //Funciones de prueba
-app.get('/prueba', httpUsuarios.mostrarPrueba);
+
 
 
 
