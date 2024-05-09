@@ -3,6 +3,35 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibEmpresas {
 
+    async  verificarEmpresaReferenciada(codEmpresa) {
+        try {
+            const pool = await dbConexion.conectarDB(); // Conectarse a la base de datos
+            const request = pool.request(); // Crear una solicitud
+            const query = `
+                SELECT 
+                    COUNT(*) AS count 
+                FROM 
+                    (
+                        SELECT empresaCod FROM Proyecto WHERE empresaCod = @empresaCod
+                        UNION ALL
+                        SELECT empresaCod FROM Serie WHERE empresaCod = @empresaCod
+                        UNION ALL
+                        SELECT empresaCod FROM FacturaVenta WHERE empresaCod = @empresaCod
+                        -- Agrega aquí más tablas que puedan tener una relación con Empresa
+                    ) AS derived;
+            `;
+            request.input('empresaCod', codEmpresa); 
+            const resultado = await request.query(query); 
+            await pool.close(); 
+    
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar empresa existente por código:', error);
+            throw 'Error al comprobar empresa existente por código';
+        }
+    }
+    
+    
     async  obtenerEmpresasDatosBasicos() {
         try {
             const pool = await dbConexion.conectarDB();

@@ -106,14 +106,16 @@ async function eliminarEmpresa(empresaCod) {
             body: JSON.stringify({ empresaCod })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
+
+        if (!data.err) {
+            // Si no hay errores, actualiza la lista de empresas
             await obtenerEmpresasAPI();
         } else {
-            mostrarError('Error al eliminar empresa:' + response.statusText);
+            mostrarError('Error al eliminar empresa: ' + data.errmsg);
         }
     } catch (error) {
-        mostrarError('Error al eliminar empresa:' + error.message);
+        mostrarError('Error al eliminar empresa: ' + error.message);
     }
 }
 

@@ -37,25 +37,6 @@ class HttpEmpresas {
 
 
     async postAgregarEmpresa(req, res) {
-        // de esta función se espera:
-        // que sanitize req
-        // que llame a un única funición de lib.agregarEmpresa
-        // que haga:
-        // res.send(200, { err: false, empresa: { datos de la empresa guardada } });
-        // res.send(200, { err: true, errmsg: 'Ya existe una empresa con ese CIF' });
-        // res.send(500) (<>200) 
-        // AUTORIZAR
-        // ¿el usuario se había autenticado?
-        // ¿el usuario tiene pemiso para llamar a esta api?
-        // ¿el usuario tiene permiso para llamar a esta api con estos datos (para un ámbito)?
-        // SANITIZAR:
-        // body trae un OBJETO llamado "empresa"
-        // a partir de aquí podría hacerlo una función "validate" de la lib
-        // empresaCod es una string de máximo 20 caracteres
-        // empresaCif es una string de máximo 20 caracteres (y es un CIF válido)
-        // etc. etc..
-        // empresa no trae ningún atributo que no esté previsto
-        // si todo ok...
         try {
             const empresa = req.body.empresa;
 
@@ -139,8 +120,14 @@ class HttpEmpresas {
     async postEliminarEmpresa(req, res) {
         try {
             const empresaCod = req.body.empresaCod;
-            const empresas = await libEmpresas.eliminarEmpresa(empresaCod);
-            res.send(200, { err: false });
+            const empresaReferenciada = await libEmpresas.verificarEmpresaReferenciada(empresaCod);
+            if (empresaReferenciada) {
+                res.status(200).send({ err: true, errmsg: 'No se puede eliminar la empresa porque está referenciada en otras tablas' });
+            }else{
+                const empresas = await libEmpresas.eliminarEmpresa(empresaCod);
+                res.send(200, { err: false });
+            }
+            
         } catch (err) {
             res.send(500);
         }
