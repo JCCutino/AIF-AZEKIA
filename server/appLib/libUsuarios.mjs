@@ -12,13 +12,13 @@ class LibUsuarios {
     
             if (resultados.recordset.length === 0) {
                 await pool.close();
-                return false; // Correo no encontrado
+                return { valido: false};
             }
     
             const usuario = resultados.recordset[0];
             if (usuario.contrasena !== contrasena) {
                 await pool.close();
-                return false; // Contraseña incorrecta
+                return { valido: false};
             }
     
             await pool.close();
