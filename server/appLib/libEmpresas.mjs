@@ -17,7 +17,6 @@ class LibEmpresas {
                         SELECT empresaCod FROM Serie WHERE empresaCod = @empresaCod
                         UNION ALL
                         SELECT empresaCod FROM FacturaVenta WHERE empresaCod = @empresaCod
-                        -- Agrega aquí más tablas que puedan tener una relación con Empresa
                     ) AS derived;
             `;
             request.input('empresaCod', codEmpresa); 

@@ -2,6 +2,33 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibClientes {
+   
+    async  verificarClienteReferenciado(clienteCod) {
+        try {
+            const pool = await dbConexion.conectarDB(); 
+            const request = pool.request(); 
+            const query = `
+                SELECT 
+                    COUNT(*) AS count 
+                FROM 
+                    (
+                        SELECT clienteCod FROM Proyecto WHERE clienteCod = @clienteCod
+                        UNION ALL
+                        SELECT clienteCod FROM FacturaVenta WHERE clienteCod = @clienteCod
+                    ) AS derived;
+            `;
+            request.input('clienteCod', clienteCod); 
+            const resultado = await request.query(query); 
+            await pool.close(); 
+    
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar cliente existente por código:', error);
+            throw 'Error al comprobar cliente existente por código';
+        }
+    }
+    
+   
     async  obtenerClientesDatosBasicos() {
         try {
             const pool = await dbConexion.conectarDB();
