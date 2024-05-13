@@ -2,6 +2,35 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibProyectos {
+   
+   
+    async  verificarProyectoReferenciado(proyectoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+                SELECT 
+                    COUNT(*) AS count 
+                FROM 
+                    (
+                        SELECT proyectoCod FROM FacturaVentaLinea WHERE proyectoCod = @proyectoCod
+                        UNION ALL
+                        SELECT proyectoCod FROM ProyectoProducido WHERE proyectoCod = @proyectoCod
+                        UNION ALL
+                        SELECT proyectoCod FROM ProyectoCertificado WHERE proyectoCod = @proyectoCod
+                    ) AS derived;
+            `;
+            request.input('proyectoCod', proyectoCod); 
+            const resultado = await request.query(query); 
+            await pool.close(); 
+    
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar proyecto existente por código:', error);
+            throw 'Error al comprobar proyecto existente por código';
+        }
+    }
+    
     async  obtenerProyectos() {
         try {
             const pool = await dbConexion.conectarDB();

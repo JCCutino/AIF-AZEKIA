@@ -104,8 +104,15 @@ class HttpProyectos {
     async postEliminarProyecto(req, res) {
         try {
             const proyectoCod = req.body.proyectoCod;
+
+            const proyectoReferenciado = await libProyectos.verificarProyectoReferenciado(proyectoCod)
+            
+            if (proyectoReferenciado) {
+                res.status(200).send({ err: true, errmsg: 'No se puede eliminar el proyecto porque está referenciado en otras tablas' });
+            }else{
             const proyectos = await libProyectos.eliminarProyecto(proyectoCod);
             res.send(200, { err: false });
+            }
         } catch (err) {
             res.send(500);
         }
