@@ -31,6 +31,8 @@ app.get('/', httpUsuarios.mostrarLogin);
 
 app.post('/login', httpUsuarios.postLogin);
 
+app.get('/detallesProyectos', httpUsuarios.mostrarDetallesProyectos);
+
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
 app.get('/clientes', httpUsuarios.mostrarClientes);

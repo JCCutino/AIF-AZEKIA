@@ -1,6 +1,7 @@
 
       body {
         font-family: Helvetica, Arial, sans-serif; 
+        margin: 0;
       }
       table {
         width: 50%;
@@ -342,15 +343,15 @@
         margin-left: 650px;
       }
 
-      #btnAgregar {
-        width: 27px; /* Ancho de tu imagen */
-        height: 27px; /* Alto de tu imagen */
-        background-image: url("../Images/anadir.png"); /* Ruta de la imagen */
-        background-size: cover; /* Ajusta la imagen al tamaño del botón */
-        background-repeat: no-repeat; /* Evita que la imagen se repita */
+      #btnAgregar, #btnAgregarProyectoCertificado, #btnAgregarProyectoProducido {
+        width: 27px; 
+        height: 27px; 
+        background-image: url("../Images/anadir.png"); 
+        background-size: cover; 
+        background-repeat: no-repeat; 
         background-color: transparent;
-        border: transparent; /* Quita el borde del botón */
-        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        border: transparent;
+        cursor: pointer;
       }
 
       .modalborrar {
@@ -497,4 +498,11 @@
   .titulo{
       margin-top: 22px;
       font-weight: bold;
+  }
+
+  @media (min-width: 1300px) {
+    .tabla-contenedor {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
   }

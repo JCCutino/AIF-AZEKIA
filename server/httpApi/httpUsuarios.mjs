@@ -35,6 +35,16 @@ class HttpUsuarios {
         }
     }
 
+    async mostrarDetallesProyectos(req, res) {
+        try {
+        res.sendFile(path.join(staticFilesPath, 'pages/proyectos/detallesProyectos/detallesProyectos.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de facturas:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }    
+    }
+
     async  mostrarSeries(req, res) {
         try {
             res.sendFile(path.join(staticFilesPath, 'pages/series/serie.html'));
@@ -113,7 +123,7 @@ class HttpUsuarios {
         }
     }
     
-    
+  
     
 
 }
