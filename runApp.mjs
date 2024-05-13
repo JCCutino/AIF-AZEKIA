@@ -111,6 +111,7 @@ app.get('/obtenerProyectosProducidos', httpProyectosDetalles.getObtenerProyectos
 
 app.get('/obtenerProyectosCertificados', httpProyectosDetalles.getObtenerProyectosCertificados);
 
+app.post('/agregarProyectoProducido', httpProyectosDetalles.postAgregarProyectoProducido);
 
 //Funciones de facturas
 

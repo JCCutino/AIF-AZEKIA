@@ -26,7 +26,7 @@ function cerrarModal() {
     document.getElementById("modalEditarProyectoProducido").style.display = "none";
 }
 
-async function agregarProyectoProducido(proyecto) {
+async function agregarProyectoProducido(proyecto) {   
     try {
         const response = await fetch('/agregarProyectoProducido', {
             method: 'POST',
@@ -317,7 +317,7 @@ async function mostrarDatosEnTablaCertificados(data) {
 
             const celdaBoton = document.createElement('td');
             const boton = document.createElement('button');
-            boton.textContent = 'Ver';
+            boton.textContent = 'Eliminar';
             celdaBoton.appendChild(boton);
             fila.appendChild(celdaBoton);
 
@@ -343,7 +343,7 @@ async function guardarProyectoProducido() {
 
     try {
         await agregarProyectoProducido(proyecto);
-        await obtenerProyectosProducido();
+        await obtenerProyectosProducidos();
     } catch (error) {
         mostrarError('Error al agregar proyecto:'+ error.message);
     }

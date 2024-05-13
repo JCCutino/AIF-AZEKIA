@@ -31,6 +31,24 @@ class LibProyectosDetalles {
         }
     }
    
+    async agregarProyectoProducido(proyecto) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'INSERT INTO ProyectoProducido (proyectoCod, fecha, importe) VALUES (@proyectoCod, @fecha, @importe)';
+            request.input('proyectoCod', proyecto.proyectoCod);
+            request.input('fecha', proyecto.fecha);
+            request.input('importe', proyecto.importe);
+           
+        
+            const resultado = await request.query(query);
+            pool.close();
+            return(resultado);
+        } catch (error) {
+            console.error('Error al agregar proyecto producido:', error);
+            return (error);
+        }
+}
     
 
 }
