@@ -31,6 +31,19 @@ class LibProyectos {
         }
     }
     
+    async  obtenerProyectosDatosBasicos() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT proyectoCod, nombre FROM Proyecto';
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener proyectos:', error);
+            throw error;
+        }
+    }
     async  obtenerProyectos() {
         try {
             const pool = await dbConexion.conectarDB();

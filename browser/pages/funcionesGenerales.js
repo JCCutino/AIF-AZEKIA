@@ -18,4 +18,3 @@ async function mostrarError(texto) {
     }, 3000); 
 }
 
-console.log("se llama");

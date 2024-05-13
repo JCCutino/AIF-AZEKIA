@@ -8,6 +8,19 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpProyectos {
     
+    async getObtenerProyectosDatosBasicos(req, res) {
+        try {
+            const datosProyecto = await libProyectos.obtenerProyectosDatosBasicos();
+            if (datosProyecto && datosProyecto.length > 0) {
+                res.status(200).send({ err: false, datosProyecto });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay proyectos añadidos en este momento' });
+            }
+        } catch (err) {
+            console.error('Error al obtener proyectos:', err);
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
     async postObtenerProyectos(req, res) {
         try {
             const proyectos = await libProyectos.obtenerProyectos();

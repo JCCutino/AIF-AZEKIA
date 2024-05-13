@@ -156,6 +156,18 @@
         border: solid 1px black;
       }
       
+      #formularioAgregarProyectoProducido , #formularioEditarProyectoProducido{
+        margin-top: 50px;
+        padding-bottom: 20px;
+        border: solid 1px rgb(0, 0, 0);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        background-color: rgb(230, 229, 229);
+      }
+
+      .modal-content-detalleProyecto {
+        height: 305px;
+      }
+
       #formularioEditarCliente{
         margin-top: 50px;
         padding-bottom: 20px;
@@ -499,6 +511,11 @@
       margin-top: 22px;
       font-weight: bold;
   }
+
+
+
+
+
 
   @media (min-width: 1300px) {
     .tabla-contenedor {
