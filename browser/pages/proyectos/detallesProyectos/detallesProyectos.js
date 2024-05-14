@@ -160,6 +160,7 @@ async function eliminarProyectoProducido(proyectoCod, fecha) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ proyectoCod, fecha })
+
         });
 
         const data = await response.json();
@@ -168,6 +169,7 @@ async function eliminarProyectoProducido(proyectoCod, fecha) {
             await obtenerProyectosProducidos();
         } else {
             mostrarError('Error al eliminar proyecto producido:'+ data.errmsg);
+            console.error(data.errmsg);
         }
     } catch (error) {
         mostrarError('Error al eliminar proyecto producido:'+ error.message);
@@ -196,7 +198,7 @@ async function eliminarProyectoCertificado(proyectoCod) {
     }
 }
 
-async function abrirModalEditableProyectoProducido(proyectoCod) {
+async function abrirModalEditableProyectoProducido(proyectoCod, fecha) {
     try {
         // Obtener todos los proyectos
         const response = await fetch('/obtenerProyectosProducidos', {
@@ -208,8 +210,8 @@ async function abrirModalEditableProyectoProducido(proyectoCod) {
 
         if (response.ok) {
             const data = await response.json();
-            // Buscar el proyecto con el código proporcionado
-            const proyecto = data.proyectos.find(proy => proy.proyectoCod === proyectoCod);
+
+            const proyecto = data.proyectos.find(proy => proy.proyectoCod === proyectoCod && proy.fecha === fecha);
 
             if (proyecto) {
                 // Mostrar el modal de edición
@@ -274,7 +276,8 @@ async function mostrarDatosEnTablaProducidos(data) {
 
             boton.addEventListener('click', function () {
                 const proyectoCod = proyecto.proyectoCod;
-                abrirModalEditableProyectoProducido(proyectoCod);
+                const fecha = proyecto.fecha;
+                abrirModalEditableProyectoProducido(proyectoCod, fecha);
             });
         });
     } else {
@@ -362,7 +365,7 @@ async function actualizadaProyectoProducido() {
 
     try {
         await actualizarProyectoProducido(proyecto);
-        await obtenerProyectosProducido();
+        await obtenerProyectosProducidos();
     } catch (error) {
         mostrarError('Error al actualizar proyecto:'+ error.message);
     }

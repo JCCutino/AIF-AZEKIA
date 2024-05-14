@@ -113,6 +113,10 @@ app.get('/obtenerProyectosCertificados', httpProyectosDetalles.getObtenerProyect
 
 app.post('/agregarProyectoProducido', httpProyectosDetalles.postAgregarProyectoProducido);
 
+app.post('/actualizarProyectoProducido', httpProyectosDetalles.postActualizarProyectoProducido);
+
+app.post('/eliminarProyectoProducido', httpProyectosDetalles.postEliminarProyectoProducido);
+
 //Funciones de facturas
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);

@@ -91,5 +91,33 @@ class HttpProyectosProducidos {
 
     }
 
+    async postActualizarProyectoProducido(req, res) {
+        try {
+            const proyecto = req.body.proyecto;
+            
+            console.log(proyecto);
+                const resultado = await libProyectosDetalles.actualizarProyectoProducido(proyecto);
+                res.status(200).send({ err: false, proyecto: resultado });
+            
+        } catch (err) {
+            console.error('Error al actualizar el proyecto:', err);
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+
+    async postEliminarProyectoProducido(req, res) {
+        try {
+            const proyectoCod = req.body.proyectoCod;
+
+            const fecha = req.body.fecha;
+            
+            const proyectos = await libProyectosDetalles.eliminarProyectoProducido(proyectoCod, fecha);
+            res.send(200, { err: false });
+            
+        } catch (err) {
+            res.send(500);
+        }
+    }
+
 }
 export default new HttpProyectosProducidos();
