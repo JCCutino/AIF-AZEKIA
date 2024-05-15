@@ -164,11 +164,12 @@ async function eliminarProyecto(proyectoCod) {
             body: JSON.stringify({ proyectoCod })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
+
+        if (!data.err) {
             await obtenerProyectosAPI();
         } else {
-            mostrarError('Error al eliminar proyecto:'+ response.statusText);
+            mostrarError('Error al eliminar proyecto:'+ data.errmsg);
         }
     } catch (error) {
         mostrarError('Error al eliminar proyecto:'+ error.message);

@@ -121,11 +121,12 @@ async function eliminarSerie(serieCod) {
             body: JSON.stringify({ serieCod })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
+
+        if (!data.err) {
             await obtenerSeriesAPI();
         } else {
-            mostrarError('Error al eliminar serie:' + response.statusText);
+            mostrarError('Error al eliminar serie:' + data.errmsg);
         }
     } catch (error) {
         mostrarError('Error al eliminar serie:' + error.message);

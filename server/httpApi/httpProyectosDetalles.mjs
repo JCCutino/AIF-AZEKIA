@@ -1,4 +1,4 @@
-import { libProyectos } from "../appLib/libProyectos.mjs";
+import { libProyectosDetalles } from "../appLib/libProyectosDetalles.mjs";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -6,24 +6,11 @@ import { dirname } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const staticFilesPath = path.join(__dirname, '../../browser');
 
-class HttpProyectos {
+class HttpProyectosProducidos {
     
-    async getObtenerProyectosDatosBasicos(req, res) {
+    async getObtenerProyectosProducidos(req, res) {
         try {
-            const datosProyecto = await libProyectos.obtenerProyectosDatosBasicos();
-            if (datosProyecto && datosProyecto.length > 0) {
-                res.status(200).send({ err: false, datosProyecto });
-            } else {
-                res.status(200).send({ err: true, errmsg: 'No hay proyectos añadidos en este momento' });
-            }
-        } catch (err) {
-            console.error('Error al obtener proyectos:', err);
-            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
-        }
-    }
-    async postObtenerProyectos(req, res) {
-        try {
-            const proyectos = await libProyectos.obtenerProyectos();
+            const proyectos = await libProyectosDetalles.obtenerProyectosProducidos();
             if (proyectos && proyectos.length > 0) {
                 res.status(200).send({ err: false, proyectos });
             } else {
@@ -35,13 +22,27 @@ class HttpProyectos {
         }
     }
 
-    async postAgregarProyecto(req, res) {
+    async getObtenerProyectosCertificados(req, res) {
+        try {
+            const proyectos = await libProyectosDetalles.obtenerProyectosCertificados();
+            if (proyectos && proyectos.length > 0) {
+                res.status(200).send({ err: false, proyectos });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay proyectos añadidos en este momento' });
+            }
+        } catch (err) {
+            console.error('Error al obtener proyectos:', err);
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+
+    async postAgregarProyectoProducido(req, res) {
         try {
             const proyecto = req.body.proyecto;
 
             if (Object.prototype.toString.call(proyecto) === '[object Object]') {
 
-                const atributosRequeridos = ['proyectoCod', 'nombre', 'fechaInicio', 'fechaFinPrevisto', 'empresaCod', 'clienteCod', 'importeTotalPrevisto', 'importeExtraPrevisto'];
+                const atributosRequeridos = ['proyectoCod', 'fecha', 'importe'];
                 const atributosProyecto = Object.keys(proyecto);
 
                 const atributosFaltantes = atributosRequeridos.filter(key => !atributosProyecto.includes(key));
@@ -51,7 +52,7 @@ class HttpProyectos {
                     // Todas las claves requeridas están presentes y no hay claves adicionales
                     
                     const atributosInvalidos = Object.keys(proyecto).filter(key => {
-                         if (key === 'importeTotalPrevisto' || key === 'importeExtraPrevisto') {
+                         if (key === 'importe') {
                             return isNaN(proyecto[key]);
                         } else {
                             return typeof proyecto[key] !== 'string';
@@ -62,14 +63,10 @@ class HttpProyectos {
                     if (atributosInvalidos.length === 0) {
                         // Todos los valores son del tipo de datos adecuado
 
-                        const proyectoValido = await libProyectos.verificarProyecto(proyecto);
-
-                        if (!proyectoValido) {
-                            res.status(200).send({ err: true, errmsg: 'El proyecto no es válido' });
-                        } else {
-                            const resultado = await libProyectos.agregarProyecto(proyecto);
+                        
+                            const resultado = await libProyectosDetalles.agregarProyectoProducido(proyecto);
                             res.status(200).send({ err: false, proyecto: resultado });
-                        }
+                        
                     } else {
                         // Si algunos valores no son del tipo de datos adecuado, enviar un mensaje de error
                         res.status(200).send({
@@ -94,43 +91,33 @@ class HttpProyectos {
 
     }
 
-    async postActualizarProyecto(req, res) {
+    async postActualizarProyectoProducido(req, res) {
         try {
             const proyecto = req.body.proyecto;
-
+            
             console.log(proyecto);
-
-            const proyectoValido = await libProyectos.verificarProyecto(proyecto, true);
-
-
-            if (!proyectoValido) {
-                res.status(200).send({ err: true, errmsg: 'El proyecto no es válido' });
-            } else {
-                const resultado = await libProyectos.actualizarProyecto(proyecto);
+                const resultado = await libProyectosDetalles.actualizarProyectoProducido(proyecto);
                 res.status(200).send({ err: false, proyecto: resultado });
-            }
+            
         } catch (err) {
             console.error('Error al actualizar el proyecto:', err);
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
-    async postEliminarProyecto(req, res) {
+
+    async postEliminarProyectoProducido(req, res) {
         try {
             const proyectoCod = req.body.proyectoCod;
 
-            const proyectoReferenciado = await libProyectos.verificarProyectoReferenciado(proyectoCod)
+            const fecha = req.body.fecha;
             
-            if (proyectoReferenciado) {
-                res.status(200).send({ err: true, errmsg: 'No se puede eliminar el proyecto porque está referenciado en otras tablas' });
-            }else{
-            const proyectos = await libProyectos.eliminarProyecto(proyectoCod);
+            const proyectos = await libProyectosDetalles.eliminarProyectoProducido(proyectoCod, fecha);
             res.send(200, { err: false });
-            }
+            
         } catch (err) {
             res.send(500);
         }
     }
 
 }
-
-export default new HttpProyectos();
+export default new HttpProyectosProducidos();

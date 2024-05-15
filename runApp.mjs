@@ -14,6 +14,7 @@ import httpSeries from './server/httpApi/httpSeries.mjs';
 import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
 import httpProyectos from './server/httpApi/httpProyectos.mjs';
+import httpProyectosDetalles from './server/httpApi/httpProyectosDetalles.mjs';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url); 
@@ -30,6 +31,8 @@ app.use(bodyParser.json());
 app.get('/', httpUsuarios.mostrarLogin);
 
 app.post('/login', httpUsuarios.postLogin);
+
+app.get('/detallesProyectos', httpUsuarios.mostrarDetallesProyectos);
 
 app.get('/empresas', httpUsuarios.mostrarEmpresas);
 
@@ -94,11 +97,25 @@ app.post('/eliminarSerie', httpSeries.postEliminarSerie);
 
 app.post('/obtenerProyectos', httpProyectos.postObtenerProyectos);
 
+app.get('/obtenerProyectosDatosBasicos', httpProyectos.getObtenerProyectosDatosBasicos);
+
 app.post('/agregarProyecto', httpProyectos.postAgregarProyecto);
 
 app.post('/actualizarProyecto', httpProyectos.postActualizarProyecto);
 
 app.post('/eliminarProyecto', httpProyectos.postEliminarProyecto);
+
+//Funciones de proyectos producidos
+
+app.get('/obtenerProyectosProducidos', httpProyectosDetalles.getObtenerProyectosProducidos);
+
+app.get('/obtenerProyectosCertificados', httpProyectosDetalles.getObtenerProyectosCertificados);
+
+app.post('/agregarProyectoProducido', httpProyectosDetalles.postAgregarProyectoProducido);
+
+app.post('/actualizarProyectoProducido', httpProyectosDetalles.postActualizarProyectoProducido);
+
+app.post('/eliminarProyectoProducido', httpProyectosDetalles.postEliminarProyectoProducido);
 
 //Funciones de facturas
 

@@ -35,6 +35,16 @@ class HttpUsuarios {
         }
     }
 
+    async mostrarDetallesProyectos(req, res) {
+        try {
+        res.sendFile(path.join(staticFilesPath, 'pages/proyectos/detallesProyectos/detallesProyectos.html'));
+        
+    } catch (error) {
+            console.error('Error al procesar la acción de facturas:', error);
+            res.status(500).send('Error al conectar con la base de datos');
+        }    
+    }
+
     async  mostrarSeries(req, res) {
         try {
             res.sendFile(path.join(staticFilesPath, 'pages/series/serie.html'));
@@ -58,7 +68,7 @@ class HttpUsuarios {
         res.sendFile(path.join(staticFilesPath, 'pages/clientes/cliente.html'));
         
     } catch (error) {
-            console.error('Error al procesar la acción de turno:', error);
+            console.error('Error al procesar la acción de cliente:', error);
             res.status(500).send('Error al conectar con la base de datos');
         }
     }
@@ -68,7 +78,7 @@ class HttpUsuarios {
         res.sendFile(path.join(staticFilesPath, 'pages/facturas/facturas.html'));
         
     } catch (error) {
-            console.error('Error al procesar la acción de turno:', error);
+            console.error('Error al procesar la acción de facturas:', error);
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
@@ -78,7 +88,7 @@ class HttpUsuarios {
         res.sendFile(path.join(staticFilesPath, 'pages/crearFacturas/crearfactura.html'));
         
     } catch (error) {
-            console.error('Error al procesar la acción de turno:', error);
+            console.error('Error al procesar la acción de facturas:', error);
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
@@ -88,30 +98,32 @@ class HttpUsuarios {
         res.sendFile(path.join(staticFilesPath, 'pages/login/login.html'));
         
     } catch (error) {
-            console.error('Error al procesar la acción de turno:', error);
+            console.error('Error al procesar la acción de login:', error);
             res.status(500).send('Error al conectar con la base de datos');
         }    
     }
 
     async postLogin(req, res) {
-        console.log('Iniciando función postLogin...'); // Agrega un registro para indicar el inicio de la función
+        console.log('Iniciando función postLogin...'); 
         const correo = req.body.correo;
         const contrasena = req.body.contrasena;
         try {
-            console.log('Validando credenciales...'); // Agrega un registro para indicar el inicio de la validación de credenciales
+            console.log('Validando credenciales...'); 
             const resultadoValidacion = await libUsuarios.validarCredenciales(correo, contrasena);
-            const usuario = resultadoValidacion.usuario;
     
             if (resultadoValidacion.valido) {
-                console.log('Credenciales válidas. Redireccionando...'); // Agrega un registro para indicar que las credenciales son válidas
-                res.sendFile(path.join(staticFilesPath, 'pages/facturas/facturas.html'));
+                console.log('Credenciales válidas.'); 
+                res.status(200).send({ valido: true });
+            } else {
+                res.status(200).send({ valido: false });
             }
         } catch (error) {
             console.error('Error al validar credenciales:', error);
-            // Si hay un error, muestra un mensaje de error y vuelve atrás
-            res.redirect('back');
+            res.status(500).json({ error: true, message: 'Error interno del servidor' });
         }
     }
+    
+  
     
 
 }

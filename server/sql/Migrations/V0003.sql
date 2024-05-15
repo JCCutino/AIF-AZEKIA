@@ -25,7 +25,19 @@ DELETE FROM [dbo].[Empresa];
 
 -- Eliminar datos de la tabla Cliente
 DELETE FROM [dbo].[Cliente];
+
+-- Eliminar datos de la tabla Usuario
+DELETE FROM [dbo].[Usuario];
 GO
+-- Script de inserciones para la tabla Cliente
+INSERT INTO [dbo].[Usuario] ([correo], [contrasena], [nombre])
+VALUES
+    ('juan@example.com', '12345678', 'Juan'),
+    ('javi@example.com', '12345678', 'Javier'),
+    ('antonio@example.com', '12345678', 'Antonio');
+
+GO
+
 -- Script de inserciones para la tabla Cliente
 INSERT INTO [dbo].[Cliente] ([clienteCod], [CIF], [razonSocial], [direccion], [CP], [municipio])
 VALUES

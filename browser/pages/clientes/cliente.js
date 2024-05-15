@@ -107,11 +107,12 @@ async function eliminarCliente(clienteCod) {
             body: JSON.stringify({ clienteCod })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
+
+        if (!data.err) {
             await obtenerClientesAPI();
         } else {
-            mostrarError('Error al eliminar cliente:' + response.statusText);
+            mostrarError('Error al eliminar cliente: ' + data.errmsg);
         }
     } catch (error) {
         mostrarError('Error al eliminar cliente:' + error.message);

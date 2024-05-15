@@ -146,6 +146,24 @@ GO
 USE [app_aif]
 
 GO
+/****** Object:  Table [dbo].[Usuario]    Script Date: 06/05/2024 10:18:55 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Usuario](
+	[correo] [varchar](100) NOT NULL,
+	[contrasena] [varchar](150) NOT NULL,
+	[nombre] [varchar](100) NOT NULL,
+	
+ CONSTRAINT [PK_Usuario] PRIMARY KEY CLUSTERED 
+(
+	[correo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Cliente]    Script Date: 06/05/2024 10:18:55 ******/
 SET ANSI_NULLS ON
 GO

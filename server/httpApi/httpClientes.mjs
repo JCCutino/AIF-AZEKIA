@@ -113,8 +113,16 @@ class HttpClientes {
     async postEliminarCliente(req, res) {
         try {
             const clienteCod = req.body.clienteCod;
+
+            const clienteReferenciado = await libClientes.verificarClienteReferenciado(clienteCod);
+
+            if (clienteReferenciado) {
+                res.status(200).send({ err: true, errmsg: 'No se puede eliminar el cliente porque está referenciado en otras tablas' });
+                return;
+            }else{
             await libClientes.eliminarCliente(clienteCod);
             res.send(200, { err: false });
+            }
         } catch (err) {
             res.send(500);
         }

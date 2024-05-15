@@ -2,6 +2,30 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibSeries {
+
+    async  verificarSerieReferenciada(serieCod) {
+        try {
+            const pool = await dbConexion.conectarDB(); 
+            const request = pool.request(); 
+            const query = `
+                SELECT 
+                    COUNT(*) AS count 
+                FROM 
+                    FacturaVenta
+                WHERE 
+                    serieCod = @serieCod;
+            `;
+            request.input('serieCod', serieCod); 
+            const resultado = await request.query(query); 
+            await pool.close(); 
+    
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar serie existente por código:', error);
+            throw 'Error al comprobar serie existente por código';
+        }
+    }
+    
     async  obtenerSeries() {
         try {
             const pool = await dbConexion.conectarDB();
