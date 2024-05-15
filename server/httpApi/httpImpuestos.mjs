@@ -8,6 +8,43 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpImpuestos {
     
+    async postObtenerIVA(req, res) {
+        try {
+            const IVA = await libImpuestos.obtenerIVA();
+            if (IVA && IVA.length > 0) {
+                res.status(200).send({ err: false, IVA });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay tipo IVA añadidos en este momento' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+
+    async postObtenerIRPF(req, res) {
+        try {
+            const IRPF = await libImpuestos.obtenerIRPF();
+            if (IRPF && IRPF.length > 0) {
+                res.status(200).send({ err: false, IRPF });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay tipo IRPF añadidos en este momento' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+    async postObtenerTipoImpuestos(req, res) {
+        try {
+            const tipoImpuestos = await libImpuestos.obtenerTipoImpuestos();
+            if (tipoImpuestos && tipoImpuestos.length > 0) {
+                res.status(200).send({ err: false, tipoImpuestos });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No hay tipo impuestos añadidos en este momento' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
     async postObtenerImpuestos(req, res) {
         try {
             const impuestos = await libImpuestos.obtenerImpuestos();

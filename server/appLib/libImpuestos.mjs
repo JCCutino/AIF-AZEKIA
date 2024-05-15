@@ -2,6 +2,46 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibImpuestos {
+    async  obtenerTipoImpuestos() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = "SELECT codigo, descripcion FROM Dominio WHERE dominio = 'TIPOIMPUESTO'";
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener tipo impuestos:', error);
+            throw 'Error al obtener tipo impuestos';
+        }
+    }
+    
+    async  obtenerIVA() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = "SELECT * FROM Impuesto WHERE tipoImpuesto = 'IVA'";
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener impuestos:', error);
+            throw 'Error al obtener impuestos';
+        }
+    }
+    async  obtenerIRPF() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = "SELECT * FROM Impuesto WHERE tipoImpuesto = 'IRPF'";
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener impuestos:', error);
+            throw 'Error al obtener impuestos';
+        }
+    }
     async  obtenerImpuestos() {
         try {
             const pool = await dbConexion.conectarDB();

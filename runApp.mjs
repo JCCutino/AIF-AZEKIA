@@ -75,6 +75,12 @@ app.post('/eliminarCliente', httpClientes.postEliminarCliente);
 
 //Funciones de impuestos
 
+app.post('/obtenerIVA', httpImpuestos.postObtenerIVA);
+
+app.post('/obtenerIRPF', httpImpuestos.postObtenerIRPF);
+
+app.post('/obtenerTipoImpuestos', httpImpuestos.postObtenerTipoImpuestos);
+
 app.post('/obtenerImpuestos', httpImpuestos.postObtenerImpuestos);
 
 app.post('/agregarImpuesto', httpImpuestos.postAgregarImpuesto);
