@@ -1,5 +1,3 @@
-
-
 async function obtenerclientesCod() {
     try {
         const response = await fetch('/obtenerClientesDatosBasicos', {
@@ -80,6 +78,120 @@ function agregarEmpresasCodSelect(datosEmpresa) {
     });
 }
 
+async function obtenerSeries() {
+    try {
+        const response = await fetch('/obtenerSeries', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                mostrarError('Error al obtener series: ' + data.errmsg);
+            } else {
+                cargarSeriesSelect(data.series);
+            }
+        } else {
+            mostrarError('Error al llamar a la API: ' + response.statusText);
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API: ' + error.message);
+    }
+}
+
+function cargarSeriesSelect(series) {
+    const selectSeries = document.getElementById("serieCod");
+    selectSeries.innerHTML = "";
+    series.forEach((serie) => {
+        let option = document.createElement("option");
+        option.text = serie.serieCod;
+        option.value = serie.serieCod;
+        selectSeries.add(option);
+    });
+}
+
+async function obtenerTiposIVA() {
+    try {
+        const response = await fetch('/obtenerIVA', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                mostrarError('Error al obtener tipos de IVA: ' + data.errmsg);
+            } else {
+                cargarTiposIVASelect(data.tiposIVA);
+            }
+        } else {
+            mostrarError('Error al llamar a la API: ' + response.statusText);
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API: ' + error.message);
+    }
+}
+
+
+function cargarTiposIVASelect(tiposIVA) {
+    const selectIVA = document.getElementById("tipoIVA");
+
+    selectIVA.innerHTML = "";
+
+    tiposIVA.forEach((tipo) => {
+        let option = document.createElement("option");
+        option.text = tipo.porcentaje;
+        option.value = tipo.tipoImpuesto;
+        selectIVA.add(option);
+    });
+}
+
+
+async function obtenerTiposIRPF() {
+    try {
+        const response = await fetch('/obtenerIRPF', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                mostrarError('Error al obtener tipos de IRPF: ' + data.errmsg);
+            } else {
+                cargarTiposIRPFSelect(data.tiposIRPF);
+            }
+        } else {
+            mostrarError('Error al llamar a la API: ' + response.statusText);
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API: ' + error.message);
+    }
+}
+
+function cargarTiposIRPFSelect(tiposIRPF) {
+    const selectIRPF = document.getElementById("tipoIRPF");
+
+    selectIRPF.innerHTML = "";
+
+    tiposIRPF.forEach((tipo) => {
+        let option = document.createElement("option");
+        option.text = tipo.porcentaje;
+        option.value = tipo.tipoImpuesto;
+        selectIRPF.add(option);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     // Ocultar la tabla al cargar la página
     document.querySelector(".table").style.display = "none";
@@ -103,23 +215,26 @@ document.addEventListener("DOMContentLoaded", function() {
     
 
     // Función para añadir una nueva fila a la tabla
-    function agregarFilaEditable() {
+    async function agregarFilaEditable() {
         const fila = `
-            <tr>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true" ></td>
-                <td contenteditable="true" ></td>
-                <td contenteditable="true" ></td>
-                <td contenteditable="true" ></td>
-                <td contenteditable="true" ></td>
-                <td contenteditable="true" ></td>
-                <td class="text-right">
-                    <button type="button" class="btn btn-success btnGuardarLinea">Guardar</button>
-                </td>
-            </tr>
+        <tr>
+            <td><select id="serieCod"></select></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td><select id="tipoIVA"></select></td>
+            <td><select id="tipoIRPF"></select></td>
+            <td class="text-right">
+                <button type="button" class="btn btn-success btnGuardarLinea">Guardar</button>
+            </td>
+        </tr>
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
+        await obtenerSeries();
+        await obtenerTiposIRPF();
+        await obtenerTiposIVA();
     }
 
 
@@ -159,10 +274,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
+    obtenerTiposIVA();
+    obtenerTiposIRPF();
+    obtenerSeries();
     obtenerclientesCod();
     obtenerEmpresasCod();
 });
-
-
-
-
