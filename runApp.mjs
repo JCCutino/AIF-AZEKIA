@@ -15,6 +15,7 @@ import httpUsuarios from './server/httpApi/httpUsuarios.mjs';
 import httpFacturas from './server/httpApi/httpFacturas.mjs';
 import httpProyectos from './server/httpApi/httpProyectos.mjs';
 import httpProyectosDetalles from './server/httpApi/httpProyectosDetalles.mjs';
+import httpFacturaLinea from './server/httpApi/httpFacturaLinea.mjs';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url); 
@@ -74,6 +75,12 @@ app.post('/eliminarCliente', httpClientes.postEliminarCliente);
 
 //Funciones de impuestos
 
+app.post('/obtenerIVA', httpImpuestos.postObtenerIVA);
+
+app.post('/obtenerIRPF', httpImpuestos.postObtenerIRPF);
+
+app.post('/obtenerTipoImpuestos', httpImpuestos.postObtenerTipoImpuestos);
+
 app.post('/obtenerImpuestos', httpImpuestos.postObtenerImpuestos);
 
 app.post('/agregarImpuesto', httpImpuestos.postAgregarImpuesto);
@@ -122,6 +129,10 @@ app.post('/eliminarProyectoProducido', httpProyectosDetalles.postEliminarProyect
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 
 app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
+
+//Funciones de lineas factura
+
+app.post('/obtenerFacturaLineas', httpFacturaLinea.postObtenerFacturaLineas);
 
 //Funciones de prueba
 
