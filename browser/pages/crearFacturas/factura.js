@@ -1,21 +1,6 @@
-// document.getElementById('openModalBtn').addEventListener('click', function() {
-//     document.getElementById('modal').style.display = 'block';
-//   });
-  
-//   document.querySelector('.close').addEventListener('click', function() {
-//     document.getElementById('modal').style.display = 'none';
-//   });
- 
-//   document.getElementById('invoiceForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
-    
-//     // Aquí puedes agregar la lógica para generar la factura con los datos del formulario
-    
-//     // Después de generar la factura, puedes cerrar el modal
-//     document.getElementById('modal').style.display = 'none';
-//   });
-  
-  async function obtenerclientesCod() {
+
+
+async function obtenerclientesCod() {
     try {
         const response = await fetch('/obtenerClientesDatosBasicos', {
             method: 'POST',
@@ -31,12 +16,10 @@
                 mostrarError('Error al obtener clientesCod:'+ data.errmsg)
 
             } else {
-                agregarclientesCodSelect(data.datosCliente)
+                agregarclientesCodSelect(data.datosCliente);
             }
         } else {
-            
             mostrarError('Error al llamar a la API:'+ response.statusText);
-
         }
     } catch (error) {
         mostrarError('Error al llamar a la API:'+ error.message);
@@ -44,17 +27,142 @@
 }
 
 function agregarclientesCodSelect(datoscliente) {
-  const selectAgregarclienteCod = document.getElementById("CodigoCliente");
+    const selectAgregarclienteCod = document.getElementById("CodigoCliente");
 
-  selectAgregarclienteCod.innerHTML = "";
+    selectAgregarclienteCod.innerHTML = "";
 
-  datoscliente.forEach(  (cliente) => {
-      let optionAgregar = document.createElement("option");
-      optionAgregar.text = cliente.razonSocial;
-      optionAgregar.value = cliente.clienteCod;
-      selectAgregarclienteCod.add(optionAgregar);
-
-  });
+    datoscliente.forEach( (cliente) => {
+        let optionAgregar = document.createElement("option");
+        optionAgregar.text = cliente.razonSocial;
+        optionAgregar.value = cliente.clienteCod;
+        selectAgregarclienteCod.add(optionAgregar);
+    });
 }
 
-obtenerclientesCod();
+
+async function obtenerEmpresasCod() {
+    try {
+        const response = await fetch('/obtenerEmpresasDatosBasicos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                mostrarError('Error al obtener EmpresaCod:'+ data.errmsg)
+
+            } else {
+                agregarEmpresasCodSelect(data.datosEmpresa);
+            }
+        } else {
+            mostrarError('Error al llamar a la API:'+ response.statusText);
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API:'+ error.message);
+    }
+}
+
+
+function agregarEmpresasCodSelect(datosEmpresa) {
+    const selectAgregarEmpresaCod = document.getElementById("CodigoEmpresa");
+
+    selectAgregarEmpresaCod.innerHTML = "";
+
+    datosEmpresa.forEach( (Empresa) => {
+        let optionAgregar = document.createElement("option");
+        optionAgregar.text = Empresa.razonSocial;
+        optionAgregar.value = Empresa.empresaCod;
+        selectAgregarEmpresaCod.add(optionAgregar);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Ocultar la tabla al cargar la página
+    document.querySelector(".table").style.display = "none";
+    document.getElementById("btnTerminarFactura").style.display = "none";
+    document.getElementById("btnAñadirFila").style.display = "none";
+
+    // Función para mostrar la tabla y el botón de añadir línea después de guardar los datos de facturación
+    function mostrarTabla() {
+        document.querySelector(".table").style.display = "table";
+        document.getElementById("DetalleFactura").style.display = "none";
+        document.getElementById("btnAñadirFila").style.display = "block";
+        document.getElementById("btnTerminarFactura").style.display = "block";
+    }
+
+    // Función para mostrar el cuerpo de la tabla y la fila editable al presionar el botón "Añadir Fila"
+    function mostrarCuerpoTabla() {
+        // Mostrar la tabla y la fila editable
+        document.getElementById("DetalleFactura").style.display = "table-row-group";
+    }
+
+    
+
+    // Función para añadir una nueva fila a la tabla
+    function agregarFilaEditable() {
+        const fila = `
+            <tr>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true" ></td>
+                <td contenteditable="true" ></td>
+                <td contenteditable="true" ></td>
+                <td contenteditable="true" ></td>
+                <td contenteditable="true" ></td>
+                <td contenteditable="true" ></td>
+                <td class="text-right">
+                    <button type="button" class="btn btn-success btnGuardarLinea">Guardar</button>
+                </td>
+            </tr>
+        `;
+        document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
+    }
+
+
+    // Función para guardar los datos de una fila en la base de datos
+    function guardarFila() {
+        const fila = this.parentNode.parentNode;
+        const inputs = fila.querySelectorAll("td[contenteditable='true']");
+        const detalle = {
+            codigoProyecto: inputs[0].textContent.trim(),
+            descripcion: inputs[1].textContent.trim(),
+            cantidad: inputs[2].textContent.trim(),
+            precio: inputs[3].textContent.trim(),
+            importeBruto: inputs[4].textContent.trim(),
+            descuento: inputs[5].textContent.trim(),
+            iva: inputs[6].textContent.trim(),
+            irpf: inputs[7].textContent.trim()
+        };
+        console.log(detalle); // Aquí enviar los datos al servidor para guardarlos en la base de datos
+    }
+
+    // Agregar evento al botón "Guardar Datos de Facturación"
+    document.getElementById("btnGuardarFacturacion").addEventListener("click", function() {
+        // Aquí puedes agregar la lógica para guardar los datos de facturación en la base de datos
+        mostrarTabla(); // Mostrar la tabla y el botón de añadir línea después de guardar los datos
+    });
+
+    // Agregar evento al botón "Añadir Fila"
+    document.getElementById("btnAñadirFila").addEventListener("click", function() {
+        mostrarCuerpoTabla();
+        agregarFilaEditable();
+    });
+
+    // Agregar evento delegado al elemento <tbody> para manejar clics en el botón "Guardar" de cada fila
+    document.getElementById("DetalleFactura").addEventListener("click", function(event) {
+        if (event.target.classList.contains("btnGuardarLinea")) {
+            guardarFila.call(event.target); // Llamar a la función guardarFila con el contexto correcto
+        }
+    });
+    
+    obtenerclientesCod();
+    obtenerEmpresasCod();
+});
+
+
+
+
