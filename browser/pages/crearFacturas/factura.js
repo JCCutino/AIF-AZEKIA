@@ -129,7 +129,7 @@ async function obtenerTiposIVA() {
             if (data.err) {
                 mostrarError('Error al obtener tipos de IVA: ' + data.errmsg);
             } else {
-                cargarTiposIVASelect(data.tiposIVA);
+                cargarTiposIVASelect(data.IVA);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -169,7 +169,7 @@ async function obtenerTiposIRPF() {
             if (data.err) {
                 mostrarError('Error al obtener tipos de IRPF: ' + data.errmsg);
             } else {
-                cargarTiposIRPFSelect(data.tiposIRPF);
+                cargarTiposIRPFSelect(data.IRPF);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
