@@ -55,6 +55,52 @@ async function actualizarImpuesto(impuesto) {
     }
 }
 
+async function obtenerTipoImpuestos() {
+    try {
+        const response = await fetch('/obtenerTipoImpuestos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.err) {
+                // Si hay un error, muestra un mensaje de error
+                mostrarError('Error al obtener impuestos:' + data.errmsg);
+            } else {
+                const tipoImpuestos = data.tipoImpuestos;
+                const tipoImpuestoSelect = document.getElementById('tipoImpuesto');
+                const tipoImpuestoEditarSelect = document.getElementById('tipoImpuestoEditar');
+
+                // Limpiar opciones anteriores
+                tipoImpuestoSelect.innerHTML = '';
+                tipoImpuestoEditarSelect.innerHTML = '';
+
+                // Agregar nuevas opciones
+                tipoImpuestos.forEach(tipo => {
+                    const option = document.createElement('option');
+                    option.value = tipo.codigo;
+                    option.textContent = tipo.descripcion;
+                    tipoImpuestoSelect.appendChild(option);
+
+                    const optionEditar = document.createElement('option');
+                    optionEditar.value = tipo.codigo;
+                    optionEditar.textContent = tipo.descripcion;
+                    tipoImpuestoEditarSelect.appendChild(optionEditar);
+                });
+            }
+        } else {
+            mostrarError('Error al llamar a la API:' + response.statusText);
+        }
+    } catch (error) {
+        mostrarError('Error al llamar a la API:' + error.message);
+    }
+}
+
+
 async function obtenerImpuestosAPI() {
     try {
         const response = await fetch('/obtenerImpuestos', {
@@ -240,6 +286,7 @@ async function main() {
     try {
         // Al cargar la página, obtener y mostrar los datos de los impuestos
         await obtenerImpuestosAPI();
+        await obtenerTipoImpuestos()
     } catch (error) {
         mostrarError('Error en la ejecución principal:' + error);
     }
