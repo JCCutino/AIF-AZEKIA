@@ -47,8 +47,10 @@ async function mostrarDatosEnTabla(data) {
                 event.stopPropagation(); 
                 confirmarBtn.addEventListener('click', async function() {
                     const empresaCod = factura.empresaCod;
+                    const serieCod = factura.serieCod;
+                    const facturaVentaNum = factura.facturaVentaNum;
                     try {
-                        await eliminarFactura(empresaCod);
+                        await eliminarFactura(empresaCod, serieCod, facturaVentaNum);
                     } catch (error) {
                         mostrarError('Error al eliminar la factura:', error.message);
                     }
@@ -96,14 +98,14 @@ async function obtenerFacturasAPI(pagina = 1, resultadosTotales = 10) {
     }
 }
 
-async function eliminarFactura(empresaCod) {
+async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
     try {
         const response = await fetch('/eliminarFactura', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({empresaCod})
+            body: JSON.stringify({empresaCod, serieCod, facturaVentaNum})
         });
 
         if (response.ok) {
