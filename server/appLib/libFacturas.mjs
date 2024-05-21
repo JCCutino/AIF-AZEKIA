@@ -1,4 +1,5 @@
 import { dbConexion } from "./dbConexion.mjs";
+import { libGenerales } from "./libGenerales.mjs";
 
 class LibFacturas {
 
@@ -7,7 +8,7 @@ class LibFacturas {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'INSERT INTO Factura (empresaCod, serieCod, facturaVentaNum, clienteCod, fechaEmision, bloqueada) VALUES (@empresaCod, @serieCod, @facturaVentaNum, @clienteCod, @fechaEmision, @bloqueada)';
+            const query = 'INSERT INTO FacturaVenta (empresaCod, serieCod, facturaVentaNum, clienteCod, fechaEmision, bloqueada) VALUES (@empresaCod, @serieCod, @facturaVentaNum, @clienteCod, @fechaEmision, @bloqueada)';
             request.input('empresaCod', factura.empresaCod);
             request.input('serieCod', factura.serieCod);
             request.input('facturaVentaNum', factura.facturaVentaNum);
@@ -79,6 +80,128 @@ class LibFacturas {
         } catch (error) {
             console.error('Error al comprobar referencia de facturaVentaNum:', error);
             throw 'Error al comprobar referencia de facturaVentaNum';
+        }
+    }
+    
+   async  verificarFactura(factura, actualizar = false) {
+    if (!libGenerales.verificarCamposVacios(factura)) {
+        return { isValid: false, errorMessage: 'Todos los campos deben estar llenos.' };
+    }
+    
+    if (!libGenerales.verificarLongitud(factura.empresaCod, 20)) {
+        return { isValid: false, errorMessage: 'El código de la empresa debe tener una longitud máxima de 20 caracteres.' };
+    }
+
+    if (!libGenerales.verificarLongitud(factura.serieCod, 10)) {
+        return { isValid: false, errorMessage: 'El código de la serie debe tener una longitud máxima de 10 caracteres.' };
+    }
+    
+    if (isNaN(factura.facturaVentaNum)) {
+        return { err: true, errorMessage: 'El número de la factura de venta debe ser formato numérico.' };
+    }
+
+    if (!libGenerales.verificarLongitud(factura.facturaVentaNum, 20)) {
+        return { isValid: false, errorMessage: 'El número de la factura de venta debe tener una longitud máxima de 20 caracteres.' };
+    }
+
+    if (!libGenerales.verificarLongitud(factura.clienteCod, 20)) {
+        return { isValid: false, errorMessage: 'El código del cliente debe tener una longitud máxima de 20 caracteres.' };
+    }
+
+    // Verificar que fechaEmision sea una fecha válida
+    if (isNaN(Date.parse(factura.fechaEmision))) {
+        return { isValid: false, errorMessage: 'La fecha de emisión no es válida.' };
+    }
+
+    // Verificar que los campos de empresaCod, serieCod, facturaVentaNum y clienteCod sean cadenas de texto (pueden ser validados según el formato esperado)
+    if (typeof factura.empresaCod !== 'string' ||
+        typeof factura.serieCod !== 'string' ||
+        typeof factura.facturaVentaNum !== 'string' ||
+        typeof factura.clienteCod !== 'string') {
+        return { isValid: false, errorMessage: 'Los códigos de empresa, serie, factura de venta y cliente deben ser cadenas de texto.' };
+    }
+
+    if (actualizar === true) {
+        return { isValid: true };
+    }
+
+    const facturaExistente = await this.obtenerFacturaExistente(factura.empresaCod, factura.serieCod, factura.facturaVentaNum);
+
+    if (facturaExistente) {
+        return { isValid: false, errorMessage: 'Ya existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
+    }
+
+    const secuenciaValida = await this.verificarSecuenciaLogicaFactura(factura);
+    if (!secuenciaValida) {
+        return { isValid: false, errorMessage: 'La secuencia lógica de la fecha de emisión no es correcta.' };
+    }
+
+    return { isValid: true };
+}
+
+
+    async  verificarSecuenciaLogicaFactura(factura) {
+        try {
+            const facturasExistentes = await this.obtenerFacturasPorCodigos(factura.empresaCod, factura.serieCod);
+    
+            for (let facturaExistente of facturasExistentes) {
+                if (factura.facturaVentaNum > facturaExistente.facturaVentaNum && new Date(facturaExistente.fechaEmision) > new Date(factura.fechaEmision)) {
+                    console.log("Aqui - secuencia incorrecta: número mayor, fecha anterior");
+                    return false; 
+                } else if (factura.facturaVentaNum < facturaExistente.facturaVentaNum && new Date(facturaExistente.fechaEmision) < new Date(factura.fechaEmision)) {
+                    console.log("Aqui2 - secuencia incorrecta: número menor, fecha posterior");
+                    return false; 
+                }
+            }
+    
+            console.log("Aqui3 - secuencia correcta");
+            return true;
+        } catch (error) {
+            console.error('Error al verificar secuencia lógica de factura:', error);
+            throw 'Error al verificar secuencia lógica de factura';
+        }
+    }
+    
+    async  obtenerFacturaExistente(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+                SELECT * FROM FacturaVenta
+                WHERE empresaCod = @empresaCod 
+                AND serieCod = @serieCod 
+                AND facturaVentaNum = @facturaVentaNum
+            `;
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0];
+        } catch (error) {
+            console.error('Error al obtener factura por código:', error);
+            throw 'Error al obtener factura por código';
+        }
+    }
+    
+    async  obtenerFacturasPorCodigos(empresaCod, serieCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+                SELECT *
+                FROM FacturaVenta
+                WHERE empresaCod = @empresaCod
+                AND serieCod = @serieCod
+            `;
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset;
+        } catch (error) {
+            console.error('Error al obtener facturas existentes:', error);
+            throw 'Error al obtener facturas existentes';
         }
     }
     

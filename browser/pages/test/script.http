@@ -1,9 +1,11 @@
-POST http://localhost:3000/obtenerIVA HTTP/1.1
+POST http://localhost:3000/agregarFactura HTTP/1.1
 Content-Type: application/json
 
-{
-  "empresaCod" : "EM001",
-  "serieCod" : "S001",
-  "facturaVentaNum" : "1"
-  
-    }
+{"factura":{
+  "empresaCod": "EM001",
+  "serieCod": "S001",
+  "facturaVentaNum":"khshjksd",
+  "clienteCod": "CL001",
+  "fechaEmision": "2024-05-22"
+}
+}

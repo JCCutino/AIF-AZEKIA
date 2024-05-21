@@ -128,6 +128,8 @@ app.post('/eliminarProyectoProducido', httpProyectosDetalles.postEliminarProyect
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 
+app.post('/agregarFactura', httpFacturas.postAgregarFactura);
+
 app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
 //Funciones de lineas factura

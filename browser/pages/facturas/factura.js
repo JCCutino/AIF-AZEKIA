@@ -106,9 +106,40 @@ async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
     }
 }
 
-async function abrirModalborrar(empresaId) {
-    const modalborrarFactura = document.getElementById('modalborrar');
-    modalborrarFactura.style.display = 'block';
+
+function abrirModalborrar(factura) {
+    // Mostrar el modal de confirmación
+    const modalborrar = document.getElementById('modalborrar');
+    modalborrar.style.display = "block";
+
+    const confirmarBtn = document.getElementById("confirmarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
+
+    // Eliminar cualquier evento previo para evitar múltiples eventos registrados
+    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+    cancelarBtn.replaceWith(cancelarBtn.cloneNode(true));
+
+    // Obtener los nuevos botones clonados
+    const confirmarBtnNuevo = document.getElementById("confirmarBtn");
+    const cancelarBtnNuevo = document.getElementById("cancelarBtn");
+
+    // Configurar el evento click del botón de confirmar
+    confirmarBtnNuevo.addEventListener('click', async function () {
+        const empresaCod = factura.empresaCod;
+        const serieCod = factura.serieCod;
+        const facturaVentaNum = factura.facturaVentaNum;
+        try {
+            await eliminarFactura(empresaCod, serieCod, facturaVentaNum);
+        } catch (error) {
+            mostrarError('Error al eliminar la factura:', error.message);
+        }
+        modalborrar.style.display = "none";
+    });
+
+    // Configurar el evento click del botón de cancelar
+    cancelarBtnNuevo.addEventListener('click', function () {
+        modalborrar.style.display = "none";
+    });
 }
 
 async function main() {
