@@ -23,11 +23,16 @@ class LibFacturas {
         }
     }
     
-    async obtenerFacturas() {
+    async  obtenerFacturas() {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT * FROM facturaventa';
+            const query = `
+                SELECT FacturaVenta.*, Cliente.razonSocial AS razonSocialCliente, Empresa.razonSocial AS razonSocialEmpresa
+                FROM FacturaVenta
+                JOIN Cliente ON FacturaVenta.clienteCod = Cliente.clienteCod
+                JOIN Empresa ON FacturaVenta.empresaCod = Empresa.empresaCod
+            `;
             const resultados = await request.query(query);
             await pool.close();
             return resultados.recordset || [];
