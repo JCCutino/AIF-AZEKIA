@@ -116,9 +116,8 @@ class LibFacturas {
     // Verificar que los campos de empresaCod, serieCod, facturaVentaNum y clienteCod sean cadenas de texto (pueden ser validados según el formato esperado)
     if (typeof factura.empresaCod !== 'string' ||
         typeof factura.serieCod !== 'string' ||
-        typeof factura.facturaVentaNum !== 'string' ||
         typeof factura.clienteCod !== 'string') {
-        return { isValid: false, errorMessage: 'Los códigos de empresa, serie, factura de venta y cliente deben ser cadenas de texto.' };
+        return { isValid: false, errorMessage: 'Los códigos de empresa, serie y cliente deben ser cadenas de texto.' };
     }
 
     if (actualizar === true) {
