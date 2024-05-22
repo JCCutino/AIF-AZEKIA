@@ -152,6 +152,7 @@ async function abrirModalEditableSerie(serieCod) {
                 // Llenar los campos del formulario del modal con los detalles de la serie
                 document.getElementById("serieCodEditar").value = serie.serieCod;
                 document.getElementById("serieCodEditar").readOnly = true;
+                document.getElementById("empresaCodEditar").value = serie.empresaCod;
                 document.getElementById("descripcionEditar").value = serie.descripcion;
                 document.getElementById("ultimoNumUsadoEditar").value = serie.ultimoNumUsado;
 
