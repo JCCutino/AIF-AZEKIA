@@ -103,13 +103,15 @@ class HttpSeries {
     async postEliminarSerie(req, res) {
         try {
             const serieCod = req.body.serieCod;
+            const empresaCod = req.body.empresaCod;
 
-            const serieReferenciada = await libSeries.verificarSerieReferenciada(serieCod);
+            console.log(serieCod, empresaCod);
+            const serieReferenciada = await libSeries.verificarSerieReferenciada(serieCod, empresaCod);
            
             if (serieReferenciada) {
                 res.status(200).send({ err: true, errmsg: 'No se puede eliminar la serie porque está referenciada en otras tablas' });
             }else{
-                const series = await libSeries.eliminarSerie(serieCod);
+                const series = await libSeries.eliminarSerie(serieCod, empresaCod);
                 res.send(200, { err: false });
             }
            

@@ -111,14 +111,14 @@ async function obtenerSeriesAPI() {
     }
 }
 
-async function eliminarSerie(serieCod) {
+async function eliminarSerie(serieCod, empresaCod) {
     try {
         const response = await fetch('/eliminarSerie', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ serieCod })
+            body: JSON.stringify({serieCod, empresaCod})
         });
 
         const data = await response.json();
@@ -133,7 +133,7 @@ async function eliminarSerie(serieCod) {
     }
 }
 
-async function abrirModalEditableSerie(serieCod) {
+async function abrirModalEditableSerie(serieCod, empresaCod) {
     try {
         // Obtener todas las series
         const response = await fetch('/obtenerSeries', {
@@ -146,7 +146,7 @@ async function abrirModalEditableSerie(serieCod) {
         if (response.ok) {
             const data = await response.json();
             // Buscar la serie con el código proporcionado
-            const serie = data.series.find(ser => ser.serieCod === serieCod);
+            const serie = data.series.find(ser => ser.serieCod === serieCod && ser.empresaCod === empresaCod);
 
             if (serie) {
                 // Llenar los campos del formulario del modal con los detalles de la serie
@@ -212,7 +212,8 @@ async function mostrarDatosEnTabla(data) {
 
             boton.addEventListener('click', function () {
                 const serieCod = serie.serieCod;
-                abrirModalEditableSerie(serieCod);
+                const empresaCod = serie.empresaCod;
+                abrirModalEditableSerie(serieCod, empresaCod);
             });
         });
     } else {
@@ -275,7 +276,8 @@ async function actualizadaSerie() {
 
 function ClicEliminarSerie() {
     const serieCod = document.getElementById("serieCodEditar").value;
-    eliminarSerie(serieCod);
+    const empresaCod = document.getElementById("empresaCodEditar").value;
+    eliminarSerie(serieCod, empresaCod);
     cerrarModal();
 }
 async function main() {
