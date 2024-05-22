@@ -27,6 +27,22 @@ class HttpFacturaLinea {
         }
     }
     
+    async postEliminarFacturaLinea(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+            const facturaVentaNum = req.body.facturaVentaNum;
+            const facturaVentaLineaNum = req.body.facturaVentaLineaNum;
+
+            const linea = await libFacturaLinea.eliminarLinea(facturaVentaNum, empresaCod, serieCod, facturaVentaLineaNum);
+                
+            res.send(200, { err: false });
+            
+            
+        } catch (err) {
+            res.send(500);
+        }
+    }
 
 }
 

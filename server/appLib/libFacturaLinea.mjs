@@ -76,6 +76,31 @@ class LibFacturaLinea {
             throw 'Error al agregar línea de factura';
         }
     }
+
+    async  eliminarLinea(facturaVentaNum, empresaCod, serieCod, facturaVentaLineaNum) {
+        try {
+            const pool = await dbConexion.conectarDB(); 
+            const request = pool.request(); 
+            const query = `
+                DELETE FROM 
+                    FacturaVentaLinea 
+                WHERE 
+                    facturaVentaNum = @facturaVentaNum AND empresaCod = @empresaCod AND serieCod = @serieCod AND facturaVentaLineaNum = @facturaVentaLineaNum;
+            `;
+            request.input('facturaVentaNum', facturaVentaNum);
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);   
+            request.input('facturaVentaLineaNum', facturaVentaLineaNum);
+
+            const resultado = await request.query(query);
+            await pool.close(); 
+
+            return resultado.rowsAffected[0];
+       } catch (error) {
+            console.error('Error al eliminar FacturaVentaLineas:', error);
+            throw 'Error al eliminar FacturaVentaLineas';
+        }
+    }
     
 }
 

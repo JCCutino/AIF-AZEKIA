@@ -136,6 +136,8 @@ app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
 app.post('/obtenerFacturaLineas', httpFacturaLinea.postObtenerFacturaLineas);
 
+app.post('/eliminarFacturaLinea', httpFacturaLinea.postEliminarFacturaLinea);
+
 //Funciones de prueba
 
 
