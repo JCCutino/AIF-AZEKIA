@@ -4,8 +4,8 @@ Content-Type: application/json
 {"factura":{
   "empresaCod": "EM002",
   "serieCod": "S002",
-  "facturaVentaNum":"12",
+  "facturaVentaNum":"2",
   "clienteCod": "CL002",
-  "fechaEmision": "2024-06-30"
+  "fechaEmision": "2024-03-30"
 }
 }

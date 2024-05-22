@@ -88,10 +88,10 @@ class HttpFacturas {
             const serieCod = req.body.serieCod;
             const facturaVentaNum = req.body.facturaVentaNum;
 
-            const facturaReferenciada = await libFacturas.verificarFacturaVentaReferenciada(facturaVentaNum);
+            const facturaReferenciada = await libFacturas.verificarFacturaVentaReferenciada(facturaVentaNum, empresaCod, serieCod);
 
             if (facturaReferenciada) {
-                await libFacturaLinea.eliminarLineasPorNumeroFactura(facturaVentaNum);
+                await libFacturaLinea.eliminarLineasPorFactura(facturaVentaNum, empresaCod, serieCod);
             }
 
             const facturaEliminada = await libFacturas.eliminarFactura(empresaCod, serieCod, facturaVentaNum);

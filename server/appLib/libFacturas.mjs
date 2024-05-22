@@ -63,7 +63,7 @@ class LibFacturas {
         }
     }
     
-    async verificarFacturaVentaReferenciada(facturaVentaNum) {
+    async verificarFacturaVentaReferenciada(facturaVentaNum, empresaCod, serieCod) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request(); 
@@ -73,9 +73,11 @@ class LibFacturas {
                 FROM 
                     FacturaVentaLinea 
                 WHERE 
-                    facturaVentaNum = @facturaVentaNum;
+                    facturaVentaNum = @facturaVentaNum AND empresaCod = @empresaCod AND serieCod = @serieCod;
             `;
-            request.input('facturaVentaNum', facturaVentaNum);
+            request.input('facturaVentaNum', facturaVentaNum);           
+            request.input('empresaCod', empresaCod);            
+            request.input('serieCod', serieCod);
             const resultado = await request.query(query);
             await pool.close(); 
     
@@ -111,12 +113,10 @@ class LibFacturas {
         return { isValid: false, errorMessage: 'El código del cliente debe tener una longitud máxima de 20 caracteres.' };
     }
 
-    // Verificar que fechaEmision sea una fecha válida
     if (isNaN(Date.parse(factura.fechaEmision))) {
         return { isValid: false, errorMessage: 'La fecha de emisión no es válida.' };
     }
 
-    // Verificar que los campos de empresaCod, serieCod, facturaVentaNum y clienteCod sean cadenas de texto (pueden ser validados según el formato esperado)
     if (typeof factura.empresaCod !== 'string' ||
         typeof factura.serieCod !== 'string' ||
         typeof factura.clienteCod !== 'string') {
@@ -138,6 +138,10 @@ class LibFacturas {
     if(!await libSeries.comprobarRelacionSerieYEmpresa(factura.serieCod, factura.empresaCod)){
         return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
     }
+
+    if (!await this.verificarSecuenciaLogicaFactura(factura)) {
+        return { isValid: false, errorMessage: 'La secuencia lógica de la fecha de emisión no es correcta.' };
+    }
     
     if (actualizar === true) {
         return { isValid: true };
@@ -146,10 +150,6 @@ class LibFacturas {
 
     if (await this.obtenerFacturaExistente(factura.empresaCod, factura.serieCod, factura.facturaVentaNum)) {
         return { isValid: false, errorMessage: 'Ya existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
-    }
-
-    if (!await this.verificarSecuenciaLogicaFactura(factura)) {
-        return { isValid: false, errorMessage: 'La secuencia lógica de la fecha de emisión no es correcta.' };
     }
 
     return { isValid: true };
@@ -162,15 +162,12 @@ class LibFacturas {
     
             for (let facturaExistente of facturasExistentes) {
                 if (factura.facturaVentaNum > facturaExistente.facturaVentaNum && new Date(facturaExistente.fechaEmision) > new Date(factura.fechaEmision)) {
-                    console.log("Aqui - secuencia incorrecta: número mayor, fecha anterior");
                     return false; 
                 } else if (factura.facturaVentaNum < facturaExistente.facturaVentaNum && new Date(facturaExistente.fechaEmision) < new Date(factura.fechaEmision)) {
-                    console.log("Aqui2 - secuencia incorrecta: número menor, fecha posterior");
                     return false; 
                 }
             }
     
-            console.log("Aqui3 - secuencia correcta");
             return true;
         } catch (error) {
             console.error('Error al verificar secuencia lógica de factura:', error);
