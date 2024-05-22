@@ -5,7 +5,7 @@ Content-Type: application/json
   "empresaCod": "EM002",
   "serieCod": "S002",
   "facturaVentaNum":"2",
-  "clienteCod": "CL002",
+  "clienteCod": "CL001",
   "fechaEmision": "2024-03-30"
 }
 }

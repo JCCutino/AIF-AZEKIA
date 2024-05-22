@@ -153,6 +153,9 @@ async function abrirModalEditableSerie(serieCod) {
                 document.getElementById("serieCodEditar").value = serie.serieCod;
                 document.getElementById("serieCodEditar").readOnly = true;
                 document.getElementById("empresaCodEditar").value = serie.empresaCod;
+                document.getElementById("empresaCodEditar").readOnly = true;
+                document.getElementById("razonSocialEmpresa").value = serie.razonSocialEmpresa;
+                document.getElementById("razonSocialEmpresa").readOnly = true;
                 document.getElementById("descripcionEditar").value = serie.descripcion;
                 document.getElementById("ultimoNumUsadoEditar").value = serie.ultimoNumUsado;
 
@@ -287,10 +290,8 @@ async function main() {
 
 function agregarEmpresasCodSelect(datosEmpresa) {
     let selectAgregarEmpresaCod = document.getElementById("empresaCod");
-    let selectEditarEmpresaCod = document.getElementById("empresaCodEditar");
 
     selectAgregarEmpresaCod.innerHTML = "";
-    selectEditarEmpresaCod.innerHTML = "";
 
     datosEmpresa.forEach(  (empresa) => {
         let optionAgregar = document.createElement("option");
@@ -298,10 +299,7 @@ function agregarEmpresasCodSelect(datosEmpresa) {
         optionAgregar.value = empresa.empresaCod;
         selectAgregarEmpresaCod.add(optionAgregar);
 
-        let optionEditar = document.createElement("option");
-        optionEditar.text = empresa.razonSocial;
-        optionEditar.value = empresa.empresaCod;
-        selectEditarEmpresaCod.add(optionEditar);
+       
     });
 }
 
