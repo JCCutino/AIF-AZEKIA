@@ -1,5 +1,8 @@
 import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
+import { libSeries } from "./libSeries.mjs";
+import { libEmpresas } from "./libEmpresas.mjs";
+import { libClientes } from "./libClientes.mjs";
 
 class LibFacturas {
 
@@ -19,8 +22,8 @@ class LibFacturas {
             await pool.close();
             return resultado.rowsAffected[0]; // Número de filas afectadas por la inserción
         } catch (error) {
-            console.error('Error al agregar proyecto:', error);
-            throw 'Error al agregar proyecto';
+            console.error('Error al agregar factura:', error);
+            throw 'Error al agregar factura';
         }
     }
     
@@ -120,18 +123,32 @@ class LibFacturas {
         return { isValid: false, errorMessage: 'Los códigos de empresa, serie y cliente deben ser cadenas de texto.' };
     }
 
+    if(!await libClientes.comprobarExistenciaClientePorCodigo(factura.clienteCod)){
+        return { isValid: false, errorMessage: 'El código del cliente no existe.' };
+    }
+
+    if(!await libEmpresas.comprobarExistenciaEmpresaPorCodigo(factura.empresaCod)){
+        return { isValid: false, errorMessage: 'El código de la empresa no existe.' };
+    }
+
+    if(!await libSeries.comprobarExistenciaSeriePorCodigo(factura.serieCod)){
+        return { isValid: false, errorMessage: 'El código de la serie no existe.' };
+    }
+
+    if(!await libSeries.comprobarRelacionSerieYEmpresa(factura.serieCod, factura.empresaCod)){
+        return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
+    }
+    
     if (actualizar === true) {
         return { isValid: true };
     }
 
-    const facturaExistente = await this.obtenerFacturaExistente(factura.empresaCod, factura.serieCod, factura.facturaVentaNum);
 
-    if (facturaExistente) {
+    if (await this.obtenerFacturaExistente(factura.empresaCod, factura.serieCod, factura.facturaVentaNum)) {
         return { isValid: false, errorMessage: 'Ya existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
     }
 
-    const secuenciaValida = await this.verificarSecuenciaLogicaFactura(factura);
-    if (!secuenciaValida) {
+    if (!await this.verificarSecuenciaLogicaFactura(factura)) {
         return { isValid: false, errorMessage: 'La secuencia lógica de la fecha de emisión no es correcta.' };
     }
 

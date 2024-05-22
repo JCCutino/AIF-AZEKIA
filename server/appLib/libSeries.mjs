@@ -59,6 +59,42 @@ class LibSeries {
         }
     }
     
+    async  comprobarExistenciaSeriePorCodigo(serieCod) {        
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Serie WHERE serieCod = @serieCod';
+            request.input('serieCod', serieCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar serie existente por código:', error);
+            throw 'Error al comprobar serie existente por código';
+        }
+    }
+
+    async  comprobarRelacionSerieYEmpresa(serieCod, empresaCod) {        
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+                SELECT COUNT(*) AS count 
+                FROM Serie 
+                WHERE serieCod = @serieCod 
+                  AND empresaCod = @empresaCod
+            `;
+            request.input('serieCod', serieCod);
+            request.input('empresaCod', empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar serie y empresa por código:', error);
+            throw 'Error al comprobar serie y empresa por código';
+        }
+    }
+    
     async  agregarSerie(serie) {
         try {
             const pool = await dbConexion.conectarDB();
