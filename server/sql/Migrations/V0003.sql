@@ -94,9 +94,9 @@ VALUES
     ('EM001', 'S001', 1, 1, 'PR001', 'Línea de factura 1', 2, 50.00, 100.00, 0.00, 0.00, 100.00, 'IVA21', NULL),
     ('EM002', 'S002', 1, 1, 'PR002', 'Línea de factura 2', 3, 40.00, 120.00, 0.00, 0.00, 120.00, 'IVA21', NULL),
     ('EM003', 'S003', 1, 1, 'PR003', 'Línea de factura 3', 4, 30.00, 120.00, 0.00, 0.00, 120.00, 'IVA21', NULL),
-    ('EM001', 'S001', 1, 2, 'PR001', 'Línea de factura 2', 3, 60.00, 180.00, 0.00, 0.00, 180.00, 'IVA21', NULL),
-    ('EM002', 'S002', 1, 2, 'PR002', 'Línea de factura 2', 4, 35.00, 140.00, 0.00, 0.00, 140.00, 'IVA21', NULL),
-    ('EM003', 'S003', 1, 2, 'PR003', 'Línea de factura 2', 5, 25.00, 125.00, 0.00, 0.00, 125.00, 'IVA21', NULL);
+    ('EM001', 'S001', 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+    ('EM002', 'S002', 1, 2, NULL, NULL, NULL, NULL, NULL,  NULL, NULL, NULL, NULL, NULL),
+    ('EM003', 'S003', 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 GO
 

@@ -1,11 +1,8 @@
-POST http://localhost:3000/agregarFactura HTTP/1.1
+POST http://localhost:3000/obtenerFacturaLineas HTTP/1.1
 Content-Type: application/json
 
-{"factura":{
-  "empresaCod": "EM002",
-  "serieCod": "S002",
-  "facturaVentaNum":"2",
-  "clienteCod": "CL001",
-  "fechaEmision": "2024-03-30"
-}
+{
+  "empresaCod": "EM001",
+  "serieCod": "S001",
+  "facturaVentaNum":"2"
 }
