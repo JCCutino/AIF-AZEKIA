@@ -3,6 +3,8 @@ import { libFacturas } from "./libFacturas.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 import { libEmpresas } from "./libEmpresas.mjs";
 import { libSeries } from "./libSeries.mjs";
+import { libProyectos } from "./libProyectos.mjs";
+import { libImpuestos } from "./libImpuestos.mjs";
 
 class LibFacturaLinea {
 
@@ -129,7 +131,7 @@ class LibFacturaLinea {
     }
  
     
-    async verficiarFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum){
+    async verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaNum){
   
         if (!await libGenerales.verificarLongitud(empresaCod, 20)) {
             return { isValid: false, errorMessage: 'El código de la empresa debe tener una longitud máxima de 20 caracteres.' };
@@ -153,7 +155,7 @@ class LibFacturaLinea {
 
         if(!await libSeries.comprobarExistenciaSeriePorCodigo(serieCod, empresaCod)){
             console.log(serieCod);
-            return { isValid: false, errorMessage: 'El código de la serie no existe.' };
+            return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
         }
 
         if(!await libSeries.comprobarRelacionSerieYEmpresa(serieCod, empresaCod)){
@@ -168,6 +170,114 @@ class LibFacturaLinea {
 
     }
 
+    async  verificarFacturaVentaLineaRellenar(lineaFactura) {
+        const { empresaCod, serieCod, facturaVentaNum } = lineaFactura;
+    
+        if (!await libGenerales.verificarLongitud(empresaCod, 20)) {
+            return { isValid: false, errorMessage: 'El código de la empresa debe tener una longitud máxima de 20 caracteres.' };
+        }
+        if (!await libEmpresas.comprobarExistenciaEmpresaPorCodigo(empresaCod)) {
+            return { isValid: false, errorMessage: 'El código de la empresa no existe.' };
+        }
+    
+        if (!await libGenerales.verificarLongitud(serieCod, 10)) {
+            return { isValid: false, errorMessage: 'El código de la serie debe tener una longitud máxima de 10 caracteres.' };
+        }
+        if (!await libSeries.comprobarExistenciaSeriePorCodigo(serieCod, empresaCod)) {
+            return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
+        }
+        if (!await libSeries.comprobarRelacionSerieYEmpresa(serieCod, empresaCod)) {
+            return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
+        }
+    
+        if (isNaN(facturaVentaNum)) {
+            return { isValid: false, errorMessage: 'El número de la factura de venta debe ser formato numérico.' };
+        }
+        if (!await libFacturas.obtenerFacturaExistente(empresaCod, serieCod, facturaVentaNum)) {
+            return { isValid: false, errorMessage: 'No existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
+        }
+    
+        const { proyectoCod, texto, cantidad, precio, importeBruto, descuento, importeDescuento, importeNeto, tipoIVACod, tipoIRPFCod } = lineaFactura;
+    
+        if (proyectoCod && !await libProyectos.comprobarExistenciaProyectoPorCodigo(proyectoCod)) {
+            return { isValid: false, errorMessage: 'El código del proyecto no existe.' };
+        }
+    
+        if (texto && typeof texto !== 'string') {
+            return { isValid: false, errorMessage: 'El texto debe ser una cadena de texto.' };
+        }
+    
+        if (cantidad !== undefined) {
+            if (isNaN(cantidad)) {
+                return { isValid: false, errorMessage: 'La cantidad debe ser formato numérico.' };
+            }
+            if (!Number.isInteger(cantidad)) {
+                return { isValid: false, errorMessage: 'La cantidad debe ser un número entero.' };
+            }
+        }
+    
+        if (precio !== undefined) {
+            if (isNaN(precio)) {
+                return { isValid: false, errorMessage: 'El precio debe ser formato numérico.' };
+            }
+            const decimalesPrecio = precio.toString().split('.')[1];
+            if (decimalesPrecio && decimalesPrecio.length > 2) {
+                return { isValid: false, errorMessage: 'El precio debe tener como máximo dos decimales.' };
+            }
+        }
+    
+        if (importeBruto !== undefined) {
+            if (isNaN(importeBruto)) {
+                return { isValid: false, errorMessage: 'El importe bruto debe ser formato numérico.' };
+            }
+            const decimalesBruto = importeBruto.toString().split('.')[1];
+            if (decimalesBruto && decimalesBruto.length > 2) {
+                return { isValid: false, errorMessage: 'El importe bruto debe tener como máximo dos decimales.' };
+            }
+        }
+    
+        if (descuento !== undefined) {
+            if (isNaN(descuento)) {
+                return { isValid: false, errorMessage: 'El descuento debe ser formato numérico.' };
+            }
+            const decimalesDescuento = descuento.toString().split('.')[1];
+            if (decimalesDescuento && decimalesDescuento.length > 2) {
+                return { isValid: false, errorMessage: 'El descuento debe tener como máximo dos decimales.' };
+            }
+        }
+    
+        if (importeDescuento !== undefined) {
+            if (isNaN(importeDescuento)) {
+                return { isValid: false, errorMessage: 'El importe de descuento debe ser formato numérico.' };
+            }
+            const decimalesImporteDescuento = importeDescuento.toString().split('.')[1];
+            if (decimalesImporteDescuento && decimalesImporteDescuento.length > 2) {
+                return { isValid: false, errorMessage: 'El importe de descuento debe tener como máximo dos decimales.' };
+            }
+        }
+    
+        if (importeNeto !== undefined) {
+            if (isNaN(importeNeto)) {
+                return { isValid: false, errorMessage: 'El importe neto debe ser formato numérico.' };
+            }
+            const decimalesNeto = importeNeto.toString().split('.')[1];
+            if (decimalesNeto && decimalesNeto.length > 2) {
+                return { isValid: false, errorMessage: 'El importe neto debe tener como máximo dos decimales.' };
+            }
+        }
+    
+        if (tipoIVACod && !await libImpuestos.comprobarExistenciaImpuestoPorCodigo(tipoIVACod)) {
+            return { isValid: false, errorMessage: 'El código del tipo de IVA no existe.' };
+        }
+    
+        if (tipoIRPFCod && !await libImpuestos.comprobarExistenciaImpuestoPorCodigo(tipoIRPFCod)) {
+            return { isValid: false, errorMessage: 'El código del tipo de IRPF no existe.' };
+        }
+    
+        return { isValid: true };
+    }
+    
+    
 }
 
 export const libFacturaLinea = new LibFacturaLinea();

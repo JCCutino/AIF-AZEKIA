@@ -2,6 +2,21 @@ import { dbConexion } from "./dbConexion.mjs";
 import { libGenerales } from "./libGenerales.mjs";
 
 class LibImpuestos {
+
+    async  comprobarExistenciaImpuestoPorCodigo(impuestoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Impuesto WHERE impuestoCod = @impuestoCod';
+            request.input('impuestoCod', impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar impuesto existente por código:', error);
+            throw 'Error al comprobar impuesto existente por código';
+        }
+    }
     async  obtenerTipoImpuestos() {
         try {
             const pool = await dbConexion.conectarDB();

@@ -1,8 +1,21 @@
-POST http://localhost:3000/agregarFacturaLinea HTTP/1.1
+POST http://localhost:3000/rellenarFacturaLinea HTTP/1.1
 Content-Type: application/json
 
-{
+{ "lineaFactura": 
+  {
   "empresaCod": "EM001",
   "serieCod": "S001",
-  "facturaVentaNum":"2"
+  "facturaVentaNum": "1",
+  "facturaVentaLineaNum": "2", 
+  "proyectoCod": "PR003",
+  "texto": "Descripción del producto",
+  "cantidad": 5,
+  "precio": 10.5,
+  "importeBruto": 52.5,
+  "descuento": 2.5,
+  "importeDescuento": 50,
+  "importeNeto": 50,
+  "tipoIVACod": "IVA21",
+  "tipoIRPFCod": "IRPF15"
+  }
 }
