@@ -218,6 +218,22 @@ class LibFacturas {
         }
     }
     
+    async comprobarExistenciaFacturaVentaPorCodigo(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM FacturaVenta WHERE empresaCod = @empresaCod AND serieCod = @serieCod AND facturaVentaNum = @facturaVentaNum';
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar Factura existente por código:', error);
+            throw 'Error al comprobar  Factura por código';
+        }
+    }
 
 }
 

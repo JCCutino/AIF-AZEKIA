@@ -6,16 +6,16 @@ Content-Type: application/json
   "empresaCod": "EM001",
   "serieCod": "S001",
   "facturaVentaNum": "1",
-  "facturaVentaLineaNum": "2", 
-  "proyectoCod": "PR003",
-  "texto": "Descripción del producto",
-  "cantidad": 5,
-  "precio": 10.5,
-  "importeBruto": 52.5,
-  "descuento": 2.5,
-  "importeDescuento": 50,
-  "importeNeto": 50,
-  "tipoIVACod": "IVA21",
-  "tipoIRPFCod": "IRPF15"
+  "facturaVentaLineaNum": "1", 
+  "proyectoCod": null,
+  "texto": null,
+  "cantidad": null,
+  "precio":null,
+  "importeBruto": null,
+  "descuento": null,
+  "importeDescuento": null,
+  "importeNeto": null,
+  "tipoIVACod": null,
+  "tipoIRPFCod": null
   }
 }

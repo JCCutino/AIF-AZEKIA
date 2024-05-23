@@ -123,8 +123,9 @@ class HttpFacturaLinea {
                             const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
 
                             if (resultadoVerificacion.isValid) {
-                                // const resultado = await libFacturas.actualizarLineaFactura(camposParaActualizar);
-                                res.status(200).send({ err: false, lineaFactura: camposParaActualizar });
+
+                                const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposParaActualizar);
+                                res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
                             } else {
                                 res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage});
                             }
