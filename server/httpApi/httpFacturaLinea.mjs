@@ -120,16 +120,74 @@ class HttpFacturaLinea {
                                 camposParaActualizar[key] = lineaFactura[key];
                             }
 
+                            if (Object.keys(camposParaActualizar).length === atributosRequeridos.length) {
+                                return res.status(200).send({
+                                    err: true,
+                                    errmsg: 'No hay campos opcionales proporcionados para actualizar.'
+                                });
+                            }
+
                             const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
 
                             if (resultadoVerificacion.isValid) {
+                                const lineaFacturaActual = await libFacturaLinea.obtenerFacturaVentaLinea(lineaFactura.empresaCod, lineaFactura.serieCod, lineaFactura.facturaVentaNum, lineaFactura.facturaVentaLineaNum);
 
-                                const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposParaActualizar);
-                                res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
+                                const camposDiferentes = {};
+                                // Agregar siempre las claves de referencia
+                                for (const key of atributosRequeridos) {
+                                    camposDiferentes[key] = lineaFactura[key];
+                                }
+
+                                // Comparar los campos opcionales
+                                for (const key in camposParaActualizar) {
+                                    if (lineaFacturaActual[key] !== camposParaActualizar[key]) {
+                                        camposDiferentes[key] = camposParaActualizar[key];
+                                    }
+                                }
+
+                                if (Object.keys(camposDiferentes).length > atributosRequeridos.length) {
+                                    const camposImporteBrutoKeys = ['cantidad', 'precio', 'importeBruto'];
+                                    const camposImporteDescuentoKeys = ['importeBruto', 'descuento', 'importeDescuento', 'importeNeto'];
+                                    
+                                    const existenAlgunosImporteBruto = camposImporteBrutoKeys.some(key => key in lineaFactura);
+                                    const existenAlgunosImporteDescuento = camposImporteDescuentoKeys.some(key => key in lineaFactura);
+                                    
+                                    if (existenAlgunosImporteBruto && !camposImporteBrutoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null)) {
+                                        return res.status(200).send({ err: true, errmsg: 'Faltan campos requeridos o son nulos para validar los campos de importe bruto.' });
+                                    }
+                                    
+                                    if (existenAlgunosImporteDescuento && !camposImporteDescuentoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null)) {
+                                        return res.status(200).send({ err: true, errmsg: 'Faltan campos requeridos o son nulos para validar los campos de importe descuento.' });
+                                    }
+                                    
+                                    
+                                    if (existenAlgunosImporteBruto) {
+                                        const validacionImporteBruto = await libFacturaLinea.verificarCamposImporteBruto(lineaFactura.cantidad, lineaFactura.precio, lineaFactura.importeBruto);
+                                        if (!validacionImporteBruto.isValid) {
+                                            return res.status(200).send({ err: true, errmsg: validacionImporteBruto.errorMessage });
+                                        }
+                                    }
+                                    
+                                    if (existenAlgunosImporteDescuento) {
+                                        const validacionImporteDescuento = await libFacturaLinea.verificarCamposImporteDescuento(lineaFactura.importeBruto, lineaFactura.descuento, lineaFactura.importeDescuento, lineaFactura.importeNeto);
+                                        if (!validacionImporteDescuento.isValid) {
+                                            return res.status(200).send({ err: true, errmsg: validacionImporteDescuento.errorMessage });
+                                        }
+                                    }
+                                    
+                                    const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposDiferentes);
+                                    
+                                    res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
+                                    
+                                } else {
+                                    res.status(200).send({
+                                        err: false,
+                                        message: 'No hay cambios para actualizar.'
+                                    });
+                                }
                             } else {
-                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage});
+                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage });
                             }
-
                         } else {
                             res.status(200).send({
                                 err: true,
