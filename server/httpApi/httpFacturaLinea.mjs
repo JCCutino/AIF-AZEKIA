@@ -43,7 +43,7 @@ class HttpFacturaLinea {
 
             const facturaVentaLineaNum = ultimaLineaNum + 1;
 
-            const resultadoVerificacion = await libFacturaLinea.verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaLineaNum);
+            const resultadoVerificacion = await libFacturaLinea.verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaNum);
 
             if (resultadoVerificacion.isValid) {
                 await libFacturaLinea.agregarFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum);

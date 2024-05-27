@@ -198,7 +198,9 @@ class LibFacturaLinea {
             return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
         }
 
-        if (await libFacturas.obtenerFacturaExistente(empresaCod, serieCod, facturaVentaNum)) {
+        console.log(empresaCod,serieCod,facturaVentaNum);
+
+        if (!await libFacturas.obtenerFacturaExistente(empresaCod, serieCod, facturaVentaNum)) {
             return { isValid: false, errorMessage: 'No existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
         }
 
