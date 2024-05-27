@@ -371,6 +371,23 @@ class LibFacturaLinea {
             throw 'Error al comprobar  Factura por código';
         }
     }
+    async obtenerFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT * FROM FacturaVentaLinea WHERE empresaCod = @empresaCod AND serieCod = @serieCod AND facturaVentaNum = @facturaVentaNum AND facturaVentaLineaNum = @facturaVentaLineaNum';
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+            request.input('facturaVentaLineaNum', facturaVentaLineaNum);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0];
+        } catch (error) {
+            console.error('Error al obtener linea:', error);
+            throw 'Error al obtener linea:', error;
+        }
+    }
 
 
 }
