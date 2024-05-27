@@ -1,3 +1,6 @@
+let filaGuardada = true;
+
+
 async function obtenerclientesCod() {
     try {
         const response = await fetch('/obtenerClientesDatosBasicos', {
@@ -216,6 +219,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Función para añadir una nueva fila a la tabla
     async function agregarFilaEditable() {
+        if (!filaGuardada) {
+            alert("Debe guardar la fila actual antes de añadir una nueva.");
+            return;
+        }
+
+        filaGuardada = false; // Estado de fila no guardada
         const fila = `
         <tr>
             <td><select id="serieCod"></select></td>
@@ -239,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // Función para guardar los datos de una fila en la base de datos
-    function guardarFila() {
+    async function guardarFila() {
         const fila = this.parentNode.parentNode;
         const inputs = fila.querySelectorAll("td[contenteditable='true']");
         const detalle = {
@@ -249,10 +258,36 @@ document.addEventListener("DOMContentLoaded", function() {
             precio: inputs[3].textContent.trim(),
             importeBruto: inputs[4].textContent.trim(),
             descuento: inputs[5].textContent.trim(),
-            iva: inputs[6].textContent.trim(),
-            irpf: inputs[7].textContent.trim()
+            iva: fila.querySelector("#tipoIVA").value,
+            irpf: fila.querySelector("#tipoIRPF").value
         };
-        console.log(detalle); // Aquí enviar los datos al servidor para guardarlos en la base de datos
+
+        try {
+            const response = await fetch('/guardarLineaFactura', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(detalle)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.err) {
+                    mostrarError('Error al guardar la línea de factura: ' + data.errmsg);
+                    filaGuardada = false;
+                } else {
+                    filaGuardada = true; // Marcar la fila como guardada
+                    alert('Línea guardada exitosamente');
+                }
+            } else {
+                mostrarError('Error al llamar a la API: ' + response.statusText);
+                filaGuardada = false;
+            }
+        } catch (error) {
+            mostrarError('Error al llamar a la API: ' + error.message);
+            filaGuardada = false;
+        }
     }
 
     // Agregar evento al botón "Guardar Datos de Facturación"
@@ -263,10 +298,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Agregar evento al botón "Añadir Fila"
     document.getElementById("btnAñadirFila").addEventListener("click", function() {
-        mostrarCuerpoTabla();
-        agregarFilaEditable();
+        if (filaGuardada) {
+            mostrarCuerpoTabla();
+            agregarFilaEditable();
+        } else {
+            alert("Debe guardar la fila actual antes de añadir una nueva.");
+        }
     });
 
+    
     // Agregar evento delegado al elemento <tbody> para manejar clics en el botón "Guardar" de cada fila
     document.getElementById("DetalleFactura").addEventListener("click", function(event) {
         if (event.target.classList.contains("btnGuardarLinea")) {
