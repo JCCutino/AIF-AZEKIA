@@ -327,6 +327,7 @@ class LibFacturaLinea {
             }
         }
 
+
         // Validaciones para tipoIVACod
         if (lineaFactura.tipoIVACod !== undefined && lineaFactura.tipoIVACod !== null) {
             if (!await libImpuestos.comprobarExistenciaImpuestoPorCodigo(lineaFactura.tipoIVACod)) {
@@ -354,6 +355,50 @@ class LibFacturaLinea {
         return { isValid: true };
     }
 
+    async verificarCamposImporteBruto(cantidad, precio, importeBruto) {
+        try {
+            if (cantidad <= 0 || isNaN(cantidad)) {
+                return { isValid: false, errorMessage: 'La cantidad debe ser un número positivo.' };
+            }
+    
+            if (precio <= 0 || isNaN(precio)) {
+                return { isValid: false, errorMessage: 'El precio debe ser un número positivo.' };
+            }
+    
+            const importeBrutoCalculado = cantidad * precio;
+    
+            if (importeBruto !== undefined && importeBruto !== importeBrutoCalculado) {
+                return { isValid: false, errorMessage: 'El importe bruto proporcionado no coincide con el calculado.' };
+            }
+    
+            return { isValid: true };
+        } catch (error) {
+            return { isValid: false, errorMessage: 'Error al verificar los campos de importe bruto.' };
+        }
+    }
+    
+    async verificarCamposImporteDescuento(importeBruto, descuento, importeDescuento, importeNeto) {
+        try {
+            if (descuento > importeBruto) {
+                return { isValid: false, errorMessage: 'El descuento no puede ser mayor que el importe bruto.' };
+            }
+    
+            const calculatedImporteNeto = importeBruto - descuento;
+    
+            if (importeNeto !== undefined && importeNeto !== calculatedImporteNeto) {
+                return { isValid: false, errorMessage: 'El importe neto proporcionado no coincide con el calculado.' };
+            }
+    
+            if (importeDescuento !== undefined && importeDescuento > importeBruto) {
+                return { isValid: false, errorMessage: 'El importe de descuento no puede ser mayor que el importe bruto.' };
+            }
+    
+            return { isValid: true };
+        } catch (error) {
+            return { isValid: false, errorMessage: 'Error al verificar los campos de importe descuento.' };
+        }
+    }
+    
     async comprobarExistenciaFacturaVentaLineaPorCodigo(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum) {
         try {
             const pool = await dbConexion.conectarDB();
