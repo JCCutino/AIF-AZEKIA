@@ -107,6 +107,8 @@ async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
 }
 
 
+
+
 function abrirModalborrar(factura) {
     // Mostrar el modal de confirmación
     const modalborrar = document.getElementById('modalborrar');

@@ -8,7 +8,7 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpProyectos {
     
-    async getObtenerProyectosDatosBasicos(req, res) {
+    async postObtenerProyectosDatosBasicos(req, res) {
         try {
             const datosProyecto = await libProyectos.obtenerProyectosDatosBasicos();
             if (datosProyecto && datosProyecto.length > 0) {

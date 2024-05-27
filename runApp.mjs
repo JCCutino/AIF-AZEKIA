@@ -104,7 +104,7 @@ app.post('/eliminarSerie', httpSeries.postEliminarSerie);
 
 app.post('/obtenerProyectos', httpProyectos.postObtenerProyectos);
 
-app.get('/obtenerProyectosDatosBasicos', httpProyectos.getObtenerProyectosDatosBasicos);
+app.post('/obtenerProyectosDatosBasicos', httpProyectos.postObtenerProyectosDatosBasicos);
 
 app.post('/agregarProyecto', httpProyectos.postAgregarProyecto);
 
@@ -131,6 +131,7 @@ app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 app.post('/agregarFactura', httpFacturas.postAgregarFactura);
 
 app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
+
 
 //Funciones de lineas factura
 

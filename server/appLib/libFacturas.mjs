@@ -131,7 +131,7 @@ class LibFacturas {
         return { isValid: false, errorMessage: 'El código de la empresa no existe.' };
     }
 
-    if(!await libSeries.comprobarExistenciaSeriePorCodigo(factura.serieCod)){
+    if(!await libSeries.comprobarExistenciaSeriePorCodigo(factura.serieCod, factura.empresaCod)){
         return { isValid: false, errorMessage: 'El código de la serie no existe.' };
     }
 
