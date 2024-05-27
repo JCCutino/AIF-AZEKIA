@@ -3,7 +3,7 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibSeries {
 
-    async  verificarSerieReferenciada(serieCod) {
+    async  verificarSerieReferenciada(serieCod, empresaCod) {
         try {
             const pool = await dbConexion.conectarDB(); 
             const request = pool.request(); 
@@ -13,9 +13,10 @@ class LibSeries {
                 FROM 
                     FacturaVenta
                 WHERE 
-                    serieCod = @serieCod;
+                    serieCod = @serieCod AND empresaCod = @empresaCod;
             `;
             request.input('serieCod', serieCod); 
+            request.input('empresaCod', empresaCod);
             const resultado = await request.query(query); 
             await pool.close(); 
     
@@ -44,18 +45,56 @@ class LibSeries {
         }
     }
     
-    async  obtenerSeriePorCodigo(serieCod) {
+    async  obtenerSeriePorCodigo(serieCod, empresaCod) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'SELECT * FROM Serie WHERE serieCod = @serieCod';
+            const query = 'SELECT * FROM Serie WHERE serieCod = @serieCod AND empresaCod = @empresaCod';
             request.input('serieCod', serieCod);
+            request.input('empresaCod', empresaCod);
             const resultado = await request.query(query);
             await pool.close();
             return resultado.recordset[0] || null;
         } catch (error) {
             console.error('Error al obtener serie por código:', error);
             throw 'Error al obtener serie por código';
+        }
+    }
+    
+    async  comprobarExistenciaSeriePorCodigo(serieCod, empresaCod) {        
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Serie WHERE serieCod = @serieCod AND empresaCod = @empresaCod';
+            request.input('serieCod', serieCod);
+            request.input('empresaCod', empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar serie existente por código:', error);
+            throw 'Error al comprobar serie existente por código';
+        }
+    }
+
+    async  comprobarRelacionSerieYEmpresa(serieCod, empresaCod) {        
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+                SELECT COUNT(*) AS count 
+                FROM Serie 
+                WHERE serieCod = @serieCod 
+                  AND empresaCod = @empresaCod
+            `;
+            request.input('serieCod', serieCod);
+            request.input('empresaCod', empresaCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar serie y empresa por código:', error);
+            throw 'Error al comprobar serie y empresa por código';
         }
     }
     
@@ -81,7 +120,7 @@ class LibSeries {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'UPDATE Serie SET descripcion = @descripcion, empresaCod = @empresaCod, ultimoNumUsado = @ultimoNumUsado WHERE serieCod = @serieCod';
+            const query = 'UPDATE Serie SET descripcion = @descripcion, ultimoNumUsado = @ultimoNumUsado WHERE serieCod = @serieCod AND empresaCod = @empresaCod';
             request.input('descripcion', serie.descripcion);
             request.input('ultimoNumUsado', serie.ultimoNumUsado);
             request.input('empresaCod', serie.empresaCod);
@@ -95,12 +134,13 @@ class LibSeries {
         }
     }
     
-    async  eliminarSerie(serieCod) {
+    async  eliminarSerie(serieCod, empresaCod) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = 'DELETE FROM Serie WHERE serieCod = @serieCod';
+            const query = 'DELETE FROM Serie WHERE serieCod = @serieCod AND empresaCod = @empresaCod';
             request.input('serieCod', serieCod);
+            request.input('empresaCod', empresaCod);
             const resultado = await request.query(query);
             await pool.close();
             return resultado.rowsAffected[0]; // Número de filas afectadas por la eliminación
@@ -136,7 +176,7 @@ class LibSeries {
             return true;
         }
     
-        const serieExistente = await this.obtenerSeriePorCodigo(serie.serieCod);
+        const serieExistente = await this.obtenerSeriePorCodigo(serie.serieCod, serie.empresaCod);
     
         return !serieExistente;
     }

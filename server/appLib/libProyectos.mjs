@@ -3,6 +3,20 @@ import { libGenerales } from "./libGenerales.mjs";
 
 class LibProyectos {
    
+    async  comprobarExistenciaProyectoPorCodigo(proyectoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = 'SELECT COUNT(*) AS count FROM Proyecto WHERE proyectoCod = @proyectoCod';
+            request.input('proyectoCod', proyectoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].count > 0;
+        } catch (error) {
+            console.error('Error al comprobar proyecto existente por código:', error);
+            throw 'Error al comprobar proyecto existente por código';
+        }
+    }
    
     async  verificarProyectoReferenciado(proyectoCod) {
         try {

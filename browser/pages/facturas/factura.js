@@ -6,67 +6,54 @@ function formatearFecha(fecha) {
 
     return `${dia}/${mes}/${anio}`;
 }
-
 async function mostrarDatosEnTabla(data) {
-
+    // Obtener la tabla HTML
     const tabla = document.getElementById('tablaFacturas');
 
+    // Obtener todas las filas de la tabla, excepto la primera (la cabecera)
     const filasDatos = Array.from(tabla.querySelectorAll('tr:not(:first-child)'));
 
+    // Eliminar todas las filas de datos existentes
     filasDatos.forEach(fila => fila.remove());
 
-            if (data.facturas && Array.isArray(data.facturas)) {
+    if (data.facturas && Array.isArray(data.facturas)) {
+        data.facturas.forEach(factura => {
+            const fila = document.createElement('tr');
 
-                data.facturas.forEach(factura => {
-                    const fila = document.createElement('tr');
-        
-                    Object.entries(factura).forEach(([clave, valor]) => {
-                        const celda = document.createElement('td');
-                        if (clave === 'fechaEmision') {
-                            celda.textContent = formatearFecha(valor);
-                        } else {
-                            celda.textContent = valor;
-                        }
-                        fila.appendChild(celda);
-                    });
+            // Orden de las propiedades de la factura para mostrar en la tabla
+            const propiedades = [
+                'razonSocialEmpresa',
+                'serieCod',
+                'facturaVentaNum',
+                'razonSocialCliente',
+                'fechaEmision',
+                'bloqueada'
+            ];
 
+            propiedades.forEach(clave => {
+                const celda = document.createElement('td');
+                const valor = factura[clave];
+                // Verificar si la clave es una fecha para formatearla
+                if (clave === 'fechaEmision') {
+                    celda.textContent = formatearFecha(valor);
+                } else {
+                    celda.textContent = valor;
+                }
+                fila.appendChild(celda);
+            });
+
+            // Añadir el botón de "Ver"
             const celdaBoton = document.createElement('td');
             const boton = document.createElement('button');
             boton.textContent = 'Ver';
             celdaBoton.appendChild(boton);
             fila.appendChild(celdaBoton);
-            boton.addEventListener('click', function() {
-                const empresaId = factura.empresaCod;
-                abrirModalborrar(empresaId);
-            });
-            
-            const confirmarBtn = document.getElementById("confirmarBtn");
-            const cancelarBtn = document.getElementById("cancelarBtn");
-            
-            boton.addEventListener('click', function(event) {
-                event.stopPropagation(); 
-                confirmarBtn.addEventListener('click', async function() {
-                    const empresaCod = factura.empresaCod;
-                    try {
-                        await eliminarFactura(empresaCod);
-                    } catch (error) {
-                        mostrarError('Error al eliminar la factura:', error.message);
-                    }
-                    modalborrar.style.display = "none";
-                });
-
-                cancelarBtn.addEventListener('click', function() {
-                    console.log('Se canceló la eliminación de la factura');
-                    modalborrar.style.display = "none";
-                });
-            });
-            
-            cancelarBtn.addEventListener('click', function() {
-                console.log('Se canceló la eliminación de la factura');
-                modalborrar.style.display = "none";
-            });
-
             tabla.appendChild(fila);
+
+            // Configurar el evento click del botón
+            boton.addEventListener('click', function () {
+                abrirModalborrar(factura);
+            });
         });
     } else {
         mostrarError('No se encontraron datos de facturas válidos en la respuesta.');
@@ -96,14 +83,15 @@ async function obtenerFacturasAPI(pagina = 1, resultadosTotales = 10) {
     }
 }
 
-async function eliminarFactura(empresaCod) {
+
+async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
     try {
         const response = await fetch('/eliminarFactura', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({empresaCod})
+            body: JSON.stringify({empresaCod, serieCod, facturaVentaNum})
         });
 
         if (response.ok) {
@@ -118,9 +106,40 @@ async function eliminarFactura(empresaCod) {
     }
 }
 
-async function abrirModalborrar(empresaId) {
-    const modalborrarFactura = document.getElementById('modalborrar');
-    modalborrarFactura.style.display = 'block';
+
+function abrirModalborrar(factura) {
+    // Mostrar el modal de confirmación
+    const modalborrar = document.getElementById('modalborrar');
+    modalborrar.style.display = "block";
+
+    const confirmarBtn = document.getElementById("confirmarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
+
+    // Eliminar cualquier evento previo para evitar múltiples eventos registrados
+    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+    cancelarBtn.replaceWith(cancelarBtn.cloneNode(true));
+
+    // Obtener los nuevos botones clonados
+    const confirmarBtnNuevo = document.getElementById("confirmarBtn");
+    const cancelarBtnNuevo = document.getElementById("cancelarBtn");
+
+    // Configurar el evento click del botón de confirmar
+    confirmarBtnNuevo.addEventListener('click', async function () {
+        const empresaCod = factura.empresaCod;
+        const serieCod = factura.serieCod;
+        const facturaVentaNum = factura.facturaVentaNum;
+        try {
+            await eliminarFactura(empresaCod, serieCod, facturaVentaNum);
+        } catch (error) {
+            mostrarError('Error al eliminar la factura:', error.message);
+        }
+        modalborrar.style.display = "none";
+    });
+
+    // Configurar el evento click del botón de cancelar
+    cancelarBtnNuevo.addEventListener('click', function () {
+        modalborrar.style.display = "none";
+    });
 }
 
 async function main() {

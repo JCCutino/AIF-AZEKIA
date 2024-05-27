@@ -1,9 +1,21 @@
-POST http://localhost:3000/obtenerIVA HTTP/1.1
+POST http://localhost:3000/rellenarFacturaLinea HTTP/1.1
 Content-Type: application/json
 
-{
-  "empresaCod" : "EM001",
-  "serieCod" : "S001",
-  "facturaVentaNum" : "1"
-  
-    }
+{ "lineaFactura": 
+  {
+  "empresaCod": "EM001",
+  "serieCod": "S001",
+  "facturaVentaNum": "1",
+  "facturaVentaLineaNum": "1", 
+  "proyectoCod": null,
+  "texto": null,
+  "cantidad": null,
+  "precio":null,
+  "importeBruto": null,
+  "descuento": null,
+  "importeDescuento": null,
+  "importeNeto": null,
+  "tipoIVACod": null,
+  "tipoIRPFCod": null
+  }
+}
