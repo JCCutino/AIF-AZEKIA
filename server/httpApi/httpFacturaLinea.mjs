@@ -77,20 +77,20 @@ class HttpFacturaLinea {
     async postRellenarFacturaLinea(req, res) {
         try {
             const lineaFactura = req.body.lineaFactura;
-
+    
             if (Object.prototype.toString.call(lineaFactura) === '[object Object]') {
                 const atributosRequeridos = ['empresaCod', 'serieCod', 'facturaVentaNum', 'facturaVentaLineaNum'];
                 const atributosOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'importeDescuento', 'importeNeto', 'tipoIVACod', 'tipoIRPFCod'];
                 const todosLosAtributos = [...atributosRequeridos, ...atributosOpcionales];
-
+    
                 const atributosLineaFactura = Object.keys(lineaFactura);
-
+    
                 const atributosObligatoriosDefinidos = atributosRequeridos.every(key => atributosLineaFactura.includes(key) && lineaFactura[key] !== null && lineaFactura[key] !== undefined);
-
+    
                 if (atributosObligatoriosDefinidos) {
                     const atributosFaltantes = atributosRequeridos.filter(key => !atributosLineaFactura.includes(key));
                     const atributosExtra = atributosLineaFactura.filter(key => !todosLosAtributos.includes(key));
-
+    
                     if (atributosFaltantes.length === 0 && atributosExtra.length === 0) {
                         const atributosInvalidos = atributosLineaFactura.filter(key => {
                             const value = lineaFactura[key];
@@ -107,7 +107,7 @@ class HttpFacturaLinea {
                                     return typeof value !== 'string' || value.trim() === '';
                             }
                         });
-
+    
                         if (atributosInvalidos.length === 0) {
                             const camposParaActualizar = {};
                             for (const key of atributosOpcionales) {
@@ -115,21 +115,51 @@ class HttpFacturaLinea {
                                     camposParaActualizar[key] = lineaFactura[key];
                                 }
                             }
-
+    
                             for (const key of atributosRequeridos) {
                                 camposParaActualizar[key] = lineaFactura[key];
                             }
-
-                            const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
-
-                            if (resultadoVerificacion.isValid) {
-
-                                const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposParaActualizar);
-                                res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
-                            } else {
-                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage});
+    
+                            if (Object.keys(camposParaActualizar).length === atributosRequeridos.length) {
+                                return res.status(200).send({
+                                    err: true,
+                                    errmsg: 'No hay campos opcionales proporcionados para actualizar.'
+                                });
                             }
-
+    
+                            const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
+    
+                            if (resultadoVerificacion.isValid) {
+                                const lineaFacturaActual = await libFacturaLinea.obtenerFacturaVentaLinea(lineaFactura.empresaCod, lineaFactura.serieCod, lineaFactura.facturaVentaNum, lineaFactura.facturaVentaLineaNum);
+    
+                                const camposDiferentes = {};
+                                // Agregar siempre las claves de referencia
+                                for (const key of atributosRequeridos) {
+                                    camposDiferentes[key] = lineaFactura[key];
+                                }
+    
+                                // Comparar los campos opcionales
+                                for (const key in camposParaActualizar) {
+                                    if (lineaFacturaActual[key] !== camposParaActualizar[key]) {
+                                        camposDiferentes[key] = camposParaActualizar[key];
+                                    }
+                                }
+    
+                                if (Object.keys(camposDiferentes).length > atributosRequeridos.length) {
+                                    // Llamada a la función de actualización con los campos que han cambiado
+                                    
+                                    const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposDiferentes);
+    
+                                    res.status(200).send({ err: false, lineaFacturaActualizada: resultado});
+                                } else {
+                                    res.status(200).send({
+                                        err: false,
+                                        message: 'No hay cambios para actualizar.'
+                                    });
+                                }
+                            } else {
+                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage });
+                            }
                         } else {
                             res.status(200).send({
                                 err: true,
@@ -156,7 +186,7 @@ class HttpFacturaLinea {
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
-
+    
 
 
 }
