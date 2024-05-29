@@ -1,4 +1,5 @@
 import { libFacturaLinea } from "../appLib/libFacturaLinea.mjs";
+import { libImpuestos } from "../appLib/libImpuestos.mjs";
 import { libGenerales } from "../appLib/libGenerales.mjs";
 
 import path from 'path';
@@ -10,23 +11,69 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpFacturaLinea {
 
-    async postObtenerDatosFinalesFactura(req, res){
-        try{
+    async postObtenerDatosFinalesFactura(req, res) {
+        try {
             const empresaCod = req.body.empresaCod;
             const serieCod = req.body.serieCod;
             const facturaVentaNum = req.body.facturaVentaNum;
-
-            const datosFinales = true;
-
-            if(datosFinales){
-                res.status(200).send({ err: false, datosFinales });
-            }else{
+    
+            const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
+            
+            const datosFinales = await libFacturaLinea.obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum);
+    
+            if (datosFinales) {
+                const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
+                    acc[curr.impuestoCod] = curr.porcentaje;
+                    return acc;
+                }, {});
+    
+                const resultImpuestos = {};
+    
+                datosFinales.forEach(linea => {
+                    const { importeBruto, importeNeto, tipoIVACod, tipoIRPFCod } = linea;
+    
+                    // Procesar IVA
+                    if (tipoIVACod) {
+                        if (!resultImpuestos[tipoIVACod]) {
+                            resultImpuestos[tipoIVACod] = { base: 0, cuota: 0 };
+                        }
+                        const baseIVA = importeNeto;
+                        const cuotaIVA = (baseIVA * impuestoMap[tipoIVACod]) / 100;
+                        resultImpuestos[tipoIVACod].base += baseIVA;
+                        resultImpuestos[tipoIVACod].cuota += cuotaIVA;
+                    }
+    
+                    // Procesar IRPF
+                    if (tipoIRPFCod) {
+                        if (!resultImpuestos[tipoIRPFCod]) {
+                            resultImpuestos[tipoIRPFCod] = { base: 0, cuota: 0 };
+                        }
+                        const baseIRPF = importeNeto;
+                        const cuotaIRPF = (baseIRPF * impuestoMap[tipoIRPFCod]) / 100;
+                        resultImpuestos[tipoIRPFCod].base += baseIRPF;
+                        resultImpuestos[tipoIRPFCod].cuota += cuotaIRPF;
+                    }
+                });
+    
+                const result = Object.entries(resultImpuestos).map(([tipo, valores]) => ({
+                    tipo,
+                    base: valores.base.toFixed(2),
+                    cuota: valores.cuota.toFixed(2)
+                }));
+                               
+                 await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+    
+                const facturaVentaImpuestos = await libFacturaLinea.insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, result)
+               
+                res.status(200).send({ err: false, FacturaVentaImpuesto: result });
+            } else {
                 res.status(200).send({ err: true, errmsg: 'No se han podido obtener los datos finales de la factura' });
             }
-        }catch(err){
+        } catch (err) {
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
+    
 
     async postObtenerFacturaLineas(req, res) {
         try {
@@ -173,7 +220,7 @@ class HttpFacturaLinea {
                                         }
                                     }                                
                                     
-                                    const camposImporteDescuentoKeys = ['importeBruto', 'descuento'];
+                                    const camposImporteDescuentoKeys = ['cantidad', 'precio', 'importeBruto', 'descuento'];
                                     const existenTodosImporteDescuento = camposImporteDescuentoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null);
 
                                     if (existenTodosImporteDescuento) {

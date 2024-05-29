@@ -407,21 +407,67 @@ class LibFacturaLinea {
         }
     }
 
-    async obtenerPorcentajePorImpuestoPorCod(impuestoCod) {
+    async limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum){
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-
-            const query = 'SELECT porcentaje FROM Impuesto WHERE impuestoCod = @impuestoCod';
-            request.input('impuestoCod', impuestoCod);
+            const query = 'DELETE FROM FacturaVentaImpuesto WHERE empresaCod = @empresaCod AND serieCod = @serieCod AND facturaVentaNum = @facturaVentaNum';
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
             const resultado = await request.query(query);
             await pool.close();
-            return resultado.recordset[0].porcentaje;
+            return resultado.rowsAffected[0] > 0;
         } catch (error) {
-            console.error('Error al obtener el porcentaje del impuesto: ', error);
-            throw new Error('Error al obtener el porcentaje del impuesto:', error);
+            console.error('Error al limpiar tabla FacturaVentaImpuesto:', error);
+            throw 'Error al limpiar tabla FacturaVentaImpuesto';
         }
     }
+
+    async insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, facturaVentaImpuestos) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = `
+            INSERT INTO FacturaVentaImpuesto 
+            (empresaCod, serieCod, facturaVentaNum, impuestoCod, base, cuota)
+            VALUES 
+            (@empresaCod, @serieCod, @facturaVentaNum, @impuestoCod, @base, @cuota)
+        `   
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+            let num = 1
+
+            // Insertar los nuevos registros
+            for (const impuesto of facturaVentaImpuestos) {
+                
+                num += 1;
+
+                const { tipo, base, cuota } = impuesto;
+               
+              
+            request.input('impuestoCod', tipo);
+            request.input('base', base);
+            request.input('cuota', cuota);
+        
+            
+                           
+                  
+                   // Cerrar la conexión
+            }
+    
+            const resultado = await request.query(query);
+            await pool.close();
+
+    
+        } catch (error) {
+            console.error('Error al insertar datos en FacturaVentaImpuesto:', error);
+            throw 'Error al insertar datos en FacturaVentaImpuesto';
+        }
+    }
+    
+    
 
     async obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum) {
         try {
@@ -430,9 +476,11 @@ class LibFacturaLinea {
 
             const query = `
                 SELECT 
-                    SUM(importeBruto) AS importeTotalBruto,
-                    SUM(descuento) AS descuentoTotal,
-                    SUM(importeNeto) AS importeTotalNeto
+                    importeBruto,
+                    importeDescuento,
+                    importeNeto,
+                    tipoIVACod,
+                    tipoIRPFCod	
                 FROM 
                     FacturaVentaLinea 
                 WHERE 
@@ -452,7 +500,7 @@ class LibFacturaLinea {
                 throw new Error('No se encontraron líneas para la factura especificada.');
             }
 
-            return resultado.recordset[0];
+            return resultado.recordset;
         } catch (error) {
             console.error('Error al obtener los totales de la factura:', error);
             throw new Error('Error al obtener los totales de la factura:', error);

@@ -30,7 +30,36 @@ class LibImpuestos {
             throw 'Error al obtener tipo impuestos';
         }
     }
+
+    async  obtenerCodigosImpuestos() {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+            const query = "SELECT impuestoCod, porcentaje FROM Impuesto ";
+            const resultados = await request.query(query);
+            await pool.close();
+            return resultados.recordset || [];
+        } catch (error) {
+            console.error('Error al obtener codigos impuestos:', error);
+            throw 'Error al obtener codigos impuestos';
+        }
+    }
     
+    async obtenerPorcentajePorImpuestoPorCod(impuestoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+
+            const query = 'SELECT porcentaje FROM Impuesto WHERE impuestoCod = @impuestoCod';
+            request.input('impuestoCod', impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].porcentaje;
+        } catch (error) {
+            console.error('Error al obtener el porcentaje del impuesto: ', error);
+            throw new Error('Error al obtener el porcentaje del impuesto:', error);
+        }
+    }
     async  obtenerIVA() {
         try {
             const pool = await dbConexion.conectarDB();
