@@ -198,7 +198,7 @@ class LibFacturaLinea {
             return { isValid: false, errorMessage: 'La serie no está asociada a la empresa.' };
         }
 
-        console.log(empresaCod,serieCod,facturaVentaNum);
+        console.log(empresaCod, serieCod, facturaVentaNum);
 
         if (!await libFacturas.obtenerFacturaExistente(empresaCod, serieCod, facturaVentaNum)) {
             return { isValid: false, errorMessage: 'No existe una factura con el mismo código de empresa, serie y número de factura de venta.' };
@@ -232,18 +232,18 @@ class LibFacturaLinea {
             return { isValid: false, errorMessage: 'El número de la factura de venta debe ser formato numérico.' };
         }
         if (!await libFacturas.comprobarExistenciaFacturaVentaPorCodigo(empresaCod, serieCod, facturaVentaNum)) {
-            return { isValid: false, errorMessage: 'La factura indicada no existe'};
+            return { isValid: false, errorMessage: 'La factura indicada no existe' };
         }
 
-        
+
         if (isNaN(facturaVentaLineaNum)) {
             return { isValid: false, errorMessage: 'El número de la linea de factura de venta debe ser formato numérico.' };
         }
-        
+
         if (!await this.comprobarExistenciaFacturaVentaLineaPorCodigo(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum)) {
-            return { isValid: false, errorMessage: 'La linea indicada no existe'};
+            return { isValid: false, errorMessage: 'La linea indicada no existe' };
         }
-        
+
 
         const validations = [];
 
@@ -302,20 +302,12 @@ class LibFacturaLinea {
                 if (decimalesDescuento && decimalesDescuento.length > 2) {
                     validations.push({ isValid: false, errorMessage: 'El descuento debe tener como máximo dos decimales.' });
                 }
-            }
-        }
-
-        // Validaciones para importeDescuento
-        if (lineaFactura.importeDescuento !== undefined && lineaFactura.importeDescuento !== null) {
-            if (isNaN(lineaFactura.importeDescuento)) {
-                validations.push({ isValid: false, errorMessage: 'El importe de descuento debe ser formato numérico.' });
-            } else {
-                const decimalesImporteDescuento = lineaFactura.importeDescuento.toString().split('.')[1];
-                if (decimalesImporteDescuento && decimalesImporteDescuento.length > 2) {
-                    validations.push({ isValid: false, errorMessage: 'El importe de descuento debe tener como máximo dos decimales.' });
+                if (lineaFactura.descuento < 0 || lineaFactura.descuento > 100) {
+                    validations.push({ isValid: false, errorMessage: 'El descuento debe estar entre 0 y 100.' });
                 }
             }
         }
+
 
         // Validaciones para importeNeto (continuación)
         if (lineaFactura.importeNeto !== undefined && lineaFactura.importeNeto !== null) {
@@ -349,7 +341,7 @@ class LibFacturaLinea {
             return { isValid: false, errorMessage: validations.map(validation => validation.errorMessage).join('  ') };
         }
 
-        const camposOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'importeDescuento', 'importeNeto', 'tipoIVACod', 'tipoIRPFCod'];
+        const camposOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'importeNeto', 'tipoIVACod', 'tipoIRPFCod'];
         if (camposOpcionales.every(key => lineaFactura[key] === undefined || lineaFactura[key] === null)) {
             return { isValid: false, errorMessage: 'No hay campos opcionales definidos para actualizar.' };
         }
@@ -362,45 +354,24 @@ class LibFacturaLinea {
             if (cantidad <= 0 || isNaN(cantidad)) {
                 return { isValid: false, errorMessage: 'La cantidad debe ser un número positivo.' };
             }
-    
+
             if (precio <= 0 || isNaN(precio)) {
                 return { isValid: false, errorMessage: 'El precio debe ser un número positivo.' };
             }
-    
+
             const importeBrutoCalculado = cantidad * precio;
-    
+
             if (importeBruto !== undefined && importeBruto !== importeBrutoCalculado) {
                 return { isValid: false, errorMessage: 'El importe bruto proporcionado no coincide con el calculado.' };
             }
-    
+
             return { isValid: true };
         } catch (error) {
             return { isValid: false, errorMessage: 'Error al verificar los campos de importe bruto.' };
         }
     }
-    
-    async verificarCamposImporteDescuento(importeBruto, descuento, importeDescuento, importeNeto) {
-        try {
-            if (descuento > importeBruto) {
-                return { isValid: false, errorMessage: 'El descuento no puede ser mayor que el importe bruto.' };
-            }
-    
-            const calculatedImporteNeto = importeBruto - descuento;
-    
-            if (importeNeto !== undefined && importeNeto !== calculatedImporteNeto) {
-                return { isValid: false, errorMessage: 'El importe neto proporcionado no coincide con el calculado.' };
-            }
-    
-            if (importeDescuento !== undefined && importeDescuento > importeBruto) {
-                return { isValid: false, errorMessage: 'El importe de descuento no puede ser mayor que el importe bruto.' };
-            }
-    
-            return { isValid: true };
-        } catch (error) {
-            return { isValid: false, errorMessage: 'Error al verificar los campos de importe descuento.' };
-        }
-    }
-    
+
+
     async comprobarExistenciaFacturaVentaLineaPorCodigo(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum) {
         try {
             const pool = await dbConexion.conectarDB();
@@ -436,6 +407,57 @@ class LibFacturaLinea {
         }
     }
 
+    async obtenerPorcentajePorImpuestoPorCod(impuestoCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+
+            const query = 'SELECT porcentaje FROM Impuesto WHERE impuestoCod = @impuestoCod';
+            request.input('impuestoCod', impuestoCod);
+            const resultado = await request.query(query);
+            await pool.close();
+            return resultado.recordset[0].porcentaje;
+        } catch (error) {
+            console.error('Error al obtener el porcentaje del impuesto: ', error);
+            throw new Error('Error al obtener el porcentaje del impuesto:', error);
+        }
+    }
+
+    async obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+
+            const query = `
+                SELECT 
+                    SUM(importeBruto) AS importeTotalBruto,
+                    SUM(descuento) AS descuentoTotal,
+                    SUM(importeNeto) AS importeTotalNeto
+                FROM 
+                    FacturaVentaLinea 
+                WHERE 
+                    empresaCod = @empresaCod 
+                    AND serieCod = @serieCod 
+                    AND facturaVentaNum = @facturaVentaNum
+            `;
+
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+
+            const resultado = await request.query(query);
+            await pool.close();
+
+            if (resultado.recordset.length === 0) {
+                throw new Error('No se encontraron líneas para la factura especificada.');
+            }
+
+            return resultado.recordset[0];
+        } catch (error) {
+            console.error('Error al obtener los totales de la factura:', error);
+            throw new Error('Error al obtener los totales de la factura:', error);
+        }
+    }
 
 }
 

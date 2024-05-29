@@ -8,14 +8,12 @@ Content-Type: application/json
   "facturaVentaNum": "1",
   "facturaVentaLineaNum": "2", 
   "proyectoCod": null,
-  "texto": null,
-  "cantidad": 4,
-  "precio":10,
-  "importeBruto": 40,
-  "descuento": null,
-  "importeDescuento": 4,
-  "importeNeto": null,
-  "tipoIVACod": null,
-  "tipoIRPFCod": null
+  "texto": 3,
+  "cantidad": 3,
+  "precio": 10,
+  "importeBruto": 30,
+  "descuento": 10,
+  "tipoIVACod": "IVA21",
+  "tipoIRPFCod": "IRPF15"
   }
 }
