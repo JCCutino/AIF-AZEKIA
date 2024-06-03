@@ -455,7 +455,7 @@ class LibFacturaLinea {
     
     
 
-    async obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum) {
+    async obtenerImportesFacturaLineas(empresaCod, serieCod, facturaVentaNum) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();

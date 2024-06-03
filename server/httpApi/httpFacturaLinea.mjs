@@ -19,9 +19,9 @@ class HttpFacturaLinea {
     
             const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
             
-            const datosFinales = await libFacturaLinea.obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum);
+            const importesLineas = await libFacturaLinea.obtenerImportesFacturaLineas(empresaCod, serieCod, facturaVentaNum);
     
-            if (datosFinales) {
+            if (importesLineas) {
                 const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
                     acc[curr.impuestoCod] = curr.porcentaje;
                     return acc;
@@ -29,36 +29,41 @@ class HttpFacturaLinea {
     
                 const resultImpuestos = {};
     
-                datosFinales.forEach(linea => {
+                importesLineas.forEach(linea => {
                     const { importeBruto, importeNeto, tipoIVACod, tipoIRPFCod } = linea;
     
                     // Procesar IVA
                     if (tipoIVACod) {
                         if (!resultImpuestos[tipoIVACod]) {
-                            resultImpuestos[tipoIVACod] = { base: 0, cuota: 0 };
+                            resultImpuestos[tipoIVACod] = { base: 0, cuota: undefined };
                         }
-                        const baseIVA = importeNeto;
-                        const cuotaIVA = (baseIVA * impuestoMap[tipoIVACod]) / 100;
-                        resultImpuestos[tipoIVACod].base += baseIVA;
-                        resultImpuestos[tipoIVACod].cuota += cuotaIVA;
+                     // importeNeto debe estar redondeado previamente, redondeamos para evitar el clasico 0.1+0.2
+                     resultImpuestos[tipoIVACod].base = resultImpuestos[tipoIVACod].base + libGenerales.redondeoEuro (resultImpuestos[tipoIVACod].base + importeNeto);
                     }
     
                     // Procesar IRPF
                     if (tipoIRPFCod) {
                         if (!resultImpuestos[tipoIRPFCod]) {
-                            resultImpuestos[tipoIRPFCod] = { base: 0, cuota: 0 };
+                            resultImpuestos[tipoIRPFCod] = { base: 0, cuota: undefined };
                         }
-                        const baseIRPF = importeNeto;
-                        const cuotaIRPF = (baseIRPF * impuestoMap[tipoIRPFCod]) / 100;
-                        resultImpuestos[tipoIRPFCod].base += baseIRPF;
-                        resultImpuestos[tipoIRPFCod].cuota += cuotaIRPF;
+                     // importeNeto debe estar redondeado previamente, redondeamos para evitar el clasico 0.1+0.2
+                     resultImpuestos[tipoIRPFCod].base =  resultImpuestos[tipoIRPFCod].base + libGenerales.redondeoEuro (resultImpuestos[tipoIRPFCod].base + importeNeto);
+                     // function redondeoEuros(n) { return +n.toFixed(2) } 1.555 > 1.55
+                     //  function re(n) { return Math.round(n * 100) / 100; } MEJOR ESTA?= pero no va con negativos (+infinito)
+                     // esta es la buena:
+                     //     return (Math.round(Math.abs(n) * 100) / 100)*Math.sign(n);
+                     //     return (Math.round(Math.abs(n) * 10**ndecs / 10**ndecs)*Math.sign(n);
+                     // pot10 = [1,10,100,1000,10000,100000,100000,1000000,10000000]
+                     //     return (Math.round(Math.abs(n) * pot10[ndec] / por10[ndec])*Math.sign(n);
+
+
                     }
                 });
     
                 const result = Object.entries(resultImpuestos).map(([tipo, valores]) => ({
                     tipo,
-                    base: valores.base.toFixed(2),
-                    cuota: valores.cuota.toFixed(2)
+                    base: valores.base, // suma de redondeados ya está redondeada
+                    cuota: libGenerales.redondeoEuros((valores.base * impuestoMap[tipo]) / 100)
                 }));
                                
                  await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
@@ -81,7 +86,11 @@ class HttpFacturaLinea {
             const serieCod = req.body.serieCod;
             const facturaVentaNum = req.body.facturaVentaNum;
 
+            console.log(empresaCod,serieCod, facturaVentaNum);
+
             const facturaLineas = await libFacturaLinea.obtenerFacturaLineas(empresaCod, serieCod, facturaVentaNum);
+
+            console.log(facturaLineas);
             if (facturaLineas && facturaLineas.length > 0) {
                 res.status(200).send({ err: false, facturaLineas });
             } else {
