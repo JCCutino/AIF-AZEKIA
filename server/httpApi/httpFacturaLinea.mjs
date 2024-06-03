@@ -1,4 +1,5 @@
 import { libFacturaLinea } from "../appLib/libFacturaLinea.mjs";
+import { libImpuestos } from "../appLib/libImpuestos.mjs";
 import { libGenerales } from "../appLib/libGenerales.mjs";
 
 import path from 'path';
@@ -9,6 +10,70 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpFacturaLinea {
+
+    async postObtenerDatosFinalesFactura(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+            const facturaVentaNum = req.body.facturaVentaNum;
+    
+            const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
+            
+            const datosFinales = await libFacturaLinea.obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum);
+    
+            if (datosFinales) {
+                const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
+                    acc[curr.impuestoCod] = curr.porcentaje;
+                    return acc;
+                }, {});
+    
+                const resultImpuestos = {};
+    
+                datosFinales.forEach(linea => {
+                    const { importeBruto, importeNeto, tipoIVACod, tipoIRPFCod } = linea;
+    
+                    // Procesar IVA
+                    if (tipoIVACod) {
+                        if (!resultImpuestos[tipoIVACod]) {
+                            resultImpuestos[tipoIVACod] = { base: 0, cuota: 0 };
+                        }
+                        const baseIVA = importeNeto;
+                        const cuotaIVA = (baseIVA * impuestoMap[tipoIVACod]) / 100;
+                        resultImpuestos[tipoIVACod].base += baseIVA;
+                        resultImpuestos[tipoIVACod].cuota += cuotaIVA;
+                    }
+    
+                    // Procesar IRPF
+                    if (tipoIRPFCod) {
+                        if (!resultImpuestos[tipoIRPFCod]) {
+                            resultImpuestos[tipoIRPFCod] = { base: 0, cuota: 0 };
+                        }
+                        const baseIRPF = importeNeto;
+                        const cuotaIRPF = (baseIRPF * impuestoMap[tipoIRPFCod]) / 100;
+                        resultImpuestos[tipoIRPFCod].base += baseIRPF;
+                        resultImpuestos[tipoIRPFCod].cuota += cuotaIRPF;
+                    }
+                });
+    
+                const result = Object.entries(resultImpuestos).map(([tipo, valores]) => ({
+                    tipo,
+                    base: valores.base.toFixed(2),
+                    cuota: valores.cuota.toFixed(2)
+                }));
+                               
+                 await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+    
+                const facturaVentaImpuestos = await libFacturaLinea.insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, result)
+               
+                res.status(200).send({ err: false, FacturaVentaImpuesto: result });
+            } else {
+                res.status(200).send({ err: true, errmsg: 'No se han podido obtener los datos finales de la factura' });
+            }
+        } catch (err) {
+            res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
+        }
+    }
+    
 
     async postObtenerFacturaLineas(req, res) {
         try {
@@ -43,7 +108,7 @@ class HttpFacturaLinea {
 
             const facturaVentaLineaNum = ultimaLineaNum + 1;
 
-            const resultadoVerificacion = await libFacturaLinea.verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaLineaNum);
+            const resultadoVerificacion = await libFacturaLinea.verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaNum);
 
             if (resultadoVerificacion.isValid) {
                 await libFacturaLinea.agregarFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum);
@@ -77,20 +142,20 @@ class HttpFacturaLinea {
     async postRellenarFacturaLinea(req, res) {
         try {
             const lineaFactura = req.body.lineaFactura;
-
+    
             if (Object.prototype.toString.call(lineaFactura) === '[object Object]') {
                 const atributosRequeridos = ['empresaCod', 'serieCod', 'facturaVentaNum', 'facturaVentaLineaNum'];
-                const atributosOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'importeDescuento', 'importeNeto', 'tipoIVACod', 'tipoIRPFCod'];
+                const atributosOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'tipoIVACod', 'tipoIRPFCod'];
                 const todosLosAtributos = [...atributosRequeridos, ...atributosOpcionales];
-
+    
                 const atributosLineaFactura = Object.keys(lineaFactura);
-
+    
                 const atributosObligatoriosDefinidos = atributosRequeridos.every(key => atributosLineaFactura.includes(key) && lineaFactura[key] !== null && lineaFactura[key] !== undefined);
-
+    
                 if (atributosObligatoriosDefinidos) {
                     const atributosFaltantes = atributosRequeridos.filter(key => !atributosLineaFactura.includes(key));
                     const atributosExtra = atributosLineaFactura.filter(key => !todosLosAtributos.includes(key));
-
+    
                     if (atributosFaltantes.length === 0 && atributosExtra.length === 0) {
                         const atributosInvalidos = atributosLineaFactura.filter(key => {
                             const value = lineaFactura[key];
@@ -100,14 +165,12 @@ class HttpFacturaLinea {
                                 case 'precio':
                                 case 'importeBruto':
                                 case 'descuento':
-                                case 'importeDescuento':
-                                case 'importeNeto':
                                     return isNaN(parseFloat(value));
                                 default:
                                     return typeof value !== 'string' || value.trim() === '';
                             }
                         });
-
+    
                         if (atributosInvalidos.length === 0) {
                             const camposParaActualizar = {};
                             for (const key of atributosOpcionales) {
@@ -115,21 +178,73 @@ class HttpFacturaLinea {
                                     camposParaActualizar[key] = lineaFactura[key];
                                 }
                             }
-
+    
                             for (const key of atributosRequeridos) {
                                 camposParaActualizar[key] = lineaFactura[key];
                             }
-
-                            const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
-
-                            if (resultadoVerificacion.isValid) {
-
-                                const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposParaActualizar);
-                                res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
-                            } else {
-                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage});
+    
+                            if (Object.keys(camposParaActualizar).length === atributosRequeridos.length) {
+                                return res.status(200).send({
+                                    err: true,
+                                    errmsg: 'No hay campos opcionales proporcionados para actualizar.'
+                                });
                             }
+    
+                            const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
+    
+                            if (resultadoVerificacion.isValid) {
+                                const lineaFacturaActual = await libFacturaLinea.obtenerFacturaVentaLinea(lineaFactura.empresaCod, lineaFactura.serieCod, lineaFactura.facturaVentaNum, lineaFactura.facturaVentaLineaNum);
+    
+                                const camposDiferentes = {};
+                                // Agregar siempre las claves de referencia
+                                for (const key of atributosRequeridos) {
+                                    camposDiferentes[key] = lineaFactura[key];
+                                }
+    
+                                // Comparar los campos opcionales
+                                for (const key in camposParaActualizar) {
+                                    if (lineaFacturaActual[key] !== camposParaActualizar[key]) {
+                                        camposDiferentes[key] = camposParaActualizar[key];
+                                    }
+                                }
+    
+                                if (Object.keys(camposDiferentes).length > atributosRequeridos.length) {
+                                    const camposImporteBrutoKeys = ['cantidad', 'precio', 'importeBruto'];
+    
+                                    const existenTodosImporteBruto = camposImporteBrutoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null);
+    
+                                    if (existenTodosImporteBruto) {
+                                        const validacionImporteBruto = await libFacturaLinea.verificarCamposImporteBruto(lineaFactura.cantidad, lineaFactura.precio, lineaFactura.importeBruto);
+                                        if (!validacionImporteBruto.isValid) {
+                                            return res.status(200).send({ err: true, errmsg: validacionImporteBruto.errorMessage });
+                                        }
+                                    }                                
+                                    
+                                    const camposImporteDescuentoKeys = ['cantidad', 'precio', 'importeBruto', 'descuento'];
+                                    const existenTodosImporteDescuento = camposImporteDescuentoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null);
 
+                                    if (existenTodosImporteDescuento) {
+                                        lineaFactura.importeDescuento = (lineaFactura.importeBruto * (lineaFactura.descuento / 100)).toFixed(2);
+                                        camposDiferentes.importeDescuento = lineaFactura.importeDescuento;
+
+                                        const importeNeto = lineaFactura.importeBruto - lineaFactura.importeDescuento;
+                                        camposDiferentes.importeNeto = importeNeto;
+                                    }
+                                    
+    
+                                    const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposDiferentes);
+    
+                                    res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
+    
+                                } else {
+                                    res.status(200).send({
+                                        err: false,
+                                        message: 'No hay cambios para actualizar.'
+                                    });
+                                }
+                            } else {
+                                res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage });
+                            }
                         } else {
                             res.status(200).send({
                                 err: true,
@@ -156,6 +271,7 @@ class HttpFacturaLinea {
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
+    
 
 
 

@@ -135,6 +135,8 @@ app.post('/eliminarFactura', httpFacturas.postEliminarFactura);
 
 //Funciones de lineas factura
 
+app.post('/obtenerDatosFinalesFactura', httpFacturaLinea.postObtenerDatosFinalesFactura);
+
 app.post('/obtenerFacturaLineas', httpFacturaLinea.postObtenerFacturaLineas);
 
 app.post('/eliminarFacturaLinea', httpFacturaLinea.postEliminarFacturaLinea);
