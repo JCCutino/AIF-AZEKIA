@@ -13,15 +13,15 @@ class HttpFacturaLinea {
 
     async postObtenerDatosFinalesFactura(req, res) {
         try {
-            const empresaCod = req.body.empresaCod;
-            const serieCod = req.body.serieCod;
-            const facturaVentaNum = req.body.facturaVentaNum;
+            const { empresaCod, serieCod, facturaVentaNum } = req.body;
     
+            // Obtener los tipos de impuestos
             const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
-            
+            // Obtener los importes de las líneas de la factura
             const importesLineas = await libFacturaLinea.obtenerImportesFacturaLineas(empresaCod, serieCod, facturaVentaNum);
     
             if (importesLineas) {
+                // Crear un mapa de impuestos para fácil acceso
                 const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
                     acc[curr.impuestoCod] = curr.porcentaje;
                     return acc;
@@ -37,8 +37,7 @@ class HttpFacturaLinea {
                         if (!resultImpuestos[tipoIVACod]) {
                             resultImpuestos[tipoIVACod] = { base: 0, cuota: undefined };
                         }
-                     // importeNeto debe estar redondeado previamente, redondeamos para evitar el clasico 0.1+0.2
-                     resultImpuestos[tipoIVACod].base = resultImpuestos[tipoIVACod].base + libGenerales.redondeoEuro (resultImpuestos[tipoIVACod].base + importeNeto);
+                        resultImpuestos[tipoIVACod].base += libGenerales.redondeoEuros(importeNeto);
                     }
     
                     // Procesar IRPF
@@ -46,35 +45,28 @@ class HttpFacturaLinea {
                         if (!resultImpuestos[tipoIRPFCod]) {
                             resultImpuestos[tipoIRPFCod] = { base: 0, cuota: undefined };
                         }
-                     // importeNeto debe estar redondeado previamente, redondeamos para evitar el clasico 0.1+0.2
-                     resultImpuestos[tipoIRPFCod].base =  resultImpuestos[tipoIRPFCod].base + libGenerales.redondeoEuro (resultImpuestos[tipoIRPFCod].base + importeNeto);
-                     // function redondeoEuros(n) { return +n.toFixed(2) } 1.555 > 1.55
-                     //  function re(n) { return Math.round(n * 100) / 100; } MEJOR ESTA?= pero no va con negativos (+infinito)
-                     // esta es la buena:
-                     //     return (Math.round(Math.abs(n) * 100) / 100)*Math.sign(n);
-                     //     return (Math.round(Math.abs(n) * 10**ndecs / 10**ndecs)*Math.sign(n);
-                     // pot10 = [1,10,100,1000,10000,100000,100000,1000000,10000000]
-                     //     return (Math.round(Math.abs(n) * pot10[ndec] / por10[ndec])*Math.sign(n);
-
-
+                        resultImpuestos[tipoIRPFCod].base += libGenerales.redondeoEuros(importeNeto);
                     }
                 });
     
                 const result = Object.entries(resultImpuestos).map(([tipo, valores]) => ({
                     tipo,
-                    base: valores.base, // suma de redondeados ya está redondeada
+                    base: valores.base, // La base ya está redondeada
                     cuota: libGenerales.redondeoEuros((valores.base * impuestoMap[tipo]) / 100)
                 }));
-                               
-                 await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
     
-                const facturaVentaImpuestos = await libFacturaLinea.insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, result)
-               
+                // Limpiar la tabla FacturaVentaImpuesto antes de insertar nuevos registros
+                await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+    
+                // Insertar los nuevos datos en FacturaVentaImpuesto
+                await libFacturaLinea.insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, result);
+                
                 res.status(200).send({ err: false, FacturaVentaImpuesto: result });
             } else {
                 res.status(200).send({ err: true, errmsg: 'No se han podido obtener los datos finales de la factura' });
             }
         } catch (err) {
+            console.error('Error al obtener datos finales de la factura:', err);
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }

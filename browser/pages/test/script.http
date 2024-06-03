@@ -31,15 +31,15 @@ Content-Type: application/json
   "empresaCod": "EM002",
   "serieCod": "S002",
   "facturaVentaNum": "1",
-  "facturaVentaLineaNum": "1",
+  "facturaVentaLineaNum": "3",
   "proyectoCod": "PR002",
   "texto": "Línea de factura 2",
-  "cantidad": 3,
-  "precio": 40,
-  "importeBruto": 120,
+  "cantidad": 6,
+  "precio": 50,
+  "importeBruto": 300,
   "descuento": 0,
-  "tipoIVACod": "IVA21",
-  "tipoIRPFCod": "IRPF15"
+  "tipoIVACod": "IVA4",
+  "tipoIRPFCod": "IRPF37"
   }
 }
 
