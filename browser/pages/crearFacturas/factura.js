@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function agregarFilaEditable() {
         if (!filaGuardada) {
-            alert("Debe guardar la fila actual antes de añadir una nueva.");
+            mostrarError("Debe guardar la fila actual antes de añadir una nueva.");
             return;
         }
     
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function() {
             mostrarCuerpoTabla();
             agregarFilaEditable();
         } else {
-            alert("Debe guardar la fila actual antes de añadir una nueva.");
+            mostrarError("Debe guardar la fila actual antes de añadir una nueva.");
         }
     });
 
@@ -346,27 +346,27 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Validar que los campos no sean nulos o estén vacíos
         if (!codigoFactura) {
-            alert('Por favor, ingrese el número de factura.');
+            mostrarError('Por favor, ingrese el número de factura.');
             return false;
         }
         
         if (codigoEmpresa === '0') {
-            alert('Por favor, seleccione una empresa.');
+            mostrarError('Por favor, seleccione una empresa.');
             return false;
         }
         
         if (!fecha) {
-            alert('Por favor, ingrese la fecha de emisión.');
+            mostrarError('Por favor, ingrese la fecha de emisión.');
             return false;
         }
         
         if (codigoCliente === '0') {
-            alert('Por favor, seleccione un cliente.');
+            mostrarError('Por favor, seleccione un cliente.');
             return false;
         }
         
         if (serieCod === '0') {
-            alert('Por favor, seleccione una serie de facturación.');
+            mostrarError('Por favor, seleccione una serie de facturación.');
             return false;
         }
         
@@ -400,9 +400,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 const result = await response.json();
     
                 if (result.err) {
-                    alert(`Error: ${result.errmsg}`);
+                    mostrarError(`Error: ${result.errmsg}`);
                 } else {
-                    alert('Factura guardada exitosamente.');
+                    mostrarError('Factura guardada exitosamente.');
                     mostrarTabla();
                     document.getElementById('btnGuardarFacturacion').style.display = 'none';
 
@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             } catch (error) {
                 console.error('Error al agregar factura:', error);
-                alert('Hubo un error al guardar la factura. Inténtelo de nuevo.');
+                mostrarError('Hubo un error al guardar la factura. Inténtelo de nuevo.');
             }
             
         }
@@ -480,14 +480,14 @@ async function guardarLineaFactura(event) {
         const result = await response.json();
 
         if (result.err) {
-            alert(`Error: ${result.errmsg}`);
+            mostrarError(`Error: ${result.errmsg}`);
         } else {
-            alert('Línea de factura guardada exitosamente.');
+            mostrarError('Línea de factura guardada exitosamente.');
             filaGuardada = true; // Marca la fila como guardada
         }
     } catch (error) {
         console.error('Error al guardar línea de factura:', error);
-        alert('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
     }
 }
 

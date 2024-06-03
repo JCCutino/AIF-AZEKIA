@@ -44,13 +44,13 @@ Content-Type: application/json
 }
 
 ### Obtenemos cuotas de la factura
-POST http://localhost:3002/obtenerFacturaLineas HTTP/1.1
+POST http://localhost:3000/obtenerFacturaLineas HTTP/1.1
 Content-Type: application/json
 
 
   {
-  "empresaCod": "EM002",
-  "serieCod": "S002",
-  "facturaVentaNum": "1"
+  "empresaCod": "EM001",
+  "serieCod": "S001",
+  "facturaVentaNum": "3"
 
   }
