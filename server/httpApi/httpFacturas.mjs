@@ -94,6 +94,8 @@ class HttpFacturas {
                 await libFacturaLinea.eliminarLineasPorFactura(facturaVentaNum, empresaCod, serieCod);
             }
 
+            await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+
             const facturaEliminada = await libFacturas.eliminarFactura(empresaCod, serieCod, facturaVentaNum);
 
             res.send(200, { err: false });

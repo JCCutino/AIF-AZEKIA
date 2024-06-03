@@ -343,7 +343,7 @@ CREATE TABLE [dbo].[FacturaVentaLinea](
 	[texto] [varchar](150) NULL,
 	[cantidad] [int] NULL,
 	[precio] [decimal](10, 2) NULL,
-	[importeBruto] [decimal](10, 0) NULL,
+	[importeBruto] [decimal](10, 2) NULL,
 	[descuento] [decimal](10, 2) NULL,
 	[importeDescuento] [decimal](10, 2) NULL,
 	[importeNeto] [decimal](10, 2) NULL,

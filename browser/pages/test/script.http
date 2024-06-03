@@ -34,9 +34,9 @@ Content-Type: application/json
   "facturaVentaLineaNum": "3",
   "proyectoCod": "PR002",
   "texto": "Línea de factura 2",
-  "cantidad": 6,
-  "precio": 50,
-  "importeBruto": 300,
+  "cantidad": 8,
+  "precio": 5.40,
+  "importeBruto": 43.20,
   "descuento": 0,
   "tipoIVACod": "IVA4",
   "tipoIRPFCod": "IRPF37"
@@ -45,6 +45,18 @@ Content-Type: application/json
 
 ### Obtenemos cuotas de la factura
 POST http://localhost:3000/obtenerDatosFinalesFactura HTTP/1.1
+Content-Type: application/json
+
+
+  {
+  "empresaCod": "EM002",
+  "serieCod": "S002",
+  "facturaVentaNum": "1"
+
+  }
+
+### Eliminamos una factura
+POST http://localhost:3000/eliminarFactura HTTP/1.1
 Content-Type: application/json
 
 
