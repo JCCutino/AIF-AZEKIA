@@ -316,23 +316,32 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
+
     // Función para guardar los datos de una fila en la base de datos
     async function guardarFila() {
         const fila = this.parentNode.parentNode;
-        const inputs = fila.querySelectorAll("td[contenteditable='true']");
+        const inputs = fila.querySelectorAll("td[contenteditable='true']");   
+    // let empresaCod =  document.getElementById('CodigoEmpresa').value;
+    // let serieCod = document.getElementById('serieCod').value;
+    // let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+    // let facturaVentaLineaNum = ;
         const detalle = {
+            empresaCod: empresaCod,
+            serieCod: serieCod,
+            facturaVentaNum: facturaVentaNum,
             proyectoCod: fila.querySelector("#proyectoCod").value,
-            descripcion: inputs[1].textContent.trim(),
+            texto: inputs[1].textContent.trim(),
             cantidad: inputs[2].textContent.trim(),
             precio: inputs[3].textContent.trim(),
             importeBruto: inputs[4].textContent.trim(),
             descuento: inputs[5].textContent.trim(),
-            iva: fila.querySelector("#tipoIVA").value,
-            irpf: fila.querySelector("#tipoIRPF").value
+
+            tipoIVACod: fila.querySelector("#tipoIVA").value,
+            tipoIRPFCod: fila.querySelector("#tipoIRPF").value
         };
 
         try {
-            const response = await fetch('/agregarFactura', {
+            const response = await fetch('/rellenarFacturaLinea', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
