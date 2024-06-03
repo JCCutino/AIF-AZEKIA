@@ -421,44 +421,30 @@ class LibFacturaLinea {
             throw 'Error al limpiar tabla FacturaVentaImpuesto';
         }
     }
-
     async insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, facturaVentaImpuestos) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();
-            const query = `
-            INSERT INTO FacturaVentaImpuesto 
-            (empresaCod, serieCod, facturaVentaNum, impuestoCod, base, cuota)
-            VALUES 
-            (@empresaCod, @serieCod, @facturaVentaNum, @impuestoCod, @base, @cuota)
-        `   
-            request.input('empresaCod', empresaCod);
-            request.input('serieCod', serieCod);
-            request.input('facturaVentaNum', facturaVentaNum);
-            let num = 1
-
-            // Insertar los nuevos registros
-            for (const impuesto of facturaVentaImpuestos) {
-                
-                num += 1;
-
-                const { tipo, base, cuota } = impuesto;
-               
-              
-            request.input('impuestoCod', tipo);
-            request.input('base', base);
-            request.input('cuota', cuota);
-        
             
-                           
-                  
-                   // Cerrar la conexión
-            }
+            // Generar la consulta con múltiples valores
+            let query = `
+                INSERT INTO FacturaVentaImpuesto 
+                (empresaCod, serieCod, facturaVentaNum, impuestoCod, base, cuota)
+                VALUES 
+            `;
     
-            const resultado = await request.query(query);
+            const values = facturaVentaImpuestos.map(impuesto => {
+                const { tipo, base, cuota } = impuesto;
+                return `('${empresaCod}', '${serieCod}', ${facturaVentaNum}, '${tipo}', ${base}, ${cuota})`;
+            });
+    
+            query += values.join(', ');
+    
+            // Ejecutar la consulta
+            await request.query(query);
+    
+            // Cerrar la conexión
             await pool.close();
-
-    
         } catch (error) {
             console.error('Error al insertar datos en FacturaVentaImpuesto:', error);
             throw 'Error al insertar datos en FacturaVentaImpuesto';
@@ -467,7 +453,7 @@ class LibFacturaLinea {
     
     
 
-    async obtenerDatosFinalesFactura(empresaCod, serieCod, facturaVentaNum) {
+    async obtenerImportesFacturaLineas(empresaCod, serieCod, facturaVentaNum) {
         try {
             const pool = await dbConexion.conectarDB();
             const request = pool.request();

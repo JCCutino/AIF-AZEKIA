@@ -148,13 +148,6 @@ app.post('/rellenarFacturaLinea', httpFacturaLinea.postRellenarFacturaLinea);
 //Funciones de prueba
 
 
-
-
-app.post('/obtenerFacturas', async (req, res) => {
-  const facturas = await httpFacturas.postObtenerFacturas(req, res);
-  res.json({ datosFactura: facturas });
-});
-
 app.listen(process.env.PORT, () => {
     console.log(`Example app listening at http://localhost:${process.env.PORT}`);
 });
