@@ -94,8 +94,11 @@ class HttpFacturaLinea {
 
     async postAgregarFacturaLinea(req, res) {
         try {
-            const { empresaCod, serieCod, facturaVentaNum } = req.body;
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+            const facturaVentaNum = req.body.facturaVentaNum;
 
+            console.log(empresaCod, serieCod, facturaVentaNum);
             if (!empresaCod || !serieCod || !facturaVentaNum) {
                 return res.status(400).send({ err: true, errmsg: "Faltan parámetros requeridos." });
             }
@@ -143,6 +146,7 @@ class HttpFacturaLinea {
         try {
             const lineaFactura = req.body.lineaFactura;
     
+            console.log(lineaFactura);
             if (Object.prototype.toString.call(lineaFactura) === '[object Object]') {
                 const atributosRequeridos = ['empresaCod', 'serieCod', 'facturaVentaNum', 'facturaVentaLineaNum'];
                 const atributosOpcionales = ['proyectoCod', 'texto', 'cantidad', 'precio', 'importeBruto', 'descuento', 'tipoIVACod', 'tipoIRPFCod'];

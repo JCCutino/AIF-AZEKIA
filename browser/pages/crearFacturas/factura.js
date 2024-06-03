@@ -133,6 +133,7 @@ async function obtenerTiposIVA() {
                 mostrarError('Error al obtener tipos de IVA: ' + data.errmsg);
             } else {
                 cargarTiposIVASelect(data.IVA);
+                console.log(data.IVA);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -144,18 +145,19 @@ async function obtenerTiposIVA() {
 
 
 function cargarTiposIVASelect(tiposIVA) {
-    const selectIVA = document.getElementById("tipoIVA");
+    const selectsIVA = document.querySelectorAll("#tipoIVA");
 
-    selectIVA.innerHTML = "";
+    selectsIVA.forEach(select => {
+        select.innerHTML = "";
 
-    tiposIVA.forEach((tipo) => {
-        let option = document.createElement("option");
-        option.text = tipo.porcentaje;
-        option.value = tipo.tipoImpuesto;
-        selectIVA.add(option);
+        tiposIVA.forEach((tipo) => {
+            let option = document.createElement("option");
+            option.text = tipo.porcentaje;
+            option.value = tipo.impuestoCod;
+            select.add(option);
+        });
     });
 }
-
 
 async function obtenerTiposIRPF() {
     try {
@@ -183,15 +185,18 @@ async function obtenerTiposIRPF() {
 }
 
 function cargarTiposIRPFSelect(tiposIRPF) {
-    const selectIRPF = document.getElementById("tipoIRPF");
+    const selectsIRPF = document.querySelectorAll("#tipoIRPF");
 
-    selectIRPF.innerHTML = "";
+    selectsIRPF.forEach(select => {
+        select.innerHTML = "";
 
-    tiposIRPF.forEach((tipo) => {
-        let option = document.createElement("option");
-        option.text = tipo.porcentaje;
-        option.value = tipo.tipoImpuesto;
-        selectIRPF.add(option);
+        tiposIRPF.forEach((tipo) => {
+            console.log(tipo.impuestoCod)
+            let option = document.createElement("option");
+            option.text = tipo.porcentaje;
+            option.value = tipo.impuestoCod;
+            select.add(option);
+        });
     });
 }
 
@@ -223,15 +228,17 @@ async function obtenerProyectosCod() {
 
 
 function cargarProyectosCodSelect(ProyectosCod) {
-    const selectProyecto = document.getElementById("proyectoCod");
+    const selectsProyecto = document.querySelectorAll("#proyectoCod");
 
-    selectProyecto.innerHTML = "";
+    selectsProyecto.forEach(select => {
+        select.innerHTML = "";
 
-    ProyectosCod.forEach((proyecto) => {
-        let option = document.createElement("option");
-        option.text = proyecto.nombre;
-        option.value = proyecto.proyectoCod;
-        selectProyecto.add(option);
+        ProyectosCod.forEach((proyecto) => {
+            let option = document.createElement("option");
+            option.text = proyecto.nombre;
+            option.value = proyecto.proyectoCod;
+            select.add(option);
+        });
     });
 }
 
@@ -258,17 +265,18 @@ document.addEventListener("DOMContentLoaded", function() {
     
 
     // Función para añadir una nueva fila a la tabla
+    let contadorFilas = 0;
+
     async function agregarFilaEditable() {
         if (!filaGuardada) {
             alert("Debe guardar la fila actual antes de añadir una nueva.");
             return;
         }
-
+    
         let empresaCod =  document.getElementById('CodigoEmpresa').value;
         let serieCod = document.getElementById('serieCod').value;
         let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-
-        const datos = { empresaCod, serieCod, facturaVentaNum };
+    
         
         try {
             const response = await fetch('/agregarFacturaLinea', {
@@ -276,9 +284,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(datos)
+                body: JSON.stringify({empresaCod, serieCod, facturaVentaNum})
             });
-
+    
             if (response.ok) {
                 const data = await response.json();
                 if (data.err) {
@@ -290,15 +298,16 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch (error) {
             console.log('Error al llamar a la API: ' + error.message);
         }
-
+    
         filaGuardada = false; // Estado de fila no guardada
+        contadorFilas++; // Incrementa el contador de filas
         const fila = `
-        <tr>
+        <tr id="fila-${contadorFilas}" class="factura-linea">
             <td><select id="proyectoCod"></select></td>
             <td contenteditable="true"></td>
             <td contenteditable="true"></td>
             <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
+            <td contenteditable="false"></td>
             <td contenteditable="true"></td>
             <td><select id="tipoIVA"></select></td>
             <td><select id="tipoIRPF"></select></td>
@@ -311,67 +320,12 @@ document.addEventListener("DOMContentLoaded", function() {
         await obtenerProyectosCod();
         await obtenerTiposIRPF();
         await obtenerTiposIVA();
-
-
+    
+        document.querySelectorAll('.btnGuardarLinea').forEach(button => {
+            button.addEventListener('click', guardarLineaFactura);
+        });
     }
-
-
-
-    // Función para guardar los datos de una fila en la base de datos
-    async function guardarFila() {
-        const fila = this.parentNode.parentNode;
-        const inputs = fila.querySelectorAll("td[contenteditable='true']");   
-    // let empresaCod =  document.getElementById('CodigoEmpresa').value;
-    // let serieCod = document.getElementById('serieCod').value;
-    // let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-    // let facturaVentaLineaNum = ;
-        const detalle = {
-            empresaCod: empresaCod,
-            serieCod: serieCod,
-            facturaVentaNum: facturaVentaNum,
-            proyectoCod: fila.querySelector("#proyectoCod").value,
-            texto: inputs[1].textContent.trim(),
-            cantidad: inputs[2].textContent.trim(),
-            precio: inputs[3].textContent.trim(),
-            importeBruto: inputs[4].textContent.trim(),
-            descuento: inputs[5].textContent.trim(),
-
-            tipoIVACod: fila.querySelector("#tipoIVA").value,
-            tipoIRPFCod: fila.querySelector("#tipoIRPF").value
-        };
-
-        try {
-            const response = await fetch('/rellenarFacturaLinea', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(detalle)
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data.err) {
-                    mostrarError('Error al guardar la línea de factura: ' + data.errmsg);
-                    filaGuardada = false;
-                } else {
-                    filaGuardada = true; // Marcar la fila como guardada
-                    alert('Línea guardada exitosamente');
-                }
-            } else {
-                mostrarError('Error al llamar a la API: ' + response.statusText);
-                filaGuardada = false;
-            }
-        } catch (error) {
-            mostrarError('Error al llamar a la API: ' + error.message);
-            filaGuardada = false;
-        }
-    }
-
-    document.querySelectorAll('btnGuardarLinea').forEach(button => {
-        button.addEventListener('click', guardarFila);
-    });
-
+    
     // Agregar evento al botón "Añadir Fila"
     document.getElementById("btnAñadirFila").addEventListener("click", function() {
         if (filaGuardada) {
@@ -450,6 +404,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     alert('Factura guardada exitosamente.');
                     mostrarTabla();
+                    document.getElementById('btnGuardarFacturacion').style.display = 'none';
+
+                    // Hacer que los campos sean no editables
+                    document.getElementById('CodigoEmpresa').disabled = true;
+                    document.getElementById('serieCod').disabled = true;
+                    document.getElementById('CodigoFactura').disabled = true;
+                    document.getElementById('CodigoCliente').disabled = true;
+                    document.getElementById('Fecha').disabled = true;
                 }
             } catch (error) {
                 console.error('Error al agregar factura:', error);
@@ -465,4 +427,76 @@ document.addEventListener("DOMContentLoaded", function() {
     obtenerclientesCod();
     obtenerEmpresasCod();
     obtenerProyectosCod();
+});
+
+
+
+async function guardarLineaFactura(event) {
+    const button = event.target;
+    const linea = button.closest('.factura-linea');
+
+    const empresaCod = document.getElementById('CodigoEmpresa').value;
+    const serieCod = document.getElementById('serieCod').value;
+    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1; // Índice de la línea + 1
+    facturaVentaLineaNum= facturaVentaLineaNum.toString();
+
+    // Declarar importeBruto antes de usarlo
+    let importeBruto = null;
+
+    // Calcular importeBruto
+    const precio = parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null;
+    const cantidad = parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null;
+    importeBruto = (precio !== null && cantidad !== null) ? precio * cantidad : null;
+
+    const lineaFactura = {
+        empresaCod,
+        serieCod,
+        facturaVentaNum,
+        facturaVentaLineaNum,
+        proyectoCod: linea.querySelector('#proyectoCod').value || null,
+        texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
+        cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
+        precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
+        importeBruto: importeBruto, // Aquí ya se ha calculado
+        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()) || null,
+        tipoIVACod: linea.querySelector('#tipoIVA').value || null,
+        tipoIRPFCod: linea.querySelector('#tipoIRPF').value || null
+    };
+
+    linea.querySelectorAll('td')[4].innerText = importeBruto !== null ? importeBruto.toFixed(2) : '';
+    console.log(lineaFactura);
+
+    try {
+        const response = await fetch('/rellenarFacturaLinea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({lineaFactura: lineaFactura})
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            alert(`Error: ${result.errmsg}`);
+        } else {
+            alert('Línea de factura guardada exitosamente.');
+            filaGuardada = true; // Marca la fila como guardada
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        alert('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+document.getElementById('btnTerminarFactura').addEventListener('click', function() {
+    // Mostrar el modal ModalFinFactura
+    $('#ModalFinFactura').modal('show');
+});
+
+document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function() {
+    // Mostrar el modal ModalConfirmarBorrar
+    $('#ModalConfirmarBorrar').modal('show');
 });
