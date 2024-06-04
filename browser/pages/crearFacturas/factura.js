@@ -322,8 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    // Función para añadir una nueva fila a la tabla
-    let contadorFilas = 0;
+
 
     async function agregarFilaEditable() {
         if (!filaGuardada) {
@@ -358,21 +357,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         filaGuardada = false; // Estado de fila no guardada
-        contadorFilas++; // Incrementa el contador de filas
-        const uniqueButtonId = `btnGuardarLinea-${contadorFilas}`;
+        let idFila = await obtenerUltimoNumFila();
+        const idBotonGuardar = `btnGuardarLinea-${idFila}`;
+        const idBotonBorrar = `btnBorrarLinea-${idFila}`;
 
         const fila = `
-        <tr id="fila-${contadorFilas}" class="factura-linea">
+        <tr id="fila-${idFila}" class="factura-linea">
             <td><select id="proyectoCod"></select></td>
-            <td contenteditable="true" id="campo1-${contadorFilas}"></td>
-            <td contenteditable="true" id="campo2-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
-            <td contenteditable="true" id="campo3-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
+            <td contenteditable="true" id="campo1-${idFila}"></td>
+            <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
+            <td contenteditable="true" id="campo3-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="false"></td>
-            <td contenteditable="true" id="campo4-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
+            <td><input type="number" id="campo4-${idFila}" step="0.01" min="0"></td>
             <td><select id="tipoIVA"></select></td>
             <td><select id="tipoIRPF"></select></td>
             <td class="text-right">
-                <button type="button" id="${uniqueButtonId}" class="btn btn-success btnGuardarLinea">Guardar</button>
+                <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
+                <button type="button" id="${idBotonBorrar}" class=" mt-3 btn btn-danger btnBorrarLinea">Borrar</button>
             </td>
         </tr>
         `;
@@ -386,9 +387,12 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener('click', guardarLineaFactura);
         });
 
-        document.querySelectorAll(`#fila-${contadorFilas} [contenteditable=true]`).forEach((element) => {
+        document.querySelectorAll('.btnBorrarLinea').forEach(button => {
+            button.addEventListener('click', borrarLineaFactura);
+        });
+        document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
-                const camposEditables = [`campo1-${contadorFilas}`, `campo2-${contadorFilas}`, `campo3-${contadorFilas}`, `campo4-${contadorFilas}`];
+                const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = true;
         
                 camposEditables.forEach((idCampo) => {
@@ -398,7 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
         
-                const botonGuardar = document.getElementById(uniqueButtonId);
+                const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     if (algunCampoCambio && botonGuardar.disabled) {
                         botonGuardar.disabled = false;
@@ -568,6 +572,74 @@ async function guardarLineaFactura(event) {
             mostrarError('Línea de factura guardada exitosamente.');
             filaGuardada = true;
             button.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+async function borrarLineaFactura(event) {
+    const button = event.target;
+    const linea = button.closest('.factura-linea');
+
+    const empresaCod = document.getElementById('CodigoEmpresa').value;
+    const serieCod = document.getElementById('serieCod').value;
+    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1;
+    facturaVentaLineaNum = facturaVentaLineaNum.toString();
+
+
+    try {
+        const response = await fetch('/eliminarFacturaLinea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ empresaCod: empresaCod, serieCod: serieCod, facturaVentaNum: facturaVentaNum, facturaVentaLineaNum: facturaVentaLineaNum})
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            mostrarError(`Error: ${result.errmsg}`);
+        } else {
+            mostrarError('Línea de factura guardada exitosamente.');
+            filaGuardada = true;
+            button.disabled = true;
+            linea.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+async function obtenerUltimoNumFila() {
+
+    try {
+
+        const empresaCod = document.getElementById('CodigoEmpresa').value;
+        const serieCod = document.getElementById('serieCod').value;
+        const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+        const response = await fetch('/obtenerUltimoNumFila', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum})
+
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            mostrarError(`Error: ${result.errmsg}`);
+        } else {
+            console.log(result.ultimoNum);
+            return result.ultimoNum
         }
     } catch (error) {
         console.error('Error al guardar línea de factura:', error);

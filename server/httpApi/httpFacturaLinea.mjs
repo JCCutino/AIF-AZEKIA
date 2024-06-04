@@ -299,7 +299,21 @@ class HttpFacturaLinea {
     }
     
 
+    async postObtenerUltimoNumFila(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+            const facturaVentaNum = req.body.facturaVentaNum;
 
+            const ultimoNum = await libFacturaLinea.obtenerUltimoNumFila(empresaCod, serieCod, facturaVentaNum);
+
+            
+            res.send(200, { err: false, ultimoNum: ultimoNum });
+        } catch (err) {
+            console.error('Error al eliminar factura:', err);
+            res.send(500);
+        }
+    }
 
 }
 

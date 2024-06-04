@@ -490,6 +490,37 @@ class LibFacturaLinea {
             throw new Error('Error al obtener los totales de la factura:', error);
         }
     }
+    async obtenerUltimoNumFila(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+
+            const query = `
+                SELECT TOP 1 facturaVentaLineaNum 
+                FROM FacturaVentaLinea
+                WHERE empresaCod = @empresaCod 
+                  AND serieCod = @serieCod 
+                  AND facturaVentaNum = @facturaVentaNum 
+                ORDER BY facturaVentaLineaNum DESC
+            `;
+
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+            request.input('facturaVentaNum', facturaVentaNum);
+
+            const resultados = await request.query(query);
+            await pool.close();
+
+            if (resultados.recordset.length > 0) {
+                return resultados.recordset[0].facturaVentaLineaNum || 0;
+            } else {
+                return 0;
+            }
+        } catch (error) {
+            console.error('Error al obtener facturaVentaLineaNum:', error);
+            throw 'Error al obtener facturaVentaLineaNum';
+        }
+    }
 
 }
 

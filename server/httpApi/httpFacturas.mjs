@@ -98,7 +98,11 @@ class HttpFacturas {
 
             const facturaEliminada = await libFacturas.eliminarFactura(empresaCod, serieCod, facturaVentaNum);
 
+            if(facturaEliminada) {
             res.send(200, { err: false });
+            }else{
+                res.send(200, { err: true, errmsg: "Error al eliminar factura" });
+            }
         } catch (err) {
             console.error('Error al eliminar factura:', err);
             res.send(500);
