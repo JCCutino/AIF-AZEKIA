@@ -14,16 +14,16 @@ async function obtenerclientesCod() {
             const data = await response.json();
 
             if (data.err) {
-                mostrarError('Error al obtener clientesCod:'+ data.errmsg)
+                mostrarError('Error al obtener clientesCod:' + data.errmsg)
 
             } else {
                 agregarclientesCodSelect(data.datosCliente);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al llamar a la API:'+ error.message);
+        mostrarError('Error al llamar a la API:' + error.message);
     }
 }
 
@@ -32,7 +32,7 @@ function agregarclientesCodSelect(datoscliente) {
 
     selectAgregarclienteCod.innerHTML = "";
 
-    datoscliente.forEach( (cliente) => {
+    datoscliente.forEach((cliente) => {
         let optionAgregar = document.createElement("option");
         optionAgregar.text = cliente.razonSocial;
         optionAgregar.value = cliente.clienteCod;
@@ -54,16 +54,16 @@ async function obtenerEmpresasCod() {
             const data = await response.json();
 
             if (data.err) {
-                mostrarError('Error al obtener EmpresaCod:'+ data.errmsg)
+                mostrarError('Error al obtener EmpresaCod:' + data.errmsg)
 
             } else {
                 agregarEmpresasCodSelect(data.datosEmpresa);
             }
         } else {
-            mostrarError('Error al llamar a la API:'+ response.statusText);
+            mostrarError('Error al llamar a la API:' + response.statusText);
         }
     } catch (error) {
-        mostrarError('Error al llamar a la API:'+ error.message);
+        mostrarError('Error al llamar a la API:' + error.message);
     }
 }
 
@@ -86,7 +86,7 @@ function agregarEmpresasCodSelect(datosEmpresa) {
     });
 
     // Añadir el evento change al select
-    selectAgregarEmpresaCod.addEventListener("change", function() {
+    selectAgregarEmpresaCod.addEventListener("change", function () {
         const selectedEmpresaCodValor = selectAgregarEmpresaCod.value;
         // Llama a la función cargarSeriesSelect con el código de empresa seleccionado
         obtenerSeries(selectedEmpresaCodValor);
@@ -135,7 +135,7 @@ function cargarSeriesSelect(series, empresaCod) {
         }
     });
 
-    selectSeries.addEventListener("change", function() {
+    selectSeries.addEventListener("change", function () {
         const selectedEmpresaCodValor = selectAgregarEmpresaCod.value;
         const selectedSerieCodValor = selectSeries.value;
 
@@ -143,28 +143,28 @@ function cargarSeriesSelect(series, empresaCod) {
     });
 }
 async function obtenerRecomendacionNumFactura(empresaCod, serieCod) {
-try {
-    const response = await fetch('/obtenerRecomendacionNumeroFactura', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({empresaCod, serieCod})
-    });
+    try {
+        const response = await fetch('/obtenerRecomendacionNumeroFactura', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ empresaCod, serieCod })
+        });
 
-    if (response.ok) {
-        const data = await response.json();
-        if (data.err) {
-            console.log('Error al obtener la recomendacion del número de la factura: ' + data.errmsg);
-        }else{
-            await recomendarNumeroFactura(data.recomendacionNumeroFactura);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.err) {
+                console.log('Error al obtener la recomendacion del número de la factura: ' + data.errmsg);
+            } else {
+                await recomendarNumeroFactura(data.recomendacionNumeroFactura);
+            }
+        } else {
+            console.log('Error al llamar a la API: ' + response.statusText);
         }
-    } else {
-        console.log('Error al llamar a la API: ' + response.statusText);
+    } catch (error) {
+        console.log('Error al llamar a la API: ' + error.message);
     }
-} catch (error) {
-    console.log('Error al llamar a la API: ' + error.message);
-}
 }
 
 async function recomendarNumeroFactura(numeroFactura) {
@@ -300,7 +300,7 @@ function cargarProyectosCodSelect(ProyectosCod) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Ocultar la tabla al cargar la página
     document.querySelector(".table").style.display = "none";
     document.getElementById("btnTerminarFactura").style.display = "none";
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("DetalleFactura").style.display = "table-row-group";
     }
 
-    
+
 
     // Función para añadir una nueva fila a la tabla
     let contadorFilas = 0;
@@ -330,62 +330,89 @@ document.addEventListener("DOMContentLoaded", function() {
             mostrarError("Debe guardar la fila actual antes de añadir una nueva.");
             return;
         }
-    
-        let empresaCod =  document.getElementById('CodigoEmpresa').value;
+
+        let empresaCod = document.getElementById('CodigoEmpresa').value;
         let serieCod = document.getElementById('serieCod').value;
         let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-    
-        
+
+
         try {
             const response = await fetch('/agregarFacturaLinea', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({empresaCod, serieCod, facturaVentaNum})
+                body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.err) {
                     console.log('Error al agregar la línea de factura: ' + data.errmsg);
-                } 
+                }
             } else {
                 console.log('Error al llamar a la API: ' + response.statusText);
             }
         } catch (error) {
             console.log('Error al llamar a la API: ' + error.message);
         }
-    
+
         filaGuardada = false; // Estado de fila no guardada
         contadorFilas++; // Incrementa el contador de filas
+        const uniqueButtonId = `btnGuardarLinea-${contadorFilas}`;
+
         const fila = `
         <tr id="fila-${contadorFilas}" class="factura-linea">
             <td><select id="proyectoCod"></select></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
+            <td contenteditable="true" id="campo1-${contadorFilas}"></td>
+            <td contenteditable="true" id="campo2-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
+            <td contenteditable="true" id="campo3-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="false"></td>
-            <td contenteditable="true"></td>
+            <td contenteditable="true" id="campo4-${contadorFilas}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td><select id="tipoIVA"></select></td>
             <td><select id="tipoIRPF"></select></td>
             <td class="text-right">
-                <button type="button" class="btn btn-success btnGuardarLinea">Guardar</button>
+                <button type="button" id="${uniqueButtonId}" class="btn btn-success btnGuardarLinea">Guardar</button>
             </td>
         </tr>
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
+
         await obtenerProyectosCod();
         await obtenerTiposIRPF();
         await obtenerTiposIVA();
-    
+
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
         });
+
+        document.querySelectorAll(`#fila-${contadorFilas} [contenteditable=true]`).forEach((element) => {
+            element.addEventListener('input', () => {
+                const camposEditables = [`campo1-${contadorFilas}`, `campo2-${contadorFilas}`, `campo3-${contadorFilas}`, `campo4-${contadorFilas}`];
+                let algunCampoCambio = true;
+        
+                camposEditables.forEach((idCampo) => {
+                    const campo = document.getElementById(idCampo);
+                    if (campo && campo.innerText.trim() !== '') {
+                        algunCampoCambio = true;
+                    }
+                });
+        
+                const botonGuardar = document.getElementById(uniqueButtonId);
+                if (botonGuardar) { // Verifica si el botón existe
+                    if (algunCampoCambio && botonGuardar.disabled) {
+                        botonGuardar.disabled = false;
+                    } else if (!algunCampoCambio && !botonGuardar.disabled) {
+                        botonGuardar.disabled = true;
+                    }
+                }
+            });
+        });
+        
     }
-    
+
     // Agregar evento al botón "Añadir Fila"
-    document.getElementById("btnAñadirFila").addEventListener("click", function() {
+    document.getElementById("btnAñadirFila").addEventListener("click", function () {
         if (filaGuardada) {
             mostrarCuerpoTabla();
             agregarFilaEditable();
@@ -401,39 +428,39 @@ document.addEventListener("DOMContentLoaded", function() {
         const fecha = document.getElementById('Fecha').value;
         const codigoCliente = document.getElementById('CodigoCliente').value;
         const serieCod = document.getElementById('serieCod').value;
-        
+
         // Validar que los campos no sean nulos o estén vacíos
         if (!codigoFactura) {
             mostrarError('Por favor, ingrese el número de factura.');
             return false;
         }
-        
+
         if (codigoEmpresa === '0') {
             mostrarError('Por favor, seleccione una empresa.');
             return false;
         }
-        
+
         if (!fecha) {
             mostrarError('Por favor, ingrese la fecha de emisión.');
             return false;
         }
-        
+
         if (codigoCliente === '0') {
             mostrarError('Por favor, seleccione un cliente.');
             return false;
         }
-        
+
         if (serieCod === '0') {
             mostrarError('Por favor, seleccione una serie de facturación.');
             return false;
         }
-        
+
         // Si todos los campos son válidos, retorna true
         return true;
 
     }
-    
-    document.getElementById('btnGuardarFacturacion').addEventListener('click', async function() {
+
+    document.getElementById('btnGuardarFacturacion').addEventListener('click', async function () {
         if (await verificarCamposFormulario()) {
             // Si los campos son válidos, preparar los datos y llamar a la API para agregar la factura
             const datos = {
@@ -445,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             console.log(datos);
-    
+
             try {
                 const response = await fetch('/agregarFactura', {
                     method: 'POST',
@@ -454,13 +481,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     },
                     body: JSON.stringify({ factura: datos })
                 });
-    
+
                 const result = await response.json();
-    
+
                 if (result.err) {
                     mostrarError(`Error: ${result.errmsg}`);
                 } else {
-                    mostrarError('Factura guardada exitosamente.');
                     mostrarTabla();
                     document.getElementById('btnGuardarFacturacion').style.display = 'none';
 
@@ -475,10 +501,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error('Error al agregar factura:', error);
                 mostrarError('Hubo un error al guardar la factura. Inténtelo de nuevo.');
             }
-            
+
         }
     });
-    
+
     obtenerTiposIVA();
     obtenerTiposIRPF();
     obtenerclientesCod();
@@ -496,8 +522,8 @@ async function guardarLineaFactura(event) {
     const serieCod = document.getElementById('serieCod').value;
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
-    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1; 
-    facturaVentaLineaNum= facturaVentaLineaNum.toString();
+    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1;
+    facturaVentaLineaNum = facturaVentaLineaNum.toString();
 
     // Declarar importeBruto antes de usarlo
     let importeBruto = null;
@@ -531,7 +557,7 @@ async function guardarLineaFactura(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({lineaFactura: lineaFactura})
+            body: JSON.stringify({ lineaFactura: lineaFactura })
         });
 
         const result = await response.json();
@@ -540,7 +566,8 @@ async function guardarLineaFactura(event) {
             mostrarError(`Error: ${result.errmsg}`);
         } else {
             mostrarError('Línea de factura guardada exitosamente.');
-            filaGuardada = true; // Marca la fila como guardada
+            filaGuardada = true;
+            button.disabled = true;
         }
     } catch (error) {
         console.error('Error al guardar línea de factura:', error);
@@ -548,12 +575,12 @@ async function guardarLineaFactura(event) {
     }
 }
 
-document.getElementById('btnTerminarFactura').addEventListener('click', function() {
+document.getElementById('btnTerminarFactura').addEventListener('click', function () {
     // Mostrar el modal ModalFinFactura
     $('#ModalFinFactura').modal('show');
 });
 
-document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function() {
+document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function () {
     // Mostrar el modal ModalConfirmarBorrar
     $('#ModalConfirmarBorrar').modal('show');
 });
