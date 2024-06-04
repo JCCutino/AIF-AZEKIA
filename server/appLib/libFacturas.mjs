@@ -235,6 +235,36 @@ class LibFacturas {
         }
     }
 
+    async obtenerRecomendacionNumeroFactura(empresaCod, serieCod) {
+        try {
+            const pool = await dbConexion.conectarDB();
+            const request = pool.request();
+
+            const query = `
+                SELECT TOP 1 facturaVentaNum 
+                FROM FacturaVenta
+                WHERE empresaCod = @empresaCod 
+                  AND serieCod = @serieCod 
+                ORDER BY facturaVentaNum DESC
+            `;
+
+            request.input('empresaCod', empresaCod);
+            request.input('serieCod', serieCod);
+          
+            const resultados = await request.query(query);
+            await pool.close();
+
+            if (resultados.recordset.length > 0) {
+                return resultados.recordset[0].facturaVentaNum;
+            } else {
+                return 0;
+            }
+        } catch (error) {
+            console.error('Error al obtener facturaVentaNum:', error);
+            throw 'Error al obtener facturaVentaNum';
+        }
+    }
+
 }
 
 export const libFacturas = new LibFacturas();

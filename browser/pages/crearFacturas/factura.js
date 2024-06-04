@@ -73,15 +73,26 @@ function agregarEmpresasCodSelect(datosEmpresa) {
 
     selectAgregarEmpresaCod.innerHTML = "";
 
-    datosEmpresa.forEach( (Empresa) => {
+    let defaultOption = document.createElement("option");
+    defaultOption.text = "Seleccionar Empresa";
+    defaultOption.value = "";
+    selectAgregarEmpresaCod.add(defaultOption);
+
+    datosEmpresa.forEach((Empresa) => {
         let optionAgregar = document.createElement("option");
         optionAgregar.text = Empresa.razonSocial;
         optionAgregar.value = Empresa.empresaCod;
         selectAgregarEmpresaCod.add(optionAgregar);
     });
-}
 
-async function obtenerSeries() {
+    // Añadir el evento change al select
+    selectAgregarEmpresaCod.addEventListener("change", function() {
+        const selectedEmpresaCodValor = selectAgregarEmpresaCod.value;
+        // Llama a la función cargarSeriesSelect con el código de empresa seleccionado
+        obtenerSeries(selectedEmpresaCodValor);
+    });
+}
+async function obtenerSeries(empresaCod) {
     try {
         const response = await fetch('/obtenerSeries', {
             method: 'POST',
@@ -96,7 +107,7 @@ async function obtenerSeries() {
             if (data.err) {
                 mostrarError('Error al obtener series: ' + data.errmsg);
             } else {
-                cargarSeriesSelect(data.series);
+                cargarSeriesSelect(data.series, empresaCod);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -106,16 +117,63 @@ async function obtenerSeries() {
     }
 }
 
-function cargarSeriesSelect(series) {
+function cargarSeriesSelect(series, empresaCod) {
+    const selectAgregarEmpresaCod = document.getElementById("CodigoEmpresa");
     const selectSeries = document.getElementById("serieCod");
     selectSeries.innerHTML = "";
+
+    let defaultOption = document.createElement("option");
+    defaultOption.text = "Seleccionar Serie";
+    defaultOption.value = "";
+    selectSeries.add(defaultOption);
     series.forEach((serie) => {
-        let option = document.createElement("option");
-        option.text = serie.serieCod;
-        option.value = serie.serieCod;
-        selectSeries.add(option);
+        if (serie.empresaCod === empresaCod) {
+            let option = document.createElement("option");
+            option.text = serie.serieCod;
+            option.value = serie.serieCod;
+            selectSeries.add(option);
+        }
+    });
+
+    selectSeries.addEventListener("change", function() {
+        const selectedEmpresaCodValor = selectAgregarEmpresaCod.value;
+        const selectedSerieCodValor = selectSeries.value;
+
+        obtenerRecomendacionNumFactura(selectedEmpresaCodValor, selectedSerieCodValor);
     });
 }
+async function obtenerRecomendacionNumFactura(empresaCod, serieCod) {
+try {
+    const response = await fetch('/obtenerRecomendacionNumeroFactura', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({empresaCod, serieCod})
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        if (data.err) {
+            console.log('Error al obtener la recomendacion del número de la factura: ' + data.errmsg);
+        }else{
+            await recomendarNumeroFactura(data.recomendacionNumeroFactura);
+        }
+    } else {
+        console.log('Error al llamar a la API: ' + response.statusText);
+    }
+} catch (error) {
+    console.log('Error al llamar a la API: ' + error.message);
+}
+}
+
+async function recomendarNumeroFactura(numeroFactura) {
+    const campoNumFactura = document.getElementById("CodigoFactura");
+
+    campoNumFactura.value = numeroFactura;
+
+}
+
 
 async function obtenerTiposIVA() {
     try {
@@ -152,7 +210,7 @@ function cargarTiposIVASelect(tiposIVA) {
 
         tiposIVA.forEach((tipo) => {
             let option = document.createElement("option");
-            option.text = tipo.porcentaje;
+            option.text = tipo.impuestoCod;
             option.value = tipo.impuestoCod;
             select.add(option);
         });
@@ -193,7 +251,7 @@ function cargarTiposIRPFSelect(tiposIRPF) {
         tiposIRPF.forEach((tipo) => {
             console.log(tipo.impuestoCod)
             let option = document.createElement("option");
-            option.text = tipo.porcentaje;
+            option.text = tipo.impuestoCod;
             option.value = tipo.impuestoCod;
             select.add(option);
         });
@@ -423,7 +481,6 @@ document.addEventListener("DOMContentLoaded", function() {
     
     obtenerTiposIVA();
     obtenerTiposIRPF();
-    obtenerSeries();
     obtenerclientesCod();
     obtenerEmpresasCod();
     obtenerProyectosCod();
@@ -439,7 +496,7 @@ async function guardarLineaFactura(event) {
     const serieCod = document.getElementById('serieCod').value;
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
-    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1; // Índice de la línea + 1
+    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1; 
     facturaVentaLineaNum= facturaVentaLineaNum.toString();
 
     // Declarar importeBruto antes de usarlo
@@ -460,7 +517,7 @@ async function guardarLineaFactura(event) {
         cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
         precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
         importeBruto: importeBruto, // Aquí ya se ha calculado
-        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()) || null,
+        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
         tipoIVACod: linea.querySelector('#tipoIVA').value || null,
         tipoIRPFCod: linea.querySelector('#tipoIRPF').value || null
     };

@@ -105,6 +105,21 @@ class HttpFacturas {
         }
     }
 
+    async postObtenerRecomendacionNumeroFactura(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+
+            const recomendacionNumeroFactura = await libFacturas.obtenerRecomendacionNumeroFactura(empresaCod, serieCod) +1;
+
+
+            res.send(200, { err: false, recomendacionNumeroFactura: recomendacionNumeroFactura });
+        } catch (err) {
+            console.error('Error al eliminar factura:', err);
+            res.send(500);
+        }
+    }
+
 
 }
 

@@ -125,6 +125,7 @@ app.post('/actualizarProyectoProducido', httpProyectosDetalles.postActualizarPro
 app.post('/eliminarProyectoProducido', httpProyectosDetalles.postEliminarProyectoProducido);
 
 //Funciones de facturas
+app.post('/obtenerRecomendacionNumeroFactura', httpFacturas.postObtenerRecomendacionNumeroFactura);
 
 app.post('/obtenerFacturas', httpFacturas.postObtenerFacturas);
 
