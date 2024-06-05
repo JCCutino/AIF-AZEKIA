@@ -175,7 +175,7 @@ async function recomendarNumeroFactura(numeroFactura) {
 }
 
 
-async function obtenerTiposIVA() {
+async function obtenerTiposIVA(id, valorSeleccionado = false) {
     try {
         const response = await fetch('/obtenerIVA', {
             method: 'POST',
@@ -190,7 +190,7 @@ async function obtenerTiposIVA() {
             if (data.err) {
                 mostrarError('Error al obtener tipos de IVA: ' + data.errmsg);
             } else {
-                cargarTiposIVASelect(data.IVA);
+                cargarTiposIVASelect(data.IVA, id, valorSeleccionado);
                 console.log(data.IVA);
             }
         } else {
@@ -202,22 +202,22 @@ async function obtenerTiposIVA() {
 }
 
 
-function cargarTiposIVASelect(tiposIVA) {
-    const selectsIVA = document.querySelectorAll("#tipoIVA");
-
-    selectsIVA.forEach(select => {
-        select.innerHTML = "";
+function cargarTiposIVASelect(tiposIVA, id, valorSeleccionado = false) {
+    const selectsIVA = document.getElementById(id);
 
         tiposIVA.forEach((tipo) => {
             let option = document.createElement("option");
             option.text = tipo.impuestoCod;
             option.value = tipo.impuestoCod;
-            select.add(option);
+            selectsIVA.add(option);
         });
-    });
+
+        if (valorSeleccionado) {
+            selectsIVA.value = valorSeleccionado;
+        }
 }
 
-async function obtenerTiposIRPF() {
+async function obtenerTiposIRPF(id, valorSeleccionado = false) {
     try {
         const response = await fetch('/obtenerIRPF', {
             method: 'POST',
@@ -232,7 +232,7 @@ async function obtenerTiposIRPF() {
             if (data.err) {
                 mostrarError('Error al obtener tipos de IRPF: ' + data.errmsg);
             } else {
-                cargarTiposIRPFSelect(data.IRPF);
+                cargarTiposIRPFSelect(data.IRPF, id, valorSeleccionado);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -242,23 +242,24 @@ async function obtenerTiposIRPF() {
     }
 }
 
-function cargarTiposIRPFSelect(tiposIRPF) {
-    const selectsIRPF = document.querySelectorAll("#tipoIRPF");
+function cargarTiposIRPFSelect(tiposIRPF, id, valorSeleccionado = false) {
+    const selectsIRPF = document.getElementById(id);
 
-    selectsIRPF.forEach(select => {
-        select.innerHTML = "";
+    selectsIRPF.innerHTML = "";
 
         tiposIRPF.forEach((tipo) => {
-            console.log(tipo.impuestoCod)
             let option = document.createElement("option");
             option.text = tipo.impuestoCod;
             option.value = tipo.impuestoCod;
-            select.add(option);
+            selectsIRPF.add(option);
         });
-    });
+
+        if (valorSeleccionado) {
+            selectsIRPF.value = valorSeleccionado;
+        }
 }
 
-async function obtenerProyectosCod() {
+async function obtenerProyectosCod(id, valorSeleccionado = false) {
     try {
         const response = await fetch('/obtenerProyectosDatosBasicos', {
             method: 'POST',
@@ -269,12 +270,12 @@ async function obtenerProyectosCod() {
 
         if (response.ok) {
             const data = await response.json();
-            // console.log(data.datosProyecto)
+            console.log(data.datosProyecto)
 
             if (data.err) {
                 mostrarError('Error al obtener los proyectos: ' + data.errmsg);
             } else {
-                cargarProyectosCodSelect(data.datosProyecto);
+                cargarProyectosCodSelect(data.datosProyecto, id, valorSeleccionado);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -285,19 +286,21 @@ async function obtenerProyectosCod() {
 }
 
 
-function cargarProyectosCodSelect(ProyectosCod) {
-    const selectsProyecto = document.querySelectorAll("#proyectoCod");
-
-    selectsProyecto.forEach(select => {
-        select.innerHTML = "";
+function cargarProyectosCodSelect(ProyectosCod, id, valorSeleccionado = false) {
+    console.log(id);
+    const selectProyecto = document.getElementById(id);
+        selectProyecto.innerHTML = "";
 
         ProyectosCod.forEach((proyecto) => {
             let option = document.createElement("option");
             option.text = proyecto.nombre;
             option.value = proyecto.proyectoCod;
-            select.add(option);
+            selectProyecto.add(option);
         });
-    });
+
+        if (valorSeleccionado) {
+            selectProyecto.value = valorSeleccionado;
+        }
 }
 
 async function guardarLineaFactura(event) {
@@ -311,7 +314,6 @@ async function guardarLineaFactura(event) {
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
     let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
-    console.log(facturaVentaLineaNum);
     // Declarar importeBruto antes de usarlo
     let importeBruto = null;
 
@@ -327,14 +329,14 @@ async function guardarLineaFactura(event) {
         serieCod,
         facturaVentaNum,
         facturaVentaLineaNum,
-        proyectoCod: linea.querySelector('#proyectoCod').value || null,
+        proyectoCod: linea.querySelector(`#proyectoCod-${facturaVentaLineaNum}`).value || null,
         texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
         cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
         precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
         importeBruto: importeBruto, // Aquí ya se ha calculado
         descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
-        tipoIVACod: linea.querySelector('#tipoIVA').value || null,
-        tipoIRPFCod: linea.querySelector('#tipoIRPF').value || null
+        tipoIVACod: linea.querySelector(`#tipoIVA-${facturaVentaLineaNum}`).value || null,
+        tipoIRPFCod: linea.querySelector(`#tipoIRPF-${facturaVentaLineaNum}`).value || null
     };
 
     linea.querySelectorAll('td')[4].innerText = importeBruto !== null ? importeBruto.toFixed(2) : '';
@@ -504,14 +506,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
-            <td><select id="proyectoCod"></select></td>
+            <td><select id="proyectoCod-${idFila}"></select></td>
             <td contenteditable="true" id="campo1-${idFila}"></td>
             <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="true" id="campo3-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="false"></td>
             <td contenteditable="true" id="campo4-${idFila}"></td>
-            <td><select id="tipoIVA"></select></td>
-            <td><select id="tipoIRPF"></select></td>
+            <td><select id="tipoIVA-${idFila}"></select></td>
+            <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-center">
                 <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
                 <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
@@ -520,9 +522,9 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
 
-        await obtenerProyectosCod();
-        await obtenerTiposIRPF();
-        await obtenerTiposIVA();
+        await obtenerProyectosCod(`proyectoCod-${idFila}`);
+        await obtenerTiposIRPF(`tipoIRPF-${idFila}`);
+        await obtenerTiposIVA(`tipoIVA-${idFila}`);
 
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
@@ -553,7 +555,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
-
+        document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
+            select.addEventListener('change', () => {
+                const botonGuardar = document.getElementById(idBotonGuardar);
+                if (botonGuardar) { // Verifica si el botón existe
+                    botonGuardar.disabled = false; // Habilita el botón al cambiar un selector
+                }
+            });
+        });
     }
 
     // Agregar evento al botón "Añadir Fila"
@@ -658,14 +667,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear la fila con los datos proporcionados
         const fila = `
     <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
-        <td><select id="proyectoCod"></select></td>
+        <td><select id="proyectoCod-${idFila}"></select></td>
         <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
         <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
         <td contenteditable="true" id="campo3-${idFila}">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
         <td contenteditable="false">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
         <td contenteditable="true" id="campo4-${idFila}">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
-        <td><select id="tipoIVA"></select></td>
-        <td><select id="tipoIRPF"></select></td>
+        <td><select id="tipoIVA-${idFila}"></select></td>
+        <td><select id="tipoIRPF-${idFila}"></select></td>
         <td class="text-right">
             <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
             <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
@@ -675,7 +684,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Insertar la nueva fila en la tabla
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
 
-
+        await obtenerProyectosCod(`proyectoCod-${idFila}`,filaDatos.proyectoCod);
+        await obtenerTiposIRPF(`tipoIRPF-${idFila}`, filaDatos.tipoIRPF); 
+        await obtenerTiposIVA(`tipoIVA-${idFila}`, filaDatos.tipoIVA);
 
         // Agregar event listeners a los botones
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
@@ -687,6 +698,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
             button.addEventListener('click', borrarLineaFactura);
         });
+
+        
 
         // Agregar event listener a los campos editables para habilitar/deshabilitar el botón Guardar
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
@@ -704,6 +717,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     botonGuardar.disabled = !algunCampoCambio;
+                }
+            });
+        });
+
+        document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
+            select.addEventListener('change', () => {
+                const botonGuardar = document.getElementById(idBotonGuardar);
+                if (botonGuardar) { // Verifica si el botón existe
+                    botonGuardar.disabled = false; // Habilita el botón al cambiar un selector
                 }
             });
         });
@@ -770,9 +792,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     agregarFilaExistente(linea);
                     console.log("Linea", linea);
                 });
-                await obtenerProyectosCod();
-                await obtenerTiposIRPF();
-                await obtenerTiposIVA();
+              
             } else {
                 console.log('No se encontraron datos de factura válidos en la respuesta.');
             }
