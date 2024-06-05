@@ -52,7 +52,6 @@ async function mostrarDatosEnTabla(data) {
             // Configurar el evento click del botón
             boton.addEventListener('click', function () {
                 redirigirCrearFactura(factura.empresaCod, factura.serieCod, factura.facturaVentaNum);
-                abrirModalborrar(factura);
             });
         });
     } else {
@@ -84,65 +83,6 @@ async function obtenerFacturasAPI(pagina = 1, resultadosTotales = 10) {
 }
 
 
-async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
-    try {
-        const response = await fetch('/eliminarFactura', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({empresaCod, serieCod, facturaVentaNum})
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Factura eliminada correctamente:', data);
-            await obtenerFacturasAPI();
-        } else {
-            mostrarError('Error al eliminar factura:', response.statusText);
-        }
-    } catch (error) {
-        mostrarError('Error al eliminar factura:', error.message);
-    }
-}
-
-
-
-
-function abrirModalborrar(factura) {
-    // Mostrar el modal de confirmación
-    const modalborrar = document.getElementById('modalborrar');
-    modalborrar.style.display = "block";
-
-    const confirmarBtn = document.getElementById("confirmarBtn");
-    const cancelarBtn = document.getElementById("cancelarBtn");
-
-    // Eliminar cualquier evento previo para evitar múltiples eventos registrados
-    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
-    cancelarBtn.replaceWith(cancelarBtn.cloneNode(true));
-
-    // Obtener los nuevos botones clonados
-    const confirmarBtnNuevo = document.getElementById("confirmarBtn");
-    const cancelarBtnNuevo = document.getElementById("cancelarBtn");
-
-    // Configurar el evento click del botón de confirmar
-    confirmarBtnNuevo.addEventListener('click', async function () {
-        const empresaCod = factura.empresaCod;
-        const serieCod = factura.serieCod;
-        const facturaVentaNum = factura.facturaVentaNum;
-        try {
-            await eliminarFactura(empresaCod, serieCod, facturaVentaNum);
-        } catch (error) {
-            mostrarError('Error al eliminar la factura:', error.message);
-        }
-        modalborrar.style.display = "none";
-    });
-
-    // Configurar el evento click del botón de cancelar
-    cancelarBtnNuevo.addEventListener('click', function () {
-        modalborrar.style.display = "none";
-    });
-}
 function redirigirCrearFactura(empresaCod, serieCod, facturaVentaNum) {
     let url = `/crearFactura?empresaCod=${empresaCod}&serieCod=${serieCod}&facturaVentaNum=${facturaVentaNum}`;
     window.location.href = url;

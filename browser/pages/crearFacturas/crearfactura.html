@@ -128,45 +128,27 @@
                     <tbody id="DetalleFactura">
                     </tbody>
                 </table>
-                <button type="button" id="btnTerminarFactura" class="btn btn-success">Terminar Factura</button>
+                <div class=" mt-5 row justify-content-end">
+                    <div class="col-auto">
+                        <button type="button" id="btnTerminarFactura" class="btn btn-success">Terminar Factura</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" id="btnEliminarFactura" class="btn btn-danger">Eliminar Factura</button>
+                    </div>
+                </div>
+                
+                <div id="modalborrar" class="modalborrar">
+                    <div class="modal-contenido">
+                      <p>¿Estás seguro de que quieres eliminar esta factura?</p>
+                      <button id="confirmarBtn">Aceptar</button>
+                      <button id="cancelarBtn">Cancelar</button>
+                    </div>
+                  </div>
+
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="ModalFinFactura" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Acciones</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="btnConfirmarFactura" class="btn btn-success">Confirmar Factura</button>
-                    <button type="button" id="btnConfirmarDescartarFactura" class="btn btn-danger">Descartar la
-                        Factura</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="ModalConfirmarBorrar" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">¿Realmente quiere borrarlo?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="btnConfirmarBorrado" class="btn btn-success">Confirmar</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-secondary">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script defer src="../../pages/funcionesGenerales.js"></script>
     <script defer src="../../pages/crearFacturas/factura.js"></script>

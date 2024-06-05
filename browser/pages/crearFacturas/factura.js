@@ -432,21 +432,13 @@ async function obtenerUltimoNumFila() {
     }
 }
 
-document.getElementById('btnTerminarFactura').addEventListener('click', function () {
-    // Mostrar el modal ModalFinFactura
-    $('#ModalFinFactura').modal('show');
-});
-
-document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function () {
-    // Mostrar el modal ModalConfirmarBorrar
-    $('#ModalConfirmarBorrar').modal('show');
-});
 
 
 document.addEventListener("DOMContentLoaded", function () {
     // Ocultar la tabla al cargar la página
     document.querySelector(".table").style.display = "none";
     document.getElementById("btnTerminarFactura").style.display = "none";
+    document.getElementById("btnEliminarFactura").style.display = "none";
     document.getElementById("btnAñadirFila").style.display = "none";
 
     // Función para mostrar la tabla y el botón de añadir línea después de guardar los datos de facturación
@@ -455,6 +447,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("DetalleFactura").style.display = "none";
         document.getElementById("btnAñadirFila").style.display = "block";
         document.getElementById("btnTerminarFactura").style.display = "block";
+        document.getElementById("btnEliminarFactura").style.display = "block";
+
+        document.getElementById("btnEliminarFactura").addEventListener("click", function() {
+            // Llamar a la función específica cuando se hace clic en el botón
+            abrirModalBorrar();
+        });
     }
 
     // Función para mostrar el cuerpo de la tabla y la fila editable al presionar el botón "Añadir Fila"
@@ -511,12 +509,12 @@ document.addEventListener("DOMContentLoaded", function () {
             <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="true" id="campo3-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
             <td contenteditable="false"></td>
-            <td><input type="number" id="campo4-${idFila}" step="0.01" min="0"></td>
+            <td contenteditable="true" id="campo4-${idFila}"></td>
             <td><select id="tipoIVA"></select></td>
             <td><select id="tipoIRPF"></select></td>
-            <td class="text-right">
+            <td class="text-center">
                 <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
-                <button type="button" id="${idBotonBorrar}" class=" mt-3 btn btn-danger btnBorrarLinea">Borrar</button>
+                <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
             </td>
         </tr>
         `;
@@ -665,12 +663,12 @@ document.addEventListener("DOMContentLoaded", function () {
         <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
         <td contenteditable="true" id="campo3-${idFila}">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
         <td contenteditable="false">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
-        <td><input type="number" id="campo4-${idFila}" step="0.01" min="0" value="${filaDatos.descuento !== null ? filaDatos.descuento : ''}"></td>
+        <td contenteditable="true" id="campo4-${idFila}">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
         <td><select id="tipoIVA"></select></td>
         <td><select id="tipoIRPF"></select></td>
         <td class="text-right">
             <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
-            <button type="button" id="${idBotonBorrar}" class=" mt-3 btn btn-danger btnBorrarLinea">Borrar</button>
+            <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
         </td>
     </tr>
     `;
@@ -682,6 +680,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Agregar event listeners a los botones
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
+            button.disabled = true;
+
         });
 
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
@@ -799,6 +799,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 await rellenarTablaConDatosExistentesFactura(empresaCod, serieCod, facturaVentaNum);
                 mostrarCuerpoTabla()
 
+            } else {
+                await obtenerclientesCod();
+                await obtenerEmpresasCod();
             }
         } catch (error) {
 
@@ -807,6 +810,65 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    async function eliminarFactura(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const response = await fetch('/eliminarFactura', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                window.location.href = "/facturas";
+            } else {
+                mostrarError('Error al eliminar factura:', response.statusText);
+            }
+        } catch (error) {
+            mostrarError('Error al eliminar factura:', error.message);
+        }
+    }
+
+
+
+    function abrirModalBorrar() {
+       
+       let empresaCod = document.getElementById('CodigoEmpresa').value;
+       let serieCod = document.getElementById('serieCod').value;
+       let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+        // Mostrar el modal de confirmación
+        const modalborrar = document.getElementById('modalborrar');
+        modalborrar.style.display = "block";
+
+        const confirmarBtn = document.getElementById("confirmarBtn");
+        const cancelarBtn = document.getElementById("cancelarBtn");
+
+        // Eliminar cualquier evento previo para evitar múltiples eventos registrados
+        confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+        cancelarBtn.replaceWith(cancelarBtn.cloneNode(true));
+
+        // Obtener los nuevos botones clonados
+        const confirmarBtnNuevo = document.getElementById("confirmarBtn");
+        const cancelarBtnNuevo = document.getElementById("cancelarBtn");
+
+        // Configurar el evento click del botón de confirmar
+        confirmarBtnNuevo.addEventListener('click', async function () {
+            try {
+                await eliminarFactura(empresaCod, serieCod, facturaVentaNum);
+            } catch (error) {
+                mostrarError('Error al eliminar la factura:', error.message);
+            }
+            modalborrar.style.display = "none";
+        });
+
+        // Configurar el evento click del botón de cancelar
+        cancelarBtnNuevo.addEventListener('click', function () {
+            modalborrar.style.display = "none";
+        });
+    }
 
     async function verificarYMostrarParametrosDesdeURL() {
         // Obtener los parámetros de la URL
