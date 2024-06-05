@@ -113,3 +113,16 @@ Content-Type: application/json
   "facturaVentaNum": "22"
 
   }
+
+
+### Obtenemos datos de la factura
+POST http://localhost:3000/obtenerDatosFactura HTTP/1.1
+Content-Type: application/json
+
+
+  {
+  "empresaCod": "EM001",
+  "serieCod": "S001",
+  "facturaVentaNum": "1"
+
+  }

@@ -124,6 +124,27 @@ class HttpFacturas {
         }
     }
 
+    async postObtenerDatosFactura(req, res) {
+        try {
+            const empresaCod = req.body.empresaCod;
+            const serieCod = req.body.serieCod;
+            const facturaVentaNum = req.body.facturaVentaNum;
+
+
+            const factura = await libFacturas.obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum);
+            
+            console.log(factura);
+
+            if(factura) {
+            res.send(200, { err: false, factura: factura});
+            }else{
+                res.send(200, { err: true, errmsg: "Error al obtener factura" });
+            }
+        } catch (err) {
+            console.error('Error al obtener factura:', err);
+            res.send(500);
+        }
+    }
 
 }
 

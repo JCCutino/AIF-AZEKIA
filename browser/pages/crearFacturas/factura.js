@@ -300,6 +300,149 @@ function cargarProyectosCodSelect(ProyectosCod) {
     });
 }
 
+async function guardarLineaFactura(event) {
+    const button = event.target;
+    const linea = button.closest('.factura-linea');
+    // const linea = zdl.row(button, "FacturaVentaLinea")
+    // const cabecera = zdl.row(button, "FacturaVenta")
+    const empresaCod = document.getElementById('CodigoEmpresa').value;
+    // const empresaCod = zdl.value(cabecera, "empresaCod")
+    const serieCod = document.getElementById('serieCod').value;
+    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
+    console.log(facturaVentaLineaNum);
+    // Declarar importeBruto antes de usarlo
+    let importeBruto = null;
+
+    // Calcular importeBruto
+    const precio = parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null;
+    // const precio = zdl.value( linea, "precio", zdl.NUMERO, [10,2])
+    const cantidad = parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null;
+    // const cantidad = zdl.value( linea, "cantidad" , { type: zdl.NUMBER, required: true,  prec: 10, scale:2, min:0, max:100} )
+    importeBruto = (precio !== null && cantidad !== null) ? precio * cantidad : null;
+    // const descripcion = zdl.value4
+    const lineaFactura = {
+        empresaCod,
+        serieCod,
+        facturaVentaNum,
+        facturaVentaLineaNum,
+        proyectoCod: linea.querySelector('#proyectoCod').value || null,
+        texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
+        cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
+        precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
+        importeBruto: importeBruto, // Aquí ya se ha calculado
+        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
+        tipoIVACod: linea.querySelector('#tipoIVA').value || null,
+        tipoIRPFCod: linea.querySelector('#tipoIRPF').value || null
+    };
+
+    linea.querySelectorAll('td')[4].innerText = importeBruto !== null ? importeBruto.toFixed(2) : '';
+    console.log(lineaFactura);
+
+    try {
+        const response = await fetch('/rellenarFacturaLinea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ lineaFactura: lineaFactura })
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            mostrarError(`Error: ${result.errmsg}`);
+        } else {
+            mostrarError('Línea de factura guardada exitosamente.');
+            filaGuardada = true;
+            button.disabled = true;
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+async function borrarLineaFactura(event) {
+    const button = event.target;
+    const linea = button.closest('.factura-linea');
+
+    const empresaCod = document.getElementById('CodigoEmpresa').value;
+    const serieCod = document.getElementById('serieCod').value;
+    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
+    facturaVentaLineaNum = facturaVentaLineaNum.toString();
+
+
+    try {
+        const response = await fetch('/eliminarFacturaLinea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ empresaCod: empresaCod, serieCod: serieCod, facturaVentaNum: facturaVentaNum, facturaVentaLineaNum: facturaVentaLineaNum })
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            mostrarError(`Error: ${result.errmsg}`);
+        } else {
+            mostrarError('Línea de factura guardada exitosamente.');
+            filaGuardada = true;
+            button.disabled = true;
+            linea.remove();
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+async function obtenerUltimoNumFila() {
+
+    try {
+
+        const empresaCod = document.getElementById('CodigoEmpresa').value;
+        const serieCod = document.getElementById('serieCod').value;
+        const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+        const response = await fetch('/obtenerUltimoNumFila', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
+
+        });
+
+        const result = await response.json();
+
+        if (result.err) {
+            mostrarError(`Error: ${result.errmsg}`);
+        } else {
+            console.log(result.ultimoNum);
+            return result.ultimoNum
+        }
+    } catch (error) {
+        console.error('Error al guardar línea de factura:', error);
+        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+    }
+}
+
+document.getElementById('btnTerminarFactura').addEventListener('click', function () {
+    // Mostrar el modal ModalFinFactura
+    $('#ModalFinFactura').modal('show');
+});
+
+document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function () {
+    // Mostrar el modal ModalConfirmarBorrar
+    $('#ModalConfirmarBorrar').modal('show');
+});
+
+
 document.addEventListener("DOMContentLoaded", function () {
     // Ocultar la tabla al cargar la página
     document.querySelector(".table").style.display = "none";
@@ -394,14 +537,14 @@ document.addEventListener("DOMContentLoaded", function () {
             element.addEventListener('input', () => {
                 const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = true;
-        
+
                 camposEditables.forEach((idCampo) => {
                     const campo = document.getElementById(idCampo);
                     if (campo && campo.innerText.trim() !== '') {
                         algunCampoCambio = true;
                     }
                 });
-        
+
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     if (algunCampoCambio && botonGuardar.disabled) {
@@ -412,7 +555,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
-        
+
     }
 
     // Agregar evento al botón "Añadir Fila"
@@ -509,153 +652,97 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    obtenerTiposIVA();
-    obtenerTiposIRPF();
-    obtenerclientesCod();
-    obtenerEmpresasCod();
-    obtenerProyectosCod();
+    async function rellenarYBloquearCamposFactura(factura) {
+        // Rellenar los campos del formulario con los datos de facturación
+        const selectEmpresa = document.getElementById('CodigoEmpresa');
+        selectEmpresa.innerHTML = ''; // Limpiar opciones existentes
+    
+        const optionEmpresa = document.createElement('option');
+        optionEmpresa.value = factura.empresaCod;
+        optionEmpresa.text = factura.empresaCod;
+        selectEmpresa.appendChild(optionEmpresa);
+    
+        const selectCliente = document.getElementById('CodigoCliente');
+        selectCliente.innerHTML = ''; // Limpiar opciones existentes
+    
+        const optionCliente = document.createElement('option');
+        optionCliente.value = factura.clienteCod;
+        optionCliente.text = factura.clienteCod;
+        selectCliente.appendChild(optionCliente);
+    
+        const selectSerie = document.getElementById('serieCod');
+        selectSerie.innerHTML = ''; // Limpiar opciones existentes
+    
+        const optionSerie = document.createElement('option');
+        optionSerie.value = factura.serieCod;
+        optionSerie.text = factura.serieCod;
+        selectSerie.appendChild(optionSerie);
+    
+       // Formatear la fecha para que sea "yyyy-MM-dd"
+    const fechaEmision = new Date(factura.fechaEmision).toISOString().split('T')[0];
+
+    document.getElementById('CodigoFactura').value = factura.facturaVentaNum;
+    document.getElementById('Fecha').value = fechaEmision;
+    
+        // Bloquear los campos para que no sean editables
+        selectEmpresa.disabled = true;
+        selectCliente.disabled = true;
+        selectSerie.disabled = true;
+        document.getElementById('CodigoFactura').disabled = true;
+        document.getElementById('Fecha').disabled = true;
+    
+        document.getElementById('btnGuardarFacturacion').style.display = 'none';
+    }
+    
+    
+
+    async function obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum ){
+        try {
+            const response = await fetch('/obtenerDatosFactura', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
+    
+            });
+    
+            const result = await response.json();
+            if(!result.err){
+                await rellenarYBloquearCamposFactura(result.factura); 
+                mostrarTabla();
+
+            }
+        } catch (error) {
+            
+        }
+       
+
+    }
+
+
+    async function verificarYMostrarParametrosDesdeURL() {
+        // Obtener los parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+
+        // Obtener los valores de los parámetros
+        const empresaCod = params.get('empresaCod');
+        const serieCod = params.get('serieCod');
+        const facturaVentaNum = params.get('facturaVentaNum');
+
+        // Comprobar si los parámetros existen
+        if (empresaCod && serieCod && facturaVentaNum) {
+           await obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum);
+        } else {
+           await obtenerclientesCod();
+           await obtenerEmpresasCod();
+            await obtenerProyectosCod();
+        }
+    }
+
+     obtenerTiposIVA();
+     obtenerTiposIRPF();
+
+     verificarYMostrarParametrosDesdeURL();
 });
 
-
-
-async function guardarLineaFactura(event) {
-    const button = event.target;
-    const linea = button.closest('.factura-linea');
-    // const linea = zdl.row(button, "FacturaVentaLinea")
-    // const cabecera = zdl.row(button, "FacturaVenta")
-    const empresaCod = document.getElementById('CodigoEmpresa').value;
-    // const empresaCod = zdl.value(cabecera, "empresaCod")
-    const serieCod = document.getElementById('serieCod').value;
-    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-
-    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
-    console.log(facturaVentaLineaNum);
-    // Declarar importeBruto antes de usarlo
-    let importeBruto = null;
-
-    // Calcular importeBruto
-    const precio = parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null;
-    // const precio = zdl.value( linea, "precio", zdl.NUMERO, [10,2])
-    const cantidad = parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null;
-    // const cantidad = zdl.value( linea, "cantidad" , { type: zdl.NUMBER, required: true,  prec: 10, scale:2, min:0, max:100} )
-    importeBruto = (precio !== null && cantidad !== null) ? precio * cantidad : null;
-    // const descripcion = zdl.value4
-    const lineaFactura = {
-        empresaCod,
-        serieCod,
-        facturaVentaNum,
-        facturaVentaLineaNum,
-        proyectoCod: linea.querySelector('#proyectoCod').value || null,
-        texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
-        cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
-        precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
-        importeBruto: importeBruto, // Aquí ya se ha calculado
-        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
-        tipoIVACod: linea.querySelector('#tipoIVA').value || null,
-        tipoIRPFCod: linea.querySelector('#tipoIRPF').value || null
-    };
-
-    linea.querySelectorAll('td')[4].innerText = importeBruto !== null ? importeBruto.toFixed(2) : '';
-    console.log(lineaFactura);
-
-    try {
-        const response = await fetch('/rellenarFacturaLinea', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ lineaFactura: lineaFactura })
-        });
-
-        const result = await response.json();
-
-        if (result.err) {
-            mostrarError(`Error: ${result.errmsg}`);
-        } else {
-            mostrarError('Línea de factura guardada exitosamente.');
-            filaGuardada = true;
-            button.disabled = true;
-        }
-    } catch (error) {
-        console.error('Error al guardar línea de factura:', error);
-        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
-    }
-}
-
-async function borrarLineaFactura(event) {
-    const button = event.target;
-    const linea = button.closest('.factura-linea');
-
-    const empresaCod = document.getElementById('CodigoEmpresa').value;
-    const serieCod = document.getElementById('serieCod').value;
-    const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-
-    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
-    facturaVentaLineaNum = facturaVentaLineaNum.toString();
-
-
-    try {
-        const response = await fetch('/eliminarFacturaLinea', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ empresaCod: empresaCod, serieCod: serieCod, facturaVentaNum: facturaVentaNum, facturaVentaLineaNum: facturaVentaLineaNum})
-        });
-
-        const result = await response.json();
-
-        if (result.err) {
-            mostrarError(`Error: ${result.errmsg}`);
-        } else {
-            mostrarError('Línea de factura guardada exitosamente.');
-            filaGuardada = true;
-            button.disabled = true;
-            linea.remove();
-        }
-    } catch (error) {
-        console.error('Error al guardar línea de factura:', error);
-        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
-    }
-}
-
-async function obtenerUltimoNumFila() {
-
-    try {
-
-        const empresaCod = document.getElementById('CodigoEmpresa').value;
-        const serieCod = document.getElementById('serieCod').value;
-        const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-
-        const response = await fetch('/obtenerUltimoNumFila', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum})
-
-        });
-
-        const result = await response.json();
-
-        if (result.err) {
-            mostrarError(`Error: ${result.errmsg}`);
-        } else {
-            console.log(result.ultimoNum);
-            return result.ultimoNum
-        }
-    } catch (error) {
-        console.error('Error al guardar línea de factura:', error);
-        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
-    }
-}
-
-document.getElementById('btnTerminarFactura').addEventListener('click', function () {
-    // Mostrar el modal ModalFinFactura
-    $('#ModalFinFactura').modal('show');
-});
-
-document.getElementById('btnConfirmarDescartarFactura').addEventListener('click', function () {
-    // Mostrar el modal ModalConfirmarBorrar
-    $('#ModalConfirmarBorrar').modal('show');
-});
