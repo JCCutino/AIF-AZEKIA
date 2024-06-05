@@ -455,6 +455,12 @@ document.addEventListener("DOMContentLoaded", function () {
             // Llamar a la función específica cuando se hace clic en el botón
             abrirModalBorrar();
         });
+
+        document.getElementById("btnTerminarFactura").addEventListener("click", function() {
+            // Llamar a la función específica cuando se hace clic en el botón
+            let facturaCompletada = verificarCamposTabla();
+            console.log(facturaCompletada);
+        });
     }
 
     // Función para mostrar el cuerpo de la tabla y la fila editable al presionar el botón "Añadir Fila"
@@ -890,6 +896,39 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function verificarCamposTabla() {
+        let camposVacios = false;
+        let botonesHabilitados = false;
+    
+        // Obtener todas las celdas editables de la tabla
+        const camposEditables = document.querySelectorAll('#DetalleFactura [contenteditable=true]');
+        const selects = document.querySelectorAll('#DetalleFactura select');
+        const botonesGuardar = document.querySelectorAll('.btnGuardarLinea');
+    
+        // Verificar si alguna celda editable está vacía
+        camposEditables.forEach(campo => {
+            if (campo.innerText.trim() === '') {
+                camposVacios = true;
+            }
+        });
+    
+        // Verificar si algún select no tiene opción seleccionada
+        selects.forEach(select => {
+            if (select.selectedIndex === -1 || !select.options[select.selectedIndex].value) {
+                camposVacios = true;
+            }
+        });
+    
+        // Verificar si todos los botones de guardar están deshabilitados
+        botonesGuardar.forEach(boton => {
+            if (!boton.disabled) {
+                botonesHabilitados = true;
+            }
+        });
+    
+        return !camposVacios && !botonesHabilitados; // Devolver true si no hay campos vacíos ni botones habilitados, de lo contrario, false
+    }
+    
     async function verificarYMostrarParametrosDesdeURL() {
         // Obtener los parámetros de la URL
         const params = new URLSearchParams(window.location.search);
