@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const idBotonBorrar = `btnBorrarLinea-${idFila}`;
 
         const fila = `
-        <tr id="fila-${idFila}" class="factura-linea">
+        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod"></select></td>
             <td contenteditable="true" id="campo1-${idFila}"></td>
             <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
@@ -521,22 +521,25 @@ document.addEventListener("DOMContentLoaded", function () {
 async function guardarLineaFactura(event) {
     const button = event.target;
     const linea = button.closest('.factura-linea');
-
+    // const linea = zdl.row(button, "FacturaVentaLinea")
+    // const cabecera = zdl.row(button, "FacturaVenta")
     const empresaCod = document.getElementById('CodigoEmpresa').value;
+    // const empresaCod = zdl.value(cabecera, "empresaCod")
     const serieCod = document.getElementById('serieCod').value;
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
-    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1;
-    facturaVentaLineaNum = facturaVentaLineaNum.toString();
-
+    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
+    console.log(facturaVentaLineaNum);
     // Declarar importeBruto antes de usarlo
     let importeBruto = null;
 
     // Calcular importeBruto
     const precio = parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null;
+    // const precio = zdl.value( linea, "precio", zdl.NUMERO, [10,2])
     const cantidad = parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null;
+    // const cantidad = zdl.value( linea, "cantidad" , { type: zdl.NUMBER, required: true,  prec: 10, scale:2, min:0, max:100} )
     importeBruto = (precio !== null && cantidad !== null) ? precio * cantidad : null;
-
+    // const descripcion = zdl.value4
     const lineaFactura = {
         empresaCod,
         serieCod,
@@ -587,7 +590,7 @@ async function borrarLineaFactura(event) {
     const serieCod = document.getElementById('serieCod').value;
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
-    let facturaVentaLineaNum = Array.from(document.querySelectorAll('.factura-linea')).indexOf(linea) + 1;
+    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
     facturaVentaLineaNum = facturaVentaLineaNum.toString();
 
 
@@ -608,7 +611,7 @@ async function borrarLineaFactura(event) {
             mostrarError('Línea de factura guardada exitosamente.');
             filaGuardada = true;
             button.disabled = true;
-            linea.style.display = 'none';
+            linea.remove();
         }
     } catch (error) {
         console.error('Error al guardar línea de factura:', error);
