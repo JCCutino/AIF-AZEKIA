@@ -19,7 +19,6 @@ async function mostrarDatosEnTabla(data) {
     if (data.facturas && Array.isArray(data.facturas)) {
         data.facturas.forEach(factura => {
             const fila = document.createElement('tr');
-
             // Orden de las propiedades de la factura para mostrar en la tabla
             const propiedades = [
                 'razonSocialEmpresa',
@@ -52,6 +51,7 @@ async function mostrarDatosEnTabla(data) {
 
             // Configurar el evento click del botón
             boton.addEventListener('click', function () {
+                redirigirCrearFactura(factura.empresaCod, factura.serieCod, factura.facturaVentaNum);
                 abrirModalborrar(factura);
             });
         });
@@ -143,6 +143,10 @@ function abrirModalborrar(factura) {
         modalborrar.style.display = "none";
     });
 }
+function redirigirCrearFactura(empresaCod, serieCod, facturaVentaNum) {
+    let url = `/crearFactura?empresaCod=${empresaCod}&serieCod=${serieCod}&facturaVentaNum=${facturaVentaNum}`;
+    window.location.href = url;
+  }
 
 async function main() {
     try {
