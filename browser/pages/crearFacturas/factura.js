@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btnAñadirFila").style.display = "none";
 
     // Función para mostrar la tabla y el botón de añadir línea después de guardar los datos de facturación
-    function mostrarTabla() {
+    async function mostrarTabla() {
         document.querySelector(".table").style.display = "table";
         document.getElementById("DetalleFactura").style.display = "none";
         document.getElementById("btnAñadirFila").style.display = "block";
@@ -651,52 +651,137 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
     });
+    async function agregarFilaExistente(filaDatos) {
+        // Obtener el ID de la última fila para generar los IDs únicos de los elementos de la nueva fila
+        const idFila = filaDatos.facturaVentaLineaNum;
+        const idBotonGuardar = `btnGuardarLinea-${idFila}`;
+        const idBotonBorrar = `btnBorrarLinea-${idFila}`;
+
+        // Crear la fila con los datos proporcionados
+        const fila = `
+    <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
+        <td><select id="proyectoCod"></select></td>
+        <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
+        <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
+        <td contenteditable="true" id="campo3-${idFila}">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
+        <td contenteditable="false">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
+        <td><input type="number" id="campo4-${idFila}" step="0.01" min="0" value="${filaDatos.descuento !== null ? filaDatos.descuento : ''}"></td>
+        <td><select id="tipoIVA"></select></td>
+        <td><select id="tipoIRPF"></select></td>
+        <td class="text-right">
+            <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
+            <button type="button" id="${idBotonBorrar}" class=" mt-3 btn btn-danger btnBorrarLinea">Borrar</button>
+        </td>
+    </tr>
+    `;
+        // Insertar la nueva fila en la tabla
+        document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
+
+
+
+        // Agregar event listeners a los botones
+        document.querySelectorAll('.btnGuardarLinea').forEach(button => {
+            button.addEventListener('click', guardarLineaFactura);
+        });
+
+        document.querySelectorAll('.btnBorrarLinea').forEach(button => {
+            button.addEventListener('click', borrarLineaFactura);
+        });
+
+        // Agregar event listener a los campos editables para habilitar/deshabilitar el botón Guardar
+        document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
+            element.addEventListener('input', () => {
+                const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
+                let algunCampoCambio = false;
+
+                camposEditables.forEach((idCampo) => {
+                    const campo = document.getElementById(idCampo);
+                    if (campo && campo.innerText.trim() !== '') {
+                        algunCampoCambio = true;
+                    }
+                });
+
+                const botonGuardar = document.getElementById(idBotonGuardar);
+                if (botonGuardar) { // Verifica si el botón existe
+                    botonGuardar.disabled = !algunCampoCambio;
+                }
+            });
+        });
+    }
 
     async function rellenarYBloquearCamposFactura(factura) {
         // Rellenar los campos del formulario con los datos de facturación
         const selectEmpresa = document.getElementById('CodigoEmpresa');
         selectEmpresa.innerHTML = ''; // Limpiar opciones existentes
-    
+
         const optionEmpresa = document.createElement('option');
         optionEmpresa.value = factura.empresaCod;
         optionEmpresa.text = factura.empresaCod;
         selectEmpresa.appendChild(optionEmpresa);
-    
+
         const selectCliente = document.getElementById('CodigoCliente');
         selectCliente.innerHTML = ''; // Limpiar opciones existentes
-    
+
         const optionCliente = document.createElement('option');
         optionCliente.value = factura.clienteCod;
         optionCliente.text = factura.clienteCod;
         selectCliente.appendChild(optionCliente);
-    
+
         const selectSerie = document.getElementById('serieCod');
         selectSerie.innerHTML = ''; // Limpiar opciones existentes
-    
+
         const optionSerie = document.createElement('option');
         optionSerie.value = factura.serieCod;
         optionSerie.text = factura.serieCod;
         selectSerie.appendChild(optionSerie);
-    
-       // Formatear la fecha para que sea "yyyy-MM-dd"
-    const fechaEmision = new Date(factura.fechaEmision).toISOString().split('T')[0];
 
-    document.getElementById('CodigoFactura').value = factura.facturaVentaNum;
-    document.getElementById('Fecha').value = fechaEmision;
-    
+        // Formatear la fecha para que sea "yyyy-MM-dd"
+        const fechaEmision = new Date(factura.fechaEmision).toISOString().split('T')[0];
+
+        document.getElementById('CodigoFactura').value = factura.facturaVentaNum;
+        document.getElementById('Fecha').value = fechaEmision;
+
         // Bloquear los campos para que no sean editables
         selectEmpresa.disabled = true;
         selectCliente.disabled = true;
         selectSerie.disabled = true;
         document.getElementById('CodigoFactura').disabled = true;
         document.getElementById('Fecha').disabled = true;
-    
+
         document.getElementById('btnGuardarFacturacion').style.display = 'none';
     }
-    
-    
 
-    async function obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum ){
+
+    async function rellenarTablaConDatosExistentesFactura(empresaCod, serieCod, facturaVentaNum) {
+        try {
+            const response = await fetch('/obtenerFacturaLineas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
+
+            });
+
+            const result = await response.json();
+
+            if (result.facturaLineas && Array.isArray(result.facturaLineas)) {
+                result.facturaLineas.forEach((linea) => {
+                    agregarFilaExistente(linea);
+                    console.log("Linea", linea);
+                });
+                await obtenerProyectosCod();
+                await obtenerTiposIRPF();
+                await obtenerTiposIVA();
+            } else {
+                console.log('No se encontraron datos de factura válidos en la respuesta.');
+            }
+        } catch (error) {
+
+        }
+    }
+
+    async function obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum) {
         try {
             const response = await fetch('/obtenerDatosFactura', {
                 method: 'POST',
@@ -704,19 +789,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
-    
+
             });
-    
+
             const result = await response.json();
-            if(!result.err){
-                await rellenarYBloquearCamposFactura(result.factura); 
-                mostrarTabla();
+            if (!result.err) {
+                await rellenarYBloquearCamposFactura(result.factura);
+                await mostrarTabla();
+                await rellenarTablaConDatosExistentesFactura(empresaCod, serieCod, facturaVentaNum);
+                mostrarCuerpoTabla()
 
             }
         } catch (error) {
-            
+
         }
-       
+
 
     }
 
@@ -732,17 +819,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Comprobar si los parámetros existen
         if (empresaCod && serieCod && facturaVentaNum) {
-           await obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum);
+            await obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum);
         } else {
-           await obtenerclientesCod();
-           await obtenerEmpresasCod();
-            await obtenerProyectosCod();
+            await obtenerclientesCod();
+            await obtenerEmpresasCod();
         }
     }
 
-     obtenerTiposIVA();
-     obtenerTiposIRPF();
 
-     verificarYMostrarParametrosDesdeURL();
+    verificarYMostrarParametrosDesdeURL();
 });
 
