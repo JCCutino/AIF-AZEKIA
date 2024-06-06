@@ -151,15 +151,15 @@ class LibSeries {
     }
     
     async verificarSerie(serie, actualizar = false) {
-        if (!libGenerales.verificarCamposVacios(serie)) {
+        if (!libGenerales.validarCamposNoVacios(serie)) {
             return false;
         }
         
-        if (!libGenerales.verificarLongitud(serie.serieCod, 10)) {
+        if (!libGenerales.validarLongitud(serie.serieCod, 10)) {
             return false;
         }
     
-        if (!libGenerales.verificarLongitud(serie.descripcion, 100)) {
+        if (!libGenerales.validarLongitud(serie.descripcion, 100)) {
             return false;
         }
     

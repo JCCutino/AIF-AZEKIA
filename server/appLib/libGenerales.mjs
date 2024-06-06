@@ -1,6 +1,6 @@
 class LibGenerales {
     
-    verificarLongitud(variable, numero) {
+    validarLongitud(variable, numero) {
 
     if (typeof variable === 'number') {
         variable = variable.toString();
@@ -8,7 +8,7 @@ class LibGenerales {
         return variable.length <= numero;
     }
 
-    verificarCamposVacios(objeto) {
+    validarCamposNoVacios(objeto) {
         for (const key in objeto) {
             if (objeto[key] === null || objeto[key] === undefined || objeto[key] === '') {
                 console.log(objeto[key]);

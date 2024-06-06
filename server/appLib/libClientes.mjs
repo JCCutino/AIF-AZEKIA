@@ -163,16 +163,16 @@ class LibClientes {
     
 
    async verificarCliente(cliente) {
-        if (!libGenerales.verificarCamposVacios(cliente)) {
+        if (!libGenerales.validarCamposNoVacios(cliente)) {
             return false;
         }
 
-        if (!libGenerales.verificarLongitud(cliente.clienteCod, 20) ||
-            !libGenerales.verificarLongitud(cliente.CIF, 20) ||
-            !libGenerales.verificarLongitud(cliente.razonSocial, 100) ||
-            !libGenerales.verificarLongitud(cliente.direccion, 150) ||
-            !libGenerales.verificarLongitud(cliente.CP, 10) ||
-            !libGenerales.verificarLongitud(cliente.municipio, 50)) {
+        if (!libGenerales.validarLongitud(cliente.clienteCod, 20) ||
+            !libGenerales.validarLongitud(cliente.CIF, 20) ||
+            !libGenerales.validarLongitud(cliente.razonSocial, 100) ||
+            !libGenerales.validarLongitud(cliente.direccion, 150) ||
+            !libGenerales.validarLongitud(cliente.CP, 10) ||
+            !libGenerales.validarLongitud(cliente.municipio, 50)) {
             return false;
         }
 

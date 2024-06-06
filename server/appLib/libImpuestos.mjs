@@ -166,17 +166,17 @@ class LibImpuestos {
     
 
     async verificarImpuesto(impuesto, actualizar = false) {
-        if (!libGenerales.verificarCamposVacios(impuesto)) {
+        if (!libGenerales.validarCamposNoVacios(impuesto)) {
             console.log("1");
             return false;
         }
         
-        if (!libGenerales.verificarLongitud(impuesto.impuestoCod, 10)) {
+        if (!libGenerales.validarLongitud(impuesto.impuestoCod, 10)) {
             console.log("2");
             return false;
         }
     
-        if (!libGenerales.verificarLongitud(impuesto.tipoImpuesto, 50)) {
+        if (!libGenerales.validarLongitud(impuesto.tipoImpuesto, 50)) {
             console.log("3");
             return false;
         }

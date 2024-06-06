@@ -1,5 +1,4 @@
-import { libFacturaLinea } from "../appLib/libFacturaLinea.mjs";
-import { libFacturas } from "../appLib/libFacturas.mjs";
+import { libFacturaVenta } from "../appLib/libFacturas.mjs";
 import { libImpuestos } from "../appLib/libImpuestos.mjs";
 import { libGenerales } from "../appLib/libGenerales.mjs";
 
@@ -16,13 +15,13 @@ class HttpFacturaLinea {
         try {
             const { empresaCod, serieCod, facturaVentaNum } = req.body;
     
-            const facturaExistente = await libFacturas.comprobarExistenciaFacturaVentaPorCodigo(empresaCod, serieCod, facturaVentaNum);
+            const facturaExistente = await libFacturaVenta.existeFactura(empresaCod, serieCod, facturaVentaNum);
     
             if (facturaExistente) {
                 // Obtener los tipos de impuestos
                 const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
                 // Obtener los importes de las líneas de la factura
-                const importesLineas = await libFacturaLinea.obtenerImportesFacturaLineas(empresaCod, serieCod, facturaVentaNum);
+                const importesLineas = await libFacturaVenta.obtenerImportesLineas(empresaCod, serieCod, facturaVentaNum);
     
                 if (importesLineas) {
                     // Crear un mapa de impuestos para fácil acceso
@@ -60,10 +59,10 @@ class HttpFacturaLinea {
                     }));
     
                     // Limpiar la tabla FacturaVentaImpuesto antes de insertar nuevos registros
-                    await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+                    await libFacturaVenta.eliminarImpuestosPorFactura(empresaCod, serieCod, facturaVentaNum);
     
                     // Insertar los nuevos datos en FacturaVentaImpuesto
-                    await libFacturaLinea.insertarDatosFacturaVentaImpuestos(empresaCod, serieCod, facturaVentaNum, result);
+                    await libFacturaVenta.insertarImpuestos(empresaCod, serieCod, facturaVentaNum, result);
                     
                     res.status(200).send({ err: false, FacturaVentaImpuesto: result });
                 } else {
@@ -86,10 +85,10 @@ class HttpFacturaLinea {
     
             console.log(empresaCod, serieCod, facturaVentaNum);
     
-            const facturaExistente = await libFacturas.comprobarExistenciaFacturaVentaPorCodigo(empresaCod, serieCod, facturaVentaNum);
+            const facturaExistente = await libFacturaVenta.existeFactura(empresaCod, serieCod, facturaVentaNum);
     
             if (facturaExistente) {
-                const facturaLineas = await libFacturaLinea.obtenerFacturaLineas(empresaCod, serieCod, facturaVentaNum);
+                const facturaLineas = await libFacturaVenta.obtenerLineas(empresaCod, serieCod, facturaVentaNum);
     
                 console.log(facturaLineas);
     
@@ -119,7 +118,7 @@ class HttpFacturaLinea {
                 return res.status(400).send({ err: true, errmsg: "Faltan parámetros requeridos." });
             }
 
-            const ultimaLineaNum = await libFacturaLinea.obtenerUltimaIDFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum);
+            const ultimaLineaNum = await libFacturaVenta.obtenerUltimaIDLinea(empresaCod, serieCod, facturaVentaNum);
 
             if (ultimaLineaNum === null || ultimaLineaNum === undefined) {
                 return res.status(500).send({ err: true, errmsg: "Error al obtener el último número de línea de factura." });
@@ -127,10 +126,10 @@ class HttpFacturaLinea {
 
             const facturaVentaLineaNum = ultimaLineaNum + 1;
 
-            const resultadoVerificacion = await libFacturaLinea.verficarFacturaVentaLineaAgregar(empresaCod, serieCod, facturaVentaNum);
+            const resultadoVerificacion = await libFacturaVenta.validarLineaParaAgregar(empresaCod, serieCod, facturaVentaNum);
 
             if (resultadoVerificacion.isValid) {
-                await libFacturaLinea.agregarFacturaVentaLinea(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum);
+                await libFacturaVenta.agregarLinea(empresaCod, serieCod, facturaVentaNum, facturaVentaLineaNum);
                 res.status(200).send({ err: false });
             } else {
                 res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage });
@@ -148,12 +147,12 @@ class HttpFacturaLinea {
             const facturaVentaNum = req.body.facturaVentaNum;
             const facturaVentaLineaNum = req.body.facturaVentaLineaNum;
 
-            const facturaExistente = libFacturas.comprobarExistenciaFacturaVentaPorCodigo(empresaCod, serieCod, facturaVentaNum);
+            const facturaExistente = libFacturaVenta.existeFactura(empresaCod, serieCod, facturaVentaNum);
 
             if (facturaExistente) {
             
 
-            const linea = await libFacturaLinea.eliminarLinea(facturaVentaNum, empresaCod, serieCod, facturaVentaLineaNum);
+            const linea = await libFacturaVenta.eliminarLinea(facturaVentaNum, empresaCod, serieCod, facturaVentaLineaNum);
 
             res.send(200, { err: false });
             }else {
@@ -216,10 +215,10 @@ class HttpFacturaLinea {
                                 });
                             }
     
-                            const resultadoVerificacion = await libFacturaLinea.verificarFacturaVentaLineaRellenar(lineaFactura);
+                            const resultadoVerificacion = await libFacturaVenta.validarLineaParaActualizar(lineaFactura);
     
                             if (resultadoVerificacion.isValid) {
-                                const lineaFacturaActual = await libFacturaLinea.obtenerFacturaVentaLinea(lineaFactura.empresaCod, lineaFactura.serieCod, lineaFactura.facturaVentaNum, lineaFactura.facturaVentaLineaNum);
+                                const lineaFacturaActual = await libFacturaVenta.obtenerLinea(lineaFactura.empresaCod, lineaFactura.serieCod, lineaFactura.facturaVentaNum, lineaFactura.facturaVentaLineaNum);
     
                                 const camposDiferentes = {};
                                 // Agregar siempre las claves de referencia
@@ -240,7 +239,7 @@ class HttpFacturaLinea {
                                     const existenTodosImporteBruto = camposImporteBrutoKeys.every(key => key in lineaFactura && lineaFactura[key] !== null);
     
                                     if (existenTodosImporteBruto) {
-                                        const validacionImporteBruto = await libFacturaLinea.verificarCamposImporteBruto(lineaFactura.cantidad, lineaFactura.precio, lineaFactura.importeBruto);
+                                        const validacionImporteBruto = await libFacturaVenta.verificarCamposImporteBruto(lineaFactura.cantidad, lineaFactura.precio, lineaFactura.importeBruto);
                                         if (!validacionImporteBruto.isValid) {
                                             return res.status(200).send({ err: true, errmsg: validacionImporteBruto.errorMessage });
                                         }
@@ -258,7 +257,7 @@ class HttpFacturaLinea {
                                     }
                                     
     
-                                    const resultado = await libFacturaLinea.actualizarFacturaVentaLinea(camposDiferentes);
+                                    const resultado = await libFacturaVenta.actualizarLinea(camposDiferentes);
     
                                     res.status(200).send({ err: false, lineaFacturaActualizada: resultado });
     
@@ -305,7 +304,7 @@ class HttpFacturaLinea {
             const serieCod = req.body.serieCod;
             const facturaVentaNum = req.body.facturaVentaNum;
 
-            const ultimoNum = await libFacturaLinea.obtenerUltimoNumFila(empresaCod, serieCod, facturaVentaNum);
+            const ultimoNum = await libFacturaVenta.obtenerUltimoNumLinea(empresaCod, serieCod, facturaVentaNum);
 
             
             res.send(200, { err: false, ultimoNum: ultimoNum });

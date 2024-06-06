@@ -154,15 +154,15 @@ class LibProyectos {
     
 
     async verificarProyecto(proyecto, actualizar = false) {
-        if (!libGenerales.verificarCamposVacios(proyecto)) {
+        if (!libGenerales.validarCamposNoVacios(proyecto)) {
             return false;
         }
         
-        if (!libGenerales.verificarLongitud(proyecto.proyectoCod, 20)) {
+        if (!libGenerales.validarLongitud(proyecto.proyectoCod, 20)) {
             return false;
         }
     
-        if (!libGenerales.verificarLongitud(proyecto.nombre, 100)) {
+        if (!libGenerales.validarLongitud(proyecto.nombre, 100)) {
             return false;
         }
     

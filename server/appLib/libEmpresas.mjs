@@ -162,26 +162,26 @@ class LibEmpresas {
     
    async verificarEmpresa(empresa, actualizar = false) {
 
-    if (!libGenerales.verificarCamposVacios(empresa)) {
+    if (!libGenerales.validarCamposNoVacios(empresa)) {
         return false;
     }
 
-        if (!libGenerales.verificarLongitud(empresa.empresaCod, 20)) {
+        if (!libGenerales.validarLongitud(empresa.empresaCod, 20)) {
             return false;
         }
-        if (!libGenerales.verificarLongitud(empresa.CIF, 20)) {
+        if (!libGenerales.validarLongitud(empresa.CIF, 20)) {
             return false;
         }
-        if (!libGenerales.verificarLongitud(empresa.razonSocial, 100)) {
+        if (!libGenerales.validarLongitud(empresa.razonSocial, 100)) {
             return false;
         }
-        if (!libGenerales.verificarLongitud(empresa.direccion, 150)) {
+        if (!libGenerales.validarLongitud(empresa.direccion, 150)) {
             return false;
         }
-        if (!libGenerales.verificarLongitud(empresa.CP, 10)) {
+        if (!libGenerales.validarLongitud(empresa.CP, 10)) {
             return false;
         }
-        if (!libGenerales.verificarLongitud(empresa.municipio, 50)) {
+        if (!libGenerales.validarLongitud(empresa.municipio, 50)) {
             return false;
         }
         const empresaExistePorCIF = await this.comprobarExistenciaEmpresaPorCIF(empresa.CIF, empresa.empresaCod);

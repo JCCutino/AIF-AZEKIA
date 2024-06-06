@@ -1,5 +1,4 @@
-import { libFacturas } from "../appLib/libFacturas.mjs";
-import { libFacturaLinea } from "../appLib/libFacturaLinea.mjs";
+import { libFacturaVenta } from "../appLib/libFacturas.mjs";
 
 
 import path from 'path';
@@ -13,7 +12,7 @@ class HttpFacturas {
 
     async postObtenerFacturas(req, res) {
         try {
-            const facturas = await libFacturas.obtenerFacturas();
+            const facturas = await libFacturaVenta.obtenerFacturas();
             if (facturas && facturas.length > 0) {
                 res.status(200).send({ err: false, facturas });
             } else {
@@ -50,13 +49,13 @@ class HttpFacturas {
                     if (atributosInvalidos.length === 0) {
                         // Todos los valores son del tipo de datos adecuado
 
-                        const resultadoVerificacion = await libFacturas.verificarFactura(factura);
+                        const resultadoVerificacion = await libFacturaVenta.validarFactura(factura);
 
                         if (!resultadoVerificacion.isValid) {
                             return res.status(200).send({ err: true, errmsg: resultadoVerificacion.errorMessage });
                         }
                         else {
-                            const resultado = await libFacturas.agregarFactura(factura, false);
+                            const resultado = await libFacturaVenta.agregarFactura(factura, false);
                             res.status(200).send({ err: false, factura: resultado });
                         }
                     } else {
@@ -88,15 +87,15 @@ class HttpFacturas {
             const serieCod = req.body.serieCod;
             const facturaVentaNum = req.body.facturaVentaNum;
 
-            const facturaReferenciada = await libFacturas.verificarFacturaVentaReferenciada(facturaVentaNum, empresaCod, serieCod);
+            const hayLineas = await libFacturaVenta.hayLineasPorFactura(empresaCod, serieCod, facturaVentaNum);
 
-            if (facturaReferenciada) {
-                await libFacturaLinea.eliminarLineasPorFactura(facturaVentaNum, empresaCod, serieCod);
+            if (hayLineas) {
+                await libFacturaVenta.eliminarLineas(empresaCod, serieCod,facturaVentaNum);
             }
 
-            await libFacturaLinea.limpiarTablaFacturaVentaImpusto(empresaCod, serieCod, facturaVentaNum);
+            await libFacturaVenta.eliminarImpuestos(empresaCod, serieCod, facturaVentaNum);
 
-            const facturaEliminada = await libFacturas.eliminarFactura(empresaCod, serieCod, facturaVentaNum);
+            const facturaEliminada = await libFacturaVenta.eliminarFacturaRow(empresaCod, serieCod, facturaVentaNum);
 
             if(facturaEliminada) {
             res.send(200, { err: false });
@@ -114,7 +113,7 @@ class HttpFacturas {
             const empresaCod = req.body.empresaCod;
             const serieCod = req.body.serieCod;
 
-            const recomendacionNumeroFactura = await libFacturas.obtenerRecomendacionNumeroFactura(empresaCod, serieCod) +1;
+            const recomendacionNumeroFactura = await libFacturaVenta.obtenerRecomendacionNumeroFactura(empresaCod, serieCod) +1;
 
 
             res.send(200, { err: false, recomendacionNumeroFactura: recomendacionNumeroFactura });
@@ -131,7 +130,7 @@ class HttpFacturas {
             const facturaVentaNum = req.body.facturaVentaNum;
 
 
-            const factura = await libFacturas.obtenerDatosFactura(empresaCod, serieCod, facturaVentaNum);
+            const factura = await libFacturaVenta.obtenerFactura(empresaCod, serieCod, facturaVentaNum);
             
             console.log(factura);
 

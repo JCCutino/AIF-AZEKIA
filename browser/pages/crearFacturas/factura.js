@@ -675,10 +675,10 @@ document.addEventListener("DOMContentLoaded", function () {
     <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
         <td><select id="proyectoCod-${idFila}"></select></td>
         <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
-        <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
-        <td contenteditable="true" id="campo3-${idFila}">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
+        <td contenteditable="true" id="campo2-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
+        <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
         <td contenteditable="false">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
-        <td contenteditable="true" id="campo4-${idFila}">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
+        <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
         <td><select id="tipoIVA-${idFila}"></select></td>
         <td><select id="tipoIRPF-${idFila}"></select></td>
         <td class="text-right">
