@@ -317,12 +317,7 @@ async function guardarLineaFactura(event) {
     // Declarar importeBruto antes de usarlo
     let importeBruto = null;
 
-    // Calcular importeBruto
-    const precio = parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null;
-    // const precio = zdl.value( linea, "precio", zdl.NUMERO, [10,2])
-    const cantidad = parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null;
-    // const cantidad = zdl.value( linea, "cantidad" , { type: zdl.NUMBER, required: true,  prec: 10, scale:2, min:0, max:100} )
-    importeBruto = (precio !== null && cantidad !== null) ? precio * cantidad : null;
+
     // const descripcion = zdl.value4
     const lineaFactura = {
         empresaCod,
@@ -333,13 +328,12 @@ async function guardarLineaFactura(event) {
         texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
         cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
         precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
-        importeBruto: importeBruto, // Aquí ya se ha calculado
+        importeBruto:  parseFloat(linea.querySelectorAll('td')[4].innerText.trim()) || null,
         descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
         tipoIVACod: linea.querySelector(`#tipoIVA-${facturaVentaLineaNum}`).value || null,
         tipoIRPFCod: linea.querySelector(`#tipoIRPF-${facturaVentaLineaNum}`).value || null
     };
 
-    linea.querySelectorAll('td')[4].innerText = importeBruto !== null ? importeBruto.toFixed(2) : '';
     console.log(lineaFactura);
 
     try {
@@ -356,7 +350,6 @@ async function guardarLineaFactura(event) {
         if (result.err) {
             mostrarError(`Error: ${result.errmsg}`);
         } else {
-            mostrarError('Línea de factura guardada exitosamente.');
             filaGuardada = true;
             button.disabled = true;
         }
@@ -392,7 +385,6 @@ async function borrarLineaFactura(event) {
         if (result.err) {
             mostrarError(`Error: ${result.errmsg}`);
         } else {
-            mostrarError('Línea de factura guardada exitosamente.');
             filaGuardada = true;
             button.disabled = true;
             linea.remove();
@@ -478,12 +470,11 @@ document.addEventListener("DOMContentLoaded", function () {
             mostrarError("Debe guardar la fila actual antes de añadir una nueva.");
             return;
         }
-
+    
         let empresaCod = document.getElementById('CodigoEmpresa').value;
         let serieCod = document.getElementById('serieCod').value;
         let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-
-
+    
         try {
             const response = await fetch('/agregarFacturaLinea', {
                 method: 'POST',
@@ -492,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
             });
-
+    
             if (response.ok) {
                 const data = await response.json();
                 if (data.err) {
@@ -504,20 +495,20 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             console.log('Error al llamar a la API: ' + error.message);
         }
-
+    
         filaGuardada = false; // Estado de fila no guardada
         let idFila = await obtenerUltimoNumFila();
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
         const idBotonBorrar = `btnBorrarLinea-${idFila}`;
-
+    
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
             <td contenteditable="true" id="campo1-${idFila}"></td>
-            <td contenteditable="true" id="campo2-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
-            <td contenteditable="true" id="campo3-${idFila}" oninput="this.innerText = this.innerText.replace(/[^0-9]/g, '');"></td>
-            <td contenteditable="false"></td>
-            <td contenteditable="true" id="campo4-${idFila}"></td>
+            <td contenteditable="true" id="campo2-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
+            <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
+            <td contenteditable="false" id="campo4-${idFila}"></td>
+            <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-center">
@@ -527,30 +518,49 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
-
+    
         await obtenerProyectosCod(`proyectoCod-${idFila}`);
         await obtenerTiposIRPF(`tipoIRPF-${idFila}`);
         await obtenerTiposIVA(`tipoIVA-${idFila}`);
-
+    
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
         });
-
+    
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
             button.addEventListener('click', borrarLineaFactura);
         });
+    
+        const campo2 = document.getElementById(`campo2-${idFila}`);
+        const campo3 = document.getElementById(`campo3-${idFila}`);
+        const campo4 = document.getElementById(`campo4-${idFila}`);
+    
+        const calcularImporte = () => {
+            const valor2 = parseFloat(campo2.innerText.trim()) || 0;
+            const valor3 = parseFloat(campo3.innerText.trim()) || 0;
+    
+            if (!isNaN(valor2) && !isNaN(valor3)) {
+                const importe = valor2 * valor3;
+                campo4.innerText = importe.toFixed(2);
+            }
+        };
+    
+        [campo2, campo3].forEach(campo => {
+            campo.addEventListener('input', calcularImporte);
+        });
+    
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
                 const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = true;
-
+    
                 camposEditables.forEach((idCampo) => {
                     const campo = document.getElementById(idCampo);
                     if (campo && campo.innerText.trim() !== '') {
                         algunCampoCambio = true;
                     }
                 });
-
+    
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     if (algunCampoCambio && botonGuardar.disabled) {
@@ -561,6 +571,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
+    
         document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
             select.addEventListener('change', () => {
                 const botonGuardar = document.getElementById(idBotonGuardar);
@@ -570,7 +581,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-
+    
     // Agregar evento al botón "Añadir Fila"
     document.getElementById("btnAñadirFila").addEventListener("click", function () {
         if (filaGuardada) {
@@ -631,8 +642,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 fechaEmision: document.getElementById('Fecha').value
             };
 
-            console.log(datos);
-
             try {
                 const response = await fetch('/agregarFactura', {
                     method: 'POST',
@@ -665,68 +674,80 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     async function agregarFilaExistente(filaDatos) {
-        // Obtener el ID de la última fila para generar los IDs únicos de los elementos de la nueva fila
         const idFila = filaDatos.facturaVentaLineaNum;
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
         const idBotonBorrar = `btnBorrarLinea-${idFila}`;
-
-        // Crear la fila con los datos proporcionados
+    
         const fila = `
-    <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
-        <td><select id="proyectoCod-${idFila}"></select></td>
-        <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
-        <td contenteditable="true" id="campo2-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
-        <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
-        <td contenteditable="false">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
-        <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
-        <td><select id="tipoIVA-${idFila}"></select></td>
-        <td><select id="tipoIRPF-${idFila}"></select></td>
-        <td class="text-right">
-            <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
-            <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
-        </td>
-    </tr>
-    `;
-        // Insertar la nueva fila en la tabla
+        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
+            <td><select id="proyectoCod-${idFila}"></select></td>
+            <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
+            <td contenteditable="true" id="campo2-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
+            <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
+            <td contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
+            <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
+            <td><select id="tipoIVA-${idFila}"></select></td>
+            <td><select id="tipoIRPF-${idFila}"></select></td>
+            <td class="text-right">
+                <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
+                <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
+            </td>
+        </tr>
+        `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
-
-        await obtenerProyectosCod(`proyectoCod-${idFila}`,filaDatos.proyectoCod);
-        await obtenerTiposIRPF(`tipoIRPF-${idFila}`, filaDatos.tipoIRPF); 
-        await obtenerTiposIVA(`tipoIVA-${idFila}`, filaDatos.tipoIVA);
-
-        // Agregar event listeners a los botones
+    
+        console.log(filaDatos);
+        await obtenerProyectosCod(`proyectoCod-${idFila}`, filaDatos.proyectoCod);
+        await obtenerTiposIRPF(`tipoIRPF-${idFila}`, filaDatos.tipoIRPFCod);
+        await obtenerTiposIVA(`tipoIVA-${idFila}`, filaDatos.tipoIVACod);
+    
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
             button.disabled = true;
-
         });
-
+    
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
             button.addEventListener('click', borrarLineaFactura);
         });
-
-        
-
-        // Agregar event listener a los campos editables para habilitar/deshabilitar el botón Guardar
+    
+        const campo2 = document.getElementById(`campo2-${idFila}`);
+        const campo3 = document.getElementById(`campo3-${idFila}`);
+        const campo4 = document.getElementById(`campo4-${idFila}`);
+        const importe = document.getElementById(`importe-${idFila}`);
+    
+        const calcularImporte = () => {
+            const valor2 = parseFloat(campo2.innerText.trim()) || 0;
+            const valor3 = parseFloat(campo3.innerText.trim()) || 0;
+    
+            if (!isNaN(valor2) && !isNaN(valor3)) {
+                const importeCalculado = valor2 * valor3;
+                importe.innerText = importeCalculado.toFixed(2);
+            }
+        };
+    
+        [campo2, campo3].forEach(campo => {
+            campo.addEventListener('input', calcularImporte);
+        });
+    
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
                 const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = false;
-
+    
                 camposEditables.forEach((idCampo) => {
                     const campo = document.getElementById(idCampo);
                     if (campo && campo.innerText.trim() !== '') {
                         algunCampoCambio = true;
                     }
                 });
-
+    
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     botonGuardar.disabled = !algunCampoCambio;
                 }
             });
         });
-
+    
         document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
             select.addEventListener('change', () => {
                 const botonGuardar = document.getElementById(idBotonGuardar);
@@ -736,6 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+    
 
     async function rellenarYBloquearCamposFactura(factura) {
         // Rellenar los campos del formulario con los datos de facturación
@@ -796,7 +818,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (result.facturaLineas && Array.isArray(result.facturaLineas)) {
                 result.facturaLineas.forEach((linea) => {
                     agregarFilaExistente(linea);
-                    console.log("Linea", linea);
                 });
               
             } else {
