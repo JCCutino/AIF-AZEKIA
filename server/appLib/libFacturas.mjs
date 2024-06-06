@@ -9,6 +9,38 @@ import { libImpuestos } from "./libImpuestos.mjs";
 
 class LibFacturaVenta {
 
+    async  obtenerImportesImpuestos(tiposImpuesto, importesLineas) {
+        const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
+            acc[curr.impuestoCod] = curr.porcentaje;
+            return acc;
+        }, {});
+        
+        const resultImpuestos = {};
+    
+        importesLineas.forEach(linea => {
+            const { importeNeto, tipoIVACod, tipoIRPFCod } = linea;
+    
+            if (tipoIVACod) {
+                if (!resultImpuestos[tipoIVACod]) {
+                    resultImpuestos[tipoIVACod] = { base: 0, cuota: 0 };
+                }
+                resultImpuestos[tipoIVACod].base += libGenerales.redondeoEuros(importeNeto);
+            }
+    
+            if (tipoIRPFCod) {
+                if (!resultImpuestos[tipoIRPFCod]) {
+                    resultImpuestos[tipoIRPFCod] = { base: 0, cuota: 0 };
+                }
+                resultImpuestos[tipoIRPFCod].base += libGenerales.redondeoEuros(importeNeto);
+            }
+        });
+    
+        return Object.entries(resultImpuestos).map(([tipo, valores]) => ({
+            tipo,
+            base: valores.base,
+            cuota: libGenerales.redondeoEuros((valores.base * impuestoMap[tipo]) / 100)
+        }));
+    }
     
     async  agregarFactura(factura, bloqueada) {
         try {

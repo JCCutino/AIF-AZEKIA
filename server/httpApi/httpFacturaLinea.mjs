@@ -11,72 +11,33 @@ const staticFilesPath = path.join(__dirname, '../../browser');
 
 class HttpFacturaLinea {
 
-    async postObtenerDatosFinalesFactura(req, res) {
+    async  postObtenerDatosFinalesFactura(req, res) {
         try {
             const { empresaCod, serieCod, facturaVentaNum } = req.body;
-    
-            const facturaExistente = await libFacturaVenta.existeFactura(empresaCod, serieCod, facturaVentaNum);
-    
-            if (facturaExistente) {
-                // Obtener los tipos de impuestos
-                const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
-                // Obtener los importes de las líneas de la factura
-                const importesLineas = await libFacturaVenta.obtenerImportesLineas(empresaCod, serieCod, facturaVentaNum);
-    
-                if (importesLineas) {
-                    // Crear un mapa de impuestos para fácil acceso
-                    const impuestoMap = tiposImpuesto.reduce((acc, curr) => {
-                        acc[curr.impuestoCod] = curr.porcentaje;
-                        return acc;
-                    }, {});
-    
-                    const resultImpuestos = {};
-    
-                    importesLineas.forEach(linea => {
-                        const { importeBruto, importeNeto, tipoIVACod, tipoIRPFCod } = linea;
-    
-                        // Procesar IVA
-                        if (tipoIVACod) {
-                            if (!resultImpuestos[tipoIVACod]) {
-                                resultImpuestos[tipoIVACod] = { base: 0, cuota: 0 };
-                            }
-                            resultImpuestos[tipoIVACod].base += libGenerales.redondeoEuros(importeNeto);
-                        }
-    
-                        // Procesar IRPF
-                        if (tipoIRPFCod) {
-                            if (!resultImpuestos[tipoIRPFCod]) {
-                                resultImpuestos[tipoIRPFCod] = { base: 0, cuota: 0 };
-                            }
-                            resultImpuestos[tipoIRPFCod].base += libGenerales.redondeoEuros(importeNeto);
-                        }
-                    });
-    
-                    const result = Object.entries(resultImpuestos).map(([tipo, valores]) => ({
-                        tipo,
-                        base: valores.base, // La base ya está redondeada
-                        cuota: libGenerales.redondeoEuros((valores.base * impuestoMap[tipo]) / 100)
-                    }));
-    
-                    // Limpiar la tabla FacturaVentaImpuesto antes de insertar nuevos registros
-                    await libFacturaVenta.eliminarImpuestosPorFactura(empresaCod, serieCod, facturaVentaNum);
-    
-                    // Insertar los nuevos datos en FacturaVentaImpuesto
-                    await libFacturaVenta.insertarImpuestos(empresaCod, serieCod, facturaVentaNum, result);
-                    
-                    res.status(200).send({ err: false, FacturaVentaImpuesto: result });
-                } else {
-                    res.status(200).send({ err: true, errmsg: 'No se han podido obtener los datos finales de la factura' });
-                }
-            } else {
-                res.status(200).send({ err: true, errmsg: 'La factura no existe.' });
+            
+            if (!await libFacturaVenta.existeFactura(empresaCod, serieCod, facturaVentaNum)) {
+                return res.status(200).send({ err: true, errmsg: 'La factura no existe.' });
             }
+    
+            const tiposImpuesto = await libImpuestos.obtenerCodigosImpuestos();
+            const importesLineas = await libFacturaVenta.obtenerImportesLineas(empresaCod, serieCod, facturaVentaNum);
+    
+            if (!importesLineas) {
+                return res.status(200).send({ err: true, errmsg: 'No se han podido obtener los datos finales de la factura' });
+            }
+    
+            const result = await libFacturaVenta.obtenerImportesImpuestos(tiposImpuesto, importesLineas);
+    
+            await libFacturaVenta.eliminarImpuestos(empresaCod, serieCod, facturaVentaNum);
+            await libFacturaVenta.insertarImpuestos(empresaCod, serieCod, facturaVentaNum, result);
+            
+            res.status(200).send({ err: false, FacturaVentaImpuesto: result });
+    
         } catch (err) {
             console.error('Error al obtener datos finales de la factura:', err);
             res.status(500).send({ err: true, errmsg: 'Error interno del servidor' });
         }
     }
-    
     
 
     async postObtenerFacturaLineas(req, res) {
@@ -89,9 +50,7 @@ class HttpFacturaLinea {
     
             if (facturaExistente) {
                 const facturaLineas = await libFacturaVenta.obtenerLineas(empresaCod, serieCod, facturaVentaNum);
-    
-                console.log(facturaLineas);
-    
+        
                 if (facturaLineas && facturaLineas.length > 0) {
                     res.status(200).send({ err: false, facturaLineas });
                 } else {

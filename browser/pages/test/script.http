@@ -63,7 +63,7 @@ Content-Type: application/json
   {
   "empresaCod": "EM001",
   "serieCod": "S001",
-  "facturaVentaNum": "3"
+  "facturaVentaNum": "1"
 
   }
 
