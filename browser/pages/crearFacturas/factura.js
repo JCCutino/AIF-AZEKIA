@@ -519,10 +519,10 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
             <td contenteditable="true" id="campoDescripcion-${idFila}"></td>
-            <td contenteditable="true" id="campoCantidad-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
-            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
-            <td contenteditable="false" id="importe-${idFila}"></td>
-            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
+            <td class="textoIzquierda" contenteditable="true" id="campoCantidad-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
+            <td class="textoDerecha" class="text-end" contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9,]*$/.test(event.key) || event.preventDefault()"></td>
+            <td class="textoDerecha" contenteditable="false" id="importe-${idFila}"></td>
+            <td class="textoDerecha" contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-center">
@@ -552,7 +552,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const calcularImporteBruto = () => {
             let valorCantidad = parseFloat(campoCantidad.innerText.trim().replace(',', '.')) || 0;
-            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace(',', '.')) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace('.', '').replace(',', '.')) || 0;
         
             if (valorCantidad === 0 && valorPrecio === 0) {
                 campoImporte.innerText = '';
@@ -569,7 +569,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     valorPrecio = parseFloat(valorPrecio.toFixed(2));
                     let valorImporte = valorCantidad * valorPrecio;
                     campoImporte.innerText = formatearImporte(valorImporte);
-                    campoPrecio.innerText = formatearImporte(valorPrecio);
                 }
             }
         };
@@ -711,11 +710,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
-            <td contenteditable="true" id="campoDescripcion-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
-            <td contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>            
-            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? formatearImporte(filaDatos.precio) : ''}</td>
-            <td contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? formatearImporte(filaDatos.importeBruto) : ''}</td>
-            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? formatearImporte(filaDatos.descuento) : ''}</td>
+            <td class="textoIzquierda" contenteditable="true" id="campoDescripcion-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
+            <td class="textoDerecha" contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>            
+            <td class="textoDerecha" contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9,]*$/.test(event.key) || event.preventDefault()">${filaDatos.precio !== null ? formatearImporte(filaDatos.precio) : ''}</td>
+            <td class="textoDerecha" contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? formatearImporte(filaDatos.importeBruto) : ''}</td>
+            <td class="textoDerecha" contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? formatearImporte(filaDatos.descuento) : ''}</td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-right">
@@ -747,7 +746,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const calcularImporteBruto = () => {
             let valorCantidad = parseFloat(campoCantidad.innerText.trim().replace(',', '.')) || 0;
-            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace(',', '.')) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace('.', '').replace(',', '.')) || 0;
         
             if (valorCantidad === 0 && valorPrecio === 0) {
                 campoImporte.innerText = '';

@@ -588,3 +588,11 @@ tr:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.textoDerecha{
+text-align: end !important;
+}
+
+.textoIzquierda{
+  text-align: start !important;
+}
