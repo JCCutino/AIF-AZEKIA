@@ -514,11 +514,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
-            <td contenteditable="true" id="campo1-${idFila}"></td>
-            <td contenteditable="true" id="campo2-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
-            <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
-            <td contenteditable="false" id="campo4-${idFila}"></td>
-            <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
+            <td contenteditable="true" id="campoDescripcion-${idFila}"></td>
+            <td contenteditable="true" id="campoCantidad-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
+            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
+            <td contenteditable="false" id="importe-${idFila}"></td>
+            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)"></td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-center">
@@ -541,27 +541,39 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener('click', borrarLineaFactura);
         });
 
-        const campo2 = document.getElementById(`campo2-${idFila}`);
-        const campo3 = document.getElementById(`campo3-${idFila}`);
-        const campo4 = document.getElementById(`campo4-${idFila}`);
+        const campoCantidad = document.getElementById(`campoCantidad-${idFila}`);
+        const campoPrecio = document.getElementById(`campoPrecio-${idFila}`);
+        const campoDescuento = document.getElementById(`campoDescuento-${idFila}`);
+        const campoImporte = document.getElementById(`importe-${idFila}`);
 
-        const calcularImporte = () => {
-            const valor2 = parseFloat(campo2.innerText.trim()) || 1;
-            const valor3 = parseFloat(campo3.innerText.trim()) || 1;
-
-            if (!isNaN(valor2) && !isNaN(valor3)) {
-                const importe = valor2 * valor3;
-                campo4.innerText = importe.toFixed(2);
+        const calcularImporteBruto = () => {
+            let valorCantidad = parseFloat(campoCantidad.innerText.trim()) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim()) || 0;
+        
+            if (valorCantidad === 0 && valorPrecio === 0) {
+                campoImporte.innerText = ''; 
+            } else {
+                if (valorCantidad !== 0 && valorPrecio === 0) {
+                    valorPrecio = 1;
+                }
+                if (valorPrecio !== 0 && valorCantidad === 0) {
+                    valorCantidad = 1; 
+                }
+        
+                if (!isNaN(valorCantidad) && !isNaN(valorPrecio)) {
+                    const valorImporte = valorCantidad * valorPrecio;
+                    campoImporte.innerText = valorImporte.toFixed(2);
+                }
             }
         };
 
-        [campo2, campo3].forEach(campo => {
-            campo.addEventListener('blur', calcularImporte);
+        [campoCantidad, campoPrecio].forEach(campo => {
+            campo.addEventListener('blur', calcularImporteBruto);
         });
 
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
-                const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
+                const camposEditables = [`campoDescripcion-${idFila}`, `campoCantidad-${idFila}`, `campoPrecio-${idFila}`, `campoDescuento-${idFila}`];
                 let algunCampoCambio = true;
 
                 camposEditables.forEach((idCampo) => {
@@ -691,11 +703,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
-            <td contenteditable="true" id="campo1-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
-            <td contenteditable="true" id="campo2-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
-            <td contenteditable="true" id="campo3-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
+            <td contenteditable="true" id="campoDescripcion-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
+            <td contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
+            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
             <td contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
-            <td contenteditable="true" id="campo4-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
+            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-right">
@@ -720,28 +732,39 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener('click', borrarLineaFactura);
         });
 
-        const campo2 = document.getElementById(`campo2-${idFila}`);
-        const campo3 = document.getElementById(`campo3-${idFila}`);
-        const campo4 = document.getElementById(`campo4-${idFila}`);
-        const importe = document.getElementById(`importe-${idFila}`);
-
-        const calcularImporte = () => {
-            const valor2 = parseFloat(campo2.innerText.trim()) || 1;
-            const valor3 = parseFloat(campo3.innerText.trim()) || 1;
-
-            if (!isNaN(valor2) && !isNaN(valor3)) {
-                const importeCalculado = valor2 * valor3;
-                importe.innerText = importeCalculado.toFixed(2);
+        const campoCantidad = document.getElementById(`campoCantidad-${idFila}`);
+        const campoPrecio = document.getElementById(`campoPrecio-${idFila}`);
+        const campoDescuento = document.getElementById(`campoDescuento-${idFila}`);
+        const campoImporte = document.getElementById(`importe-${idFila}`);
+       
+        const calcularImporteBruto = () => {
+            let valorCantidad = parseFloat(campoCantidad.innerText.trim()) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim()) || 0;
+        
+            if (valorCantidad === 0 && valorPrecio === 0) {
+                campoImporte.innerText = ''; 
+            } else {
+                if (valorCantidad !== 0 && valorPrecio === 0) {
+                    valorPrecio = 1;
+                }
+                if (valorPrecio !== 0 && valorCantidad === 0) {
+                    valorCantidad = 1; 
+                }
+        
+                if (!isNaN(valorCantidad) && !isNaN(valorPrecio)) {
+                    const importe = valorCantidad * valorPrecio;
+                    campoImporte.innerText = importe.toFixed(2);
+                }
             }
         };
 
-        [campo2, campo3].forEach(campo => {
-            campo.addEventListener('blur', calcularImporte);
+        [campoCantidad, campoPrecio].forEach(campo => {
+            campo.addEventListener('blur', calcularImporteBruto);
         });
 
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
-                const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
+                const camposEditables = [`campoDescripcion-${idFila}`, `campoCantidad-${idFila}`, `campoPrecio-${idFila}`, `campoDescuento-${idFila}`];
                 let algunCampoCambio = false;
 
                 camposEditables.forEach((idCampo) => {
