@@ -25,6 +25,10 @@ function formatearImporte(importe) {
 }
 
 function formatearPorcentaje(porcentaje) {
+    if (isNaN(porcentaje)) {
+        return null;
+    }
+
     const porcentajeLimitado = Math.min(porcentaje, 100);
     const porcentajeFormateado = porcentajeLimitado.toLocaleString('de-DE', {
         minimumFractionDigits: 2,
@@ -32,6 +36,7 @@ function formatearPorcentaje(porcentaje) {
     });
     return porcentajeFormateado + '%';
 }
+
 
 function formatearNumeroEspanol(str) {
     return parseFloat(str.replace(/\./g, '').replace(',', '.'));
