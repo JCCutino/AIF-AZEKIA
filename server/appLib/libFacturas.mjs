@@ -649,8 +649,9 @@ class LibFacturaVenta {
                 return { isValid: false, errorMessage: 'El precio debe ser un número positivo.' };
             }
 
-            const importeBrutoCalculado = cantidad * precio;
-
+            const importeBrutoCalculado = parseFloat((cantidad * precio).toFixed(2));
+            console.log(importeBrutoCalculado);
+            console.log(importeBruto);
             if (importeBruto !== undefined && importeBruto !== importeBrutoCalculado) {
                 return { isValid: false, errorMessage: 'El importe bruto proporcionado no coincide con el calculado.' };
             }

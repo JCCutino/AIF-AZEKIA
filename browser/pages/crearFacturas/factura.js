@@ -1,5 +1,15 @@
 let filaGuardada = true;
 
+function formatearImporte(importe) {
+    const importeFormateado = importe.toLocaleString('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    return importeFormateado;
+}
+function formatearNumeroEspanol(str) {
+    return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+}
 
 async function obtenerclientesCod() {
     try {
@@ -191,7 +201,6 @@ async function obtenerTiposIVA(id, valorSeleccionado = false) {
                 mostrarError('Error al obtener tipos de IVA: ' + data.errmsg);
             } else {
                 cargarTiposIVASelect(data.IVA, id, valorSeleccionado);
-                console.log(data.IVA);
             }
         } else {
             mostrarError('Error al llamar a la API: ' + response.statusText);
@@ -270,8 +279,6 @@ async function obtenerProyectosCod(id, valorSeleccionado = false) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data.datosProyecto)
-
             if (data.err) {
                 mostrarError('Error al obtener los proyectos: ' + data.errmsg);
             } else {
@@ -287,7 +294,6 @@ async function obtenerProyectosCod(id, valorSeleccionado = false) {
 
 
 function cargarProyectosCodSelect(ProyectosCod, id, valorSeleccionado = false) {
-    console.log(id);
     const selectProyecto = document.getElementById(id);
     selectProyecto.innerHTML = "";
 
@@ -327,15 +333,14 @@ async function guardarLineaFactura(event) {
         proyectoCod: linea.querySelector(`#proyectoCod-${facturaVentaLineaNum}`).value || null,
         texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
         cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
-        precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
-        importeBruto: parseFloat(linea.querySelectorAll('td')[4].innerText.trim()) || null,
-        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()) || 0,
+        precio: formatearNumeroEspanol(linea.querySelectorAll('td')[3].innerText.trim()) || null,
+        importeBruto: formatearNumeroEspanol(linea.querySelectorAll('td')[4].innerText.trim()) || null,
+        descuento: formatearNumeroEspanol(linea.querySelectorAll('td')[5].innerText.trim()) || 0,
         tipoIVACod: linea.querySelector(`#tipoIVA-${facturaVentaLineaNum}`).value || null,
         tipoIRPFCod: linea.querySelector(`#tipoIRPF-${facturaVentaLineaNum}`).value || null
     };
 
     console.log(lineaFactura);
-
     try {
         const response = await fetch('/rellenarFacturaLinea', {
             method: 'POST',
@@ -417,7 +422,6 @@ async function obtenerUltimoNumFila() {
         if (result.err) {
             mostrarError(`Error: ${result.errmsg}`);
         } else {
-            console.log(result.ultimoNum);
             return result.ultimoNum
         }
     } catch (error) {
@@ -547,25 +551,29 @@ document.addEventListener("DOMContentLoaded", function () {
         const campoImporte = document.getElementById(`importe-${idFila}`);
 
         const calcularImporteBruto = () => {
-            let valorCantidad = parseFloat(campoCantidad.innerText.trim()) || 0;
-            let valorPrecio = parseFloat(campoPrecio.innerText.trim()) || 0;
+            let valorCantidad = parseFloat(campoCantidad.innerText.trim().replace(',', '.')) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace(',', '.')) || 0;
         
             if (valorCantidad === 0 && valorPrecio === 0) {
-                campoImporte.innerText = ''; 
+                campoImporte.innerText = '';
             } else {
                 if (valorCantidad !== 0 && valorPrecio === 0) {
                     valorPrecio = 1;
                 }
                 if (valorPrecio !== 0 && valorCantidad === 0) {
-                    valorCantidad = 1; 
+                    valorCantidad = 1;
+                    campoPrecio.innerText = formatearImporte(valorPrecio);
                 }
         
                 if (!isNaN(valorCantidad) && !isNaN(valorPrecio)) {
-                    const valorImporte = valorCantidad * valorPrecio;
-                    campoImporte.innerText = valorImporte.toFixed(2);
+                    valorPrecio = parseFloat(valorPrecio.toFixed(2));
+                    let valorImporte = valorCantidad * valorPrecio;
+                    campoImporte.innerText = formatearImporte(valorImporte);
+                    campoPrecio.innerText = formatearImporte(valorPrecio);
                 }
             }
         };
+        
 
         [campoCantidad, campoPrecio].forEach(campo => {
             campo.addEventListener('blur', calcularImporteBruto);
@@ -704,10 +712,10 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
             <td contenteditable="true" id="campoDescripcion-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
-            <td contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>
-            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? filaDatos.precio : ''}</td>
-            <td contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? filaDatos.importeBruto : ''}</td>
-            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? filaDatos.descuento : ''}</td>
+            <td contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>            
+            <td contenteditable="true" id="campoPrecio-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.precio !== null ? formatearImporte(filaDatos.precio) : ''}</td>
+            <td contenteditable="false" id="importe-${idFila}">${filaDatos.importeBruto !== null ? formatearImporte(filaDatos.importeBruto) : ''}</td>
+            <td contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? formatearImporte(filaDatos.descuento) : ''}</td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-right">
@@ -716,9 +724,9 @@ document.addEventListener("DOMContentLoaded", function () {
             </td>
         </tr>
         `;
+
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
 
-        console.log(filaDatos);
         await obtenerProyectosCod(`proyectoCod-${idFila}`, filaDatos.proyectoCod);
         await obtenerTiposIRPF(`tipoIRPF-${idFila}`, filaDatos.tipoIRPFCod);
         await obtenerTiposIVA(`tipoIVA-${idFila}`, filaDatos.tipoIVACod);
@@ -736,27 +744,31 @@ document.addEventListener("DOMContentLoaded", function () {
         const campoPrecio = document.getElementById(`campoPrecio-${idFila}`);
         const campoDescuento = document.getElementById(`campoDescuento-${idFila}`);
         const campoImporte = document.getElementById(`importe-${idFila}`);
-       
+
         const calcularImporteBruto = () => {
-            let valorCantidad = parseFloat(campoCantidad.innerText.trim()) || 0;
-            let valorPrecio = parseFloat(campoPrecio.innerText.trim()) || 0;
+            let valorCantidad = parseFloat(campoCantidad.innerText.trim().replace(',', '.')) || 0;
+            let valorPrecio = parseFloat(campoPrecio.innerText.trim().replace(',', '.')) || 0;
         
             if (valorCantidad === 0 && valorPrecio === 0) {
-                campoImporte.innerText = ''; 
+                campoImporte.innerText = '';
             } else {
                 if (valorCantidad !== 0 && valorPrecio === 0) {
                     valorPrecio = 1;
                 }
                 if (valorPrecio !== 0 && valorCantidad === 0) {
-                    valorCantidad = 1; 
+                    valorCantidad = 1;
+                    campoPrecio.innerText = formatearImporte(valorPrecio);
                 }
         
                 if (!isNaN(valorCantidad) && !isNaN(valorPrecio)) {
-                    const importe = valorCantidad * valorPrecio;
-                    campoImporte.innerText = importe.toFixed(2);
+                    valorPrecio = parseFloat(valorPrecio.toFixed(2));
+                    let valorImporte = valorCantidad * valorPrecio;
+                    campoImporte.innerText = formatearImporte(valorImporte);
+                    campoPrecio.innerText = formatearImporte(valorPrecio);
                 }
             }
         };
+        
 
         [campoCantidad, campoPrecio].forEach(campo => {
             campo.addEventListener('blur', calcularImporteBruto);
