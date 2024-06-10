@@ -556,7 +556,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         [campo2, campo3].forEach(campo => {
-            campo.addEventListener('input', calcularImporte);
+            campo.addEventListener('blur', calcularImporte);
         });
 
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
@@ -736,7 +736,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         [campo2, campo3].forEach(campo => {
-            campo.addEventListener('input', calcularImporte);
+            campo.addEventListener('blur', calcularImporte);
         });
 
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
