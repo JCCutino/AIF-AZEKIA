@@ -1,5 +1,21 @@
 let filaGuardada = true;
 
+let filaSeleccionadaID = null;
+let filaSeleccionada = null;
+let filaAnteriorSeleccionada = null;
+
+function seleccionarFila(id, fila) {
+    if (filaAnteriorSeleccionada) {
+        filaAnteriorSeleccionada.style.backgroundColor = ''; 
+    }
+
+    filaSeleccionadaID = id;
+    filaSeleccionada = fila;
+    filaSeleccionada.style.backgroundColor = '#d9d9d9';
+
+    filaAnteriorSeleccionada = filaSeleccionada; 
+    console.log('Fila seleccionada:', filaSeleccionadaID, filaSeleccionada);
+}
 function formatearImporte(importe) {
     const importeFormateado = importe.toLocaleString('de-DE', {
         minimumFractionDigits: 2,
@@ -374,17 +390,12 @@ async function guardarLineaFactura(event) {
     }
 }
 
-async function borrarLineaFactura(event) {
-    const button = event.target;
-    const linea = button.closest('.factura-linea');
-
+async function borrarLineaFactura() {
     const empresaCod = document.getElementById('CodigoEmpresa').value;
     const serieCod = document.getElementById('serieCod').value;
     const facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
-    let facturaVentaLineaNum = linea.getAttribute('data-id-linea');
-    facturaVentaLineaNum = facturaVentaLineaNum.toString();
-
+    let facturaVentaLineaNum = filaSeleccionadaID;
 
     try {
         const response = await fetch('/eliminarFacturaLinea', {
@@ -401,14 +412,17 @@ async function borrarLineaFactura(event) {
             mostrarError(`Error: ${result.errmsg}`);
         } else {
             filaGuardada = true;
-            button.disabled = true;
-            linea.remove();
+            const linea = document.getElementById(`fila-${facturaVentaLineaNum}`); // Obtener la fila por su ID
+            if (linea) { // Verificar si la fila existe
+                linea.remove(); // Eliminar la fila de la tabla
+            }
         }
     } catch (error) {
-        console.error('Error al guardar línea de factura:', error);
-        mostrarError('Hubo un error al guardar la línea de factura. Inténtelo de nuevo.');
+        console.error('Error al borrar línea de factura:', error);
+        mostrarError('Hubo un error al borrar la línea de factura. Inténtelo de nuevo.');
     }
 }
+
 
 async function obtenerUltimoNumFila() {
 
@@ -448,6 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btnTerminarFactura").style.display = "none";
     document.getElementById("btnEliminarFactura").style.display = "none";
     document.getElementById("btnAñadirFila").style.display = "none";
+    document.getElementById("btnEliminarFila").style.display = "none";
     document.getElementById("tituloDetallesFacturacion").style.display = "none";
 
 
@@ -456,10 +471,14 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".table").style.display = "table";
         document.getElementById("DetalleFactura").style.display = "none";
         document.getElementById("btnAñadirFila").style.display = "block";
+        document.getElementById("btnEliminarFila").style.display = "block";
         document.getElementById("btnTerminarFactura").style.display = "block";
         document.getElementById("btnEliminarFactura").style.display = "block";
         document.getElementById("tituloDetallesFacturacion").style.display = "block";
 
+        document.getElementById("btnEliminarFila").addEventListener("click", function () {
+            borrarLineaFactura();
+        });
         document.getElementById("btnEliminarFactura").addEventListener("click", function () {
             // Llamar a la función específica cuando se hace clic en el botón
             abrirModalBorrar();
@@ -516,7 +535,6 @@ document.addEventListener("DOMContentLoaded", function () {
         filaGuardada = false; // Estado de fila no guardada
         let idFila = await obtenerUltimoNumFila();
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
-        const idBotonBorrar = `btnBorrarLinea-${idFila}`;
 
         // Obtener los valores de la última fila si existe
         let proyectoCodAnterior, tipoIVAAnterior, tipoIRPFAnterior;
@@ -529,7 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const fila = `
-        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
+        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}" onclick="seleccionarFila(${idFila}, this)">
             <td><select id="proyectoCod-${idFila}"></select></td>
             <td contenteditable="true" id="campoDescripcion-${idFila}"></td>
             <td class="textoIzquierda" contenteditable="true" id="campoCantidad-${idFila}"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"></td>
@@ -540,7 +558,6 @@ document.addEventListener("DOMContentLoaded", function () {
             <td><select id="tipoIRPF-${idFila}"></select></td>
             <td class="text-center">
                 <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
-                <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
             </td>
         </tr>
         `;
@@ -554,9 +571,6 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener('click', guardarLineaFactura);
         });
 
-        document.querySelectorAll('.btnBorrarLinea').forEach(button => {
-            button.addEventListener('click', borrarLineaFactura);
-        });
 
         const campoCantidad = document.getElementById(`campoCantidad-${idFila}`);
         const campoPrecio = document.getElementById(`campoPrecio-${idFila}`);
@@ -724,10 +738,9 @@ document.addEventListener("DOMContentLoaded", function () {
     async function agregarFilaExistente(filaDatos) {
         const idFila = filaDatos.facturaVentaLineaNum;
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
-        const idBotonBorrar = `btnBorrarLinea-${idFila}`;
 
         const fila = `
-        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
+        <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}" onclick="seleccionarFila(${idFila}, this)">
             <td><select id="proyectoCod-${idFila}"></select></td>
             <td class="textoIzquierda" contenteditable="true" id="campoDescripcion-${idFila}">${filaDatos.texto !== null ? filaDatos.texto : ''}</td>
             <td class="textoDerecha" contenteditable="true" id="campoCantidad-${idFila}" onkeypress="return event.charCode >= 48 && event.charCode <= 57">${filaDatos.cantidad !== null ? filaDatos.cantidad : ''}</td>            
@@ -736,9 +749,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <td class="textoDerecha" contenteditable="true" id="campoDescuento-${idFila}" onkeypress="return /^[0-9.]*$/.test(event.key)">${filaDatos.descuento !== null ? formatearPorcentaje(filaDatos.descuento) : ''}</td>
             <td><select id="tipoIVA-${idFila}"></select></td>
             <td><select id="tipoIRPF-${idFila}"></select></td>
-            <td class="text-right">
+            <td class="text-center">
                 <button type="button" id="${idBotonGuardar}" class="btn btn-success btnGuardarLinea">Guardar</button>
-                <button type="button" id="${idBotonBorrar}" class="btn btn-danger btnBorrarLinea">Borrar</button>
             </td>
         </tr>
         `;
@@ -752,10 +764,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
             button.disabled = true;
-        });
-
-        document.querySelectorAll('.btnBorrarLinea').forEach(button => {
-            button.addEventListener('click', borrarLineaFactura);
         });
 
         const campoCantidad = document.getElementById(`campoCantidad-${idFila}`);
