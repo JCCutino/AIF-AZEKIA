@@ -205,16 +205,16 @@ async function obtenerTiposIVA(id, valorSeleccionado = false) {
 function cargarTiposIVASelect(tiposIVA, id, valorSeleccionado = false) {
     const selectsIVA = document.getElementById(id);
 
-        tiposIVA.forEach((tipo) => {
-            let option = document.createElement("option");
-            option.text = tipo.impuestoCod;
-            option.value = tipo.impuestoCod;
-            selectsIVA.add(option);
-        });
+    tiposIVA.forEach((tipo) => {
+        let option = document.createElement("option");
+        option.text = tipo.porcentaje;
+        option.value = tipo.impuestoCod;
+        selectsIVA.add(option);
+    });
 
-        if (valorSeleccionado) {
-            selectsIVA.value = valorSeleccionado;
-        }
+    if (valorSeleccionado) {
+        selectsIVA.value = valorSeleccionado;
+    }
 }
 
 async function obtenerTiposIRPF(id, valorSeleccionado = false) {
@@ -247,16 +247,16 @@ function cargarTiposIRPFSelect(tiposIRPF, id, valorSeleccionado = false) {
 
     selectsIRPF.innerHTML = "";
 
-        tiposIRPF.forEach((tipo) => {
-            let option = document.createElement("option");
-            option.text = tipo.impuestoCod;
-            option.value = tipo.impuestoCod;
-            selectsIRPF.add(option);
-        });
+    tiposIRPF.forEach((tipo) => {
+        let option = document.createElement("option");
+        option.text = tipo.porcentaje;
+        option.value = tipo.impuestoCod;
+        selectsIRPF.add(option);
+    });
 
-        if (valorSeleccionado) {
-            selectsIRPF.value = valorSeleccionado;
-        }
+    if (valorSeleccionado) {
+        selectsIRPF.value = valorSeleccionado;
+    }
 }
 
 async function obtenerProyectosCod(id, valorSeleccionado = false) {
@@ -289,18 +289,18 @@ async function obtenerProyectosCod(id, valorSeleccionado = false) {
 function cargarProyectosCodSelect(ProyectosCod, id, valorSeleccionado = false) {
     console.log(id);
     const selectProyecto = document.getElementById(id);
-        selectProyecto.innerHTML = "";
+    selectProyecto.innerHTML = "";
 
-        ProyectosCod.forEach((proyecto) => {
-            let option = document.createElement("option");
-            option.text = proyecto.nombre;
-            option.value = proyecto.proyectoCod;
-            selectProyecto.add(option);
-        });
+    ProyectosCod.forEach((proyecto) => {
+        let option = document.createElement("option");
+        option.text = proyecto.nombre;
+        option.value = proyecto.proyectoCod;
+        selectProyecto.add(option);
+    });
 
-        if (valorSeleccionado) {
-            selectProyecto.value = valorSeleccionado;
-        }
+    if (valorSeleccionado) {
+        selectProyecto.value = valorSeleccionado;
+    }
 }
 
 async function guardarLineaFactura(event) {
@@ -328,8 +328,8 @@ async function guardarLineaFactura(event) {
         texto: linea.querySelectorAll('td')[1].innerText.trim() || null,
         cantidad: parseFloat(linea.querySelectorAll('td')[2].innerText.trim()) || null,
         precio: parseFloat(linea.querySelectorAll('td')[3].innerText.trim()) || null,
-        importeBruto:  parseFloat(linea.querySelectorAll('td')[4].innerText.trim()) || null,
-        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()),
+        importeBruto: parseFloat(linea.querySelectorAll('td')[4].innerText.trim()) || null,
+        descuento: parseFloat(linea.querySelectorAll('td')[5].innerText.trim()) || 0,
         tipoIVACod: linea.querySelector(`#tipoIVA-${facturaVentaLineaNum}`).value || null,
         tipoIRPFCod: linea.querySelector(`#tipoIRPF-${facturaVentaLineaNum}`).value || null
     };
@@ -443,12 +443,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("btnTerminarFactura").style.display = "block";
         document.getElementById("btnEliminarFactura").style.display = "block";
 
-        document.getElementById("btnEliminarFactura").addEventListener("click", function() {
+        document.getElementById("btnEliminarFactura").addEventListener("click", function () {
             // Llamar a la función específica cuando se hace clic en el botón
             abrirModalBorrar();
         });
 
-        document.getElementById("btnTerminarFactura").addEventListener("click", function() {
+        document.getElementById("btnTerminarFactura").addEventListener("click", function () {
             // Llamar a la función específica cuando se hace clic en el botón
             let facturaCompletada = verificarCamposTabla();
             console.log(facturaCompletada);
@@ -470,11 +470,11 @@ document.addEventListener("DOMContentLoaded", function () {
             mostrarError("Debe guardar la fila actual antes de añadir una nueva.");
             return;
         }
-    
+
         let empresaCod = document.getElementById('CodigoEmpresa').value;
         let serieCod = document.getElementById('serieCod').value;
         let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
-    
+
         try {
             const response = await fetch('/agregarFacturaLinea', {
                 method: 'POST',
@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify({ empresaCod, serieCod, facturaVentaNum })
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.err) {
@@ -495,12 +495,22 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             console.log('Error al llamar a la API: ' + error.message);
         }
-    
+
         filaGuardada = false; // Estado de fila no guardada
         let idFila = await obtenerUltimoNumFila();
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
         const idBotonBorrar = `btnBorrarLinea-${idFila}`;
-    
+
+        // Obtener los valores de la última fila si existe
+        let proyectoCodAnterior, tipoIVAAnterior, tipoIRPFAnterior;
+        const ultimaFila = document.querySelector(`#DetalleFactura tr.factura-linea:last-child`);
+        if (ultimaFila) {
+            const ultimaFilaId = ultimaFila.getAttribute('data-id-linea');
+            proyectoCodAnterior = document.getElementById(`proyectoCod-${ultimaFilaId}`).value;
+            tipoIVAAnterior = document.getElementById(`tipoIVA-${ultimaFilaId}`).value;
+            tipoIRPFAnterior = document.getElementById(`tipoIRPF-${ultimaFilaId}`).value;
+        }
+
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
@@ -518,49 +528,49 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
-    
-        await obtenerProyectosCod(`proyectoCod-${idFila}`);
-        await obtenerTiposIRPF(`tipoIRPF-${idFila}`);
-        await obtenerTiposIVA(`tipoIVA-${idFila}`);
-    
+
+        await obtenerProyectosCod(`proyectoCod-${idFila}`, proyectoCodAnterior);
+        await obtenerTiposIRPF(`tipoIRPF-${idFila}`, tipoIRPFAnterior);
+        await obtenerTiposIVA(`tipoIVA-${idFila}`, tipoIVAAnterior);
+
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
         });
-    
+
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
             button.addEventListener('click', borrarLineaFactura);
         });
-    
+
         const campo2 = document.getElementById(`campo2-${idFila}`);
         const campo3 = document.getElementById(`campo3-${idFila}`);
         const campo4 = document.getElementById(`campo4-${idFila}`);
-    
+
         const calcularImporte = () => {
-            const valor2 = parseFloat(campo2.innerText.trim()) || 0;
-            const valor3 = parseFloat(campo3.innerText.trim()) || 0;
-    
+            const valor2 = parseFloat(campo2.innerText.trim()) || 1;
+            const valor3 = parseFloat(campo3.innerText.trim()) || 1;
+
             if (!isNaN(valor2) && !isNaN(valor3)) {
                 const importe = valor2 * valor3;
                 campo4.innerText = importe.toFixed(2);
             }
         };
-    
+
         [campo2, campo3].forEach(campo => {
             campo.addEventListener('input', calcularImporte);
         });
-    
+
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
                 const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = true;
-    
+
                 camposEditables.forEach((idCampo) => {
                     const campo = document.getElementById(idCampo);
                     if (campo && campo.innerText.trim() !== '') {
                         algunCampoCambio = true;
                     }
                 });
-    
+
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     if (algunCampoCambio && botonGuardar.disabled) {
@@ -571,7 +581,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
-    
+
         document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
             select.addEventListener('change', () => {
                 const botonGuardar = document.getElementById(idBotonGuardar);
@@ -581,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    
+
     // Agregar evento al botón "Añadir Fila"
     document.getElementById("btnAñadirFila").addEventListener("click", function () {
         if (filaGuardada) {
@@ -677,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const idFila = filaDatos.facturaVentaLineaNum;
         const idBotonGuardar = `btnGuardarLinea-${idFila}`;
         const idBotonBorrar = `btnBorrarLinea-${idFila}`;
-    
+
         const fila = `
         <tr id="fila-${idFila}" class="factura-linea" data-id-linea="${idFila}">
             <td><select id="proyectoCod-${idFila}"></select></td>
@@ -695,59 +705,59 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>
         `;
         document.getElementById("DetalleFactura").insertAdjacentHTML("beforeend", fila);
-    
+
         console.log(filaDatos);
         await obtenerProyectosCod(`proyectoCod-${idFila}`, filaDatos.proyectoCod);
         await obtenerTiposIRPF(`tipoIRPF-${idFila}`, filaDatos.tipoIRPFCod);
         await obtenerTiposIVA(`tipoIVA-${idFila}`, filaDatos.tipoIVACod);
-    
+
         document.querySelectorAll('.btnGuardarLinea').forEach(button => {
             button.addEventListener('click', guardarLineaFactura);
             button.disabled = true;
         });
-    
+
         document.querySelectorAll('.btnBorrarLinea').forEach(button => {
             button.addEventListener('click', borrarLineaFactura);
         });
-    
+
         const campo2 = document.getElementById(`campo2-${idFila}`);
         const campo3 = document.getElementById(`campo3-${idFila}`);
         const campo4 = document.getElementById(`campo4-${idFila}`);
         const importe = document.getElementById(`importe-${idFila}`);
-    
+
         const calcularImporte = () => {
-            const valor2 = parseFloat(campo2.innerText.trim()) || 0;
-            const valor3 = parseFloat(campo3.innerText.trim()) || 0;
-    
+            const valor2 = parseFloat(campo2.innerText.trim()) || 1;
+            const valor3 = parseFloat(campo3.innerText.trim()) || 1;
+
             if (!isNaN(valor2) && !isNaN(valor3)) {
                 const importeCalculado = valor2 * valor3;
                 importe.innerText = importeCalculado.toFixed(2);
             }
         };
-    
+
         [campo2, campo3].forEach(campo => {
             campo.addEventListener('input', calcularImporte);
         });
-    
+
         document.querySelectorAll(`#fila-${idFila} [contenteditable=true]`).forEach((element) => {
             element.addEventListener('input', () => {
                 const camposEditables = [`campo1-${idFila}`, `campo2-${idFila}`, `campo3-${idFila}`, `campo4-${idFila}`];
                 let algunCampoCambio = false;
-    
+
                 camposEditables.forEach((idCampo) => {
                     const campo = document.getElementById(idCampo);
                     if (campo && campo.innerText.trim() !== '') {
                         algunCampoCambio = true;
                     }
                 });
-    
+
                 const botonGuardar = document.getElementById(idBotonGuardar);
                 if (botonGuardar) { // Verifica si el botón existe
                     botonGuardar.disabled = !algunCampoCambio;
                 }
             });
         });
-    
+
         document.querySelectorAll(`#fila-${idFila} select`).forEach((select) => {
             select.addEventListener('change', () => {
                 const botonGuardar = document.getElementById(idBotonGuardar);
@@ -757,7 +767,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    
+
 
     async function rellenarYBloquearCamposFactura(factura) {
         // Rellenar los campos del formulario con los datos de facturación
@@ -819,7 +829,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 result.facturaLineas.forEach((linea) => {
                     agregarFilaExistente(linea);
                 });
-              
+
             } else {
                 console.log('No se encontraron datos de factura válidos en la respuesta.');
             }
@@ -881,10 +891,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     function abrirModalBorrar() {
-       
-       let empresaCod = document.getElementById('CodigoEmpresa').value;
-       let serieCod = document.getElementById('serieCod').value;
-       let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
+
+        let empresaCod = document.getElementById('CodigoEmpresa').value;
+        let serieCod = document.getElementById('serieCod').value;
+        let facturaVentaNum = document.getElementById('CodigoFactura').value.trim();
 
         // Mostrar el modal de confirmación
         const modalborrar = document.getElementById('modalborrar');
@@ -920,36 +930,36 @@ document.addEventListener("DOMContentLoaded", function () {
     function verificarCamposTabla() {
         let camposVacios = false;
         let botonesHabilitados = false;
-    
+
         // Obtener todas las celdas editables de la tabla
         const camposEditables = document.querySelectorAll('#DetalleFactura [contenteditable=true]');
         const selects = document.querySelectorAll('#DetalleFactura select');
         const botonesGuardar = document.querySelectorAll('.btnGuardarLinea');
-    
+
         // Verificar si alguna celda editable está vacía
         camposEditables.forEach(campo => {
             if (campo.innerText.trim() === '') {
                 camposVacios = true;
             }
         });
-    
+
         // Verificar si algún select no tiene opción seleccionada
         selects.forEach(select => {
             if (select.selectedIndex === -1 || !select.options[select.selectedIndex].value) {
                 camposVacios = true;
             }
         });
-    
+
         // Verificar si todos los botones de guardar están deshabilitados
         botonesGuardar.forEach(boton => {
             if (!boton.disabled) {
                 botonesHabilitados = true;
             }
         });
-    
+
         return !camposVacios && !botonesHabilitados; // Devolver true si no hay campos vacíos ni botones habilitados, de lo contrario, false
     }
-    
+
     async function verificarYMostrarParametrosDesdeURL() {
         // Obtener los parámetros de la URL
         const params = new URLSearchParams(window.location.search);
