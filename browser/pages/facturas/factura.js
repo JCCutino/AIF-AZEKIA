@@ -6,6 +6,10 @@ function formatearFecha(fecha) {
 
     return `${dia}/${mes}/${anio}`;
 }
+function mostrarPaginaAgregarFactura() {
+    window.location.href = '/crearfactura';
+}
+
 async function mostrarDatosEnTabla(data) {
     // Obtener la tabla HTML
     const tabla = document.getElementById('tablaFacturas');
